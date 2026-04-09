@@ -1,6 +1,6 @@
 # Documento de Diseño
 
--Nombre:
+-Nombre: Pill of Silence.
 
 -Género/Subtipo: Shooter/Aventura
 
@@ -10,6 +10,6 @@
 
 -Estética: Pixelado, temática del estilo. Orientado a un mundo oscuro.
 
--Mecanismos: disparar, recargar, melee, (ampliable).
+-Mecánicas: disparar, recargar, melee, diálogos.
 
 -Escenarios: Ciudades destruidas, claros desiertos, pasillos muy estrechos.
