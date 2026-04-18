@@ -2,17 +2,31 @@ import arcade
 from vista.inventory import *
 from vista.textos import *
 
+
 class Jugador(arcade.SpriteSolidColor):
     def __init__(self):
         super().__init__(32, 32, arcade.color.AQUAMARINE)
         
         self.vida = 100
         self.municion = 30
-        self.velocidad = 5
+        self.vel_caminar = 5
+        self.velocidad = self.vel_caminar
+        self.vel_correr = 10
+        self.esta_corriendo = False
+        self.stamina_agotada = False
         self.capacidad = 8 # NOTE: Está hardcodeada la capacidad del invetario.  
         self.inventory = [None] * self.capacidad
         self.vistaInventario = BaseInventoryUI(self.capacidad) 
         self.indice_seleccionado = None
+        self.indice_activo = 0
+        self.stamina = 100; 
+        self.max_stamina = 100.0
+        self.stamina_cooldown_timer = 0.0
+        self.stamina_delay= 1.5 
+        self.stamina_exhausted_delay = 3.0
+        self.tasa_consumo_stamina = 25
+        self.tasa_regen_stamina = 25
+        
 
     def draw_inventory(self): 
         self.vistaInventario.draw(self.inventory, self.indice_seleccionado )
@@ -51,3 +65,43 @@ class Jugador(arcade.SpriteSolidColor):
             return objeto
            
         return None
+
+
+    def move(self, arriba, abajo, izq, der, shift, delta_time):
+
+        intencion_movimiento = arriba or abajo or izq or der
+        
+        #Logica de velocidad
+        if shift and intencion_movimiento and self.stamina > 0:
+            self.velocidad_actual = self.vel_correr
+            self.stamina -= self.tasa_consumo_stamina * delta_time
+            self.stamina_cooldown_timer = self.stamina_delay
+            if self.stamina <= 0:
+                self.stamina = 0
+                self.stamina_cooldown_timer = self.stamina_exhausted_delay
+        else:
+            self.velocidad_actual = self.vel_caminar
+            if self.stamina_cooldown_timer > 0:
+                self.stamina_cooldown_timer -= delta_time
+            elif self.stamina < self.max_stamina:
+                self.stamina += self.tasa_regen_stamina * delta_time
+
+        # 3. Calcular change_x y change_y
+        self.change_x = 0
+        self.change_y = 0
+
+        if arriba and not abajo:
+            self.change_y = self.velocidad_actual
+        elif abajo and not arriba:
+            self.change_y = -self.velocidad_actual
+
+        if izq and not der:
+            self.change_x = -self.velocidad_actual
+        elif der and not izq:
+            self.change_x = self.velocidad_actual
+
+
+    def cambiar_slot(self, indice):
+        if 0 <= indice < 4:
+            self.indice_activo = indice
+            ## TODO: Añadir sonidos 

@@ -1,140 +1,149 @@
 import arcade
 
+# --- CLASES DE OBJETOS ---
+
 class Bloque(arcade.Sprite):
-    def __init__(self, width=32, height=32, color=arcade.color.GRAY):
+    def __init__(self, width, height, ruta_imagen=None, color=arcade.color.GRAY):
         super().__init__()
+        
+        if ruta_imagen:
+            try:
+                self.texture = arcade.load_texture(ruta_imagen)
+            except Exception:
+                self.texture = arcade.make_soft_square_texture(max(width, height), color, 255, 255)
+        else:
+            self.texture = arcade.make_soft_square_texture(max(width, height), color, 255, 255)
 
-        # Arcade 2.x solo genera cuadrados, así que usamos el mayor lado
-        size = max(width, height)
-
-        # Creamos textura temporal
-        self.texture = arcade.make_soft_square_texture(
-            size,
-            color,
-            255,
-            255
-        )
-
-        # Ajustamos tamaño real del sprite
         self.width = width
         self.height = height
 
-
 class Puerta(arcade.Sprite):
-    def __init__(self, x, y, width=32, height=64, tiempo_apertura=1.5, tiempo_cierre=1.0):
+    def __init__(self, x, y, width, height, ruta_cerrada=None, ruta_abierta=None, tiempo_apertura= 0.5, tiempo_cierre= 0.5):
         super().__init__()
         self.center_x = x
         self.center_y = y
-
         self.width = width
         self.height = height
 
+        # Tiempos de animación
         self.tiempo_apertura = tiempo_apertura
         self.tiempo_cierre = tiempo_cierre
-
-        self.estado = "cerrada"
         self.tiempo_estado = 0.0
+        
+        self.estado = "cerrada"
         self.activa_colision = True
 
-        self.texture_cerrada = arcade.make_soft_square_texture(width, arcade.color.DARK_BROWN, 255, 255)
-        self.texture_abierta = arcade.make_soft_square_texture(width, arcade.color.DARK_GREEN, 255, 255)
-        self.texture = self.texture_cerrada
+        # Carga de texturas con Fallback
+        self.frames = [
+            self._cargar_tex(ruta_cerrada, arcade.color.DARK_BROWN, width, height),
+            self._cargar_tex(ruta_abierta, arcade.color.DARK_GREEN, width, height)
+        ]
+        
+        # El len es simplemente la longitud de esa lista
+        self.cantidad_frames = len(self.frames) 
+        
+        # Inicializamos con el primer frame (cerrada)
+        self.texture = self.frames[0]
+
+    def _cargar_tex(self, ruta, color_alternativo, w, h):
+        if ruta:
+            try:
+                return arcade.load_texture(ruta)
+            except Exception:
+                return arcade.make_soft_square_texture(max(w, h), color_alternativo, 255, 255)
+        return arcade.make_soft_square_texture(max(w, h), color_alternativo, 255, 255)
 
     def interactuar(self):
         if self.estado == "cerrada":
             self.estado = "abriendo"
-            self.tiempo_estado = 0.0
         elif self.estado == "abierta":
             self.estado = "cerrando"
-            self.tiempo_estado = 0.0
+        self.tiempo_estado = 0.0
 
-    def update(self, delta_time=0.0, *args, **kwargs):
+    def update(self, delta_time=1/60):
         if self.estado == "abriendo":
             self.tiempo_estado += delta_time
-            if self.tiempo_estado >= self.tiempo_apertura:
+            
+            # Calculamos el progreso (de 0.0 a 1.0)
+            progreso = min(self.tiempo_estado / self.tiempo_apertura, 1.0)
+            
+            # Mapeamos el progreso al índice de la lista de frames
+            # Si hay 5 frames, los índices son 0, 1, 2, 3, 4
+            indice = int(progreso * (len(self.frames) - 1))
+            self.texture = self.frames[indice]
+
+            if progreso >= 1.0:
                 self.estado = "abierta"
-                self.tiempo_estado = 0.0
                 self.activa_colision = False
-                self.texture = self.texture_abierta
 
         elif self.estado == "cerrando":
             self.tiempo_estado += delta_time
-            if self.tiempo_estado >= self.tiempo_cierre:
-                self.estado = "cerrada"
-                self.tiempo_estado = 0.0
-                self.activa_colision = True
-                self.texture = self.texture_cerrada
-
-def crear_casa(x, y, ancho_habitable, alto_habitable, grosor, direcciones_puerta, ancho_puerta):
-    lista_bloques = []
-    lista_puertas = []
-
-    # Límites exteriores (aseguramos enteros)
-    izquierda = x - ancho_habitable // 2 - grosor // 2
-    derecha = x + ancho_habitable // 2 + grosor // 2
-    abajo = y - alto_habitable // 2 - grosor // 2
-    arriba = y + alto_habitable // 2 + grosor // 2
-
-    def crear_pared_horizontal(y_pared, tiene_puerta):
-        ancho_total = ancho_habitable + grosor * 2
-        if not tiene_puerta:
-            bloque = Bloque(ancho_total, grosor)
-            bloque.center_x = x
-            bloque.center_y = y_pared
-            lista_bloques.append(bloque)
-        else:
-            # Segmento de pared a cada lado de la puerta
-            lateral = (ancho_total - ancho_puerta) // 2
             
-            # Bloque izquierdo
-            bloque_izq = Bloque(lateral, grosor)
-            bloque_izq.center_x = x - ancho_total // 2 + lateral // 2
-            bloque_izq.center_y = y_pared
-            lista_bloques.append(bloque_izq)
+            progreso = min(self.tiempo_estado / self.tiempo_cierre, 1.0)
+            
+            # Al cerrar, invertimos el índice (va del último al primero)
+            indice = (len(self.frames) - 1) - int(progreso * (len(self.frames) - 1))
+            self.texture = self.frames[indice]
 
-            # Bloque derecho
-            bloque_der = Bloque(lateral, grosor)
-            bloque_der.center_x = x + ancho_total // 2 - lateral // 2
-            bloque_der.center_y = y_pared
-            lista_bloques.append(bloque_der)
+            if progreso >= 1.0:
+                self.estado = "cerrada"
+                self.activa_colision = True
 
-            # Puerta (el ancho_puerta ahora sí define el hueco real)
-            puerta = Puerta(x, y_pared, width=ancho_puerta, height=grosor)
-            lista_puertas.append(puerta)
-            lista_bloques.append(puerta)
 
-    def crear_pared_vertical(x_pared, tiene_puerta):
-        alto_total = alto_habitable + grosor * 2
+
+
+
+# --- FUNCIÓN CONSTRUCTORA ---
+
+def crear_casa(x, y, ancho_habitable, alto_habitable, grosor, direcciones_puerta, ancho_puerta, ruta_pared=None):
+    """
+    Crea una estructura de casa evitando el solape de esquinas.
+    """
+    lista_bloques = arcade.SpriteList()
+    lista_puertas = arcade.SpriteList()
+
+    # Calculamos dimensiones totales para que las esquinas encajen perfecto
+    ancho_total = ancho_habitable + (grosor * 2)
+    alto_total = alto_habitable + (grosor * 2)
+
+    # Definimos las 4 paredes (Nombre, es_horizontal, posicion_eje, largo_total)
+    config_paredes = [
+        ("NORTE", True,  y + alto_habitable // 2 + grosor // 2, ancho_total),
+        ("SUR",   True,  y - alto_habitable // 2 - grosor // 2, ancho_total),
+        ("OESTE", False, x - ancho_habitable // 2 - grosor // 2, alto_total),
+        ("ESTE",  False, x + ancho_habitable // 2 + grosor // 2, alto_total),
+    ]
+
+    for nombre, es_horiz, pos_eje, largo_max in config_paredes:
+        tiene_puerta = nombre in direcciones_puerta
+
         if not tiene_puerta:
-            bloque = Bloque(grosor, alto_total)
-            bloque.center_x = x_pared
-            bloque.center_y = y
+            # Pared completa
+            w, h = (largo_max, grosor) if es_horiz else (grosor, largo_max)
+            bloque = Bloque(w, h, ruta_imagen=ruta_pared)
+            bloque.position = (x, pos_eje) if es_horiz else (pos_eje, y)
             lista_bloques.append(bloque)
         else:
-            # Segmento de pared arriba y abajo de la puerta
-            lateral = (alto_total - ancho_puerta) // 2
+            # Pared partida en dos por una puerta
+            largo_segmento = (largo_max - ancho_puerta) / 2
+            offset = (largo_max / 2) - (largo_segmento / 2)
 
-            # Bloque inferior
-            bloque_inf = Bloque(grosor, lateral)
-            bloque_inf.center_x = x_pared
-            bloque_inf.center_y = y - alto_total // 2 + lateral // 2
-            lista_bloques.append(bloque_inf)
+            # Creamos los dos segmentos de muro
+            for i in [-1, 1]:
+                w_seg, h_seg = (largo_segmento, grosor) if es_horiz else (grosor, largo_segmento)
+                seg = Bloque(int(w_seg), int(h_seg), ruta_imagen=ruta_pared)
+                if es_horiz:
+                    seg.position = (x + (i * offset), pos_eje)
+                else:
+                    seg.position = (pos_eje, y + (i * offset))
+                lista_bloques.append(seg)
 
-            # Bloque superior
-            bloque_sup = Bloque(grosor, lateral)
-            bloque_sup.center_x = x_pared
-            bloque_sup.center_y = y + alto_total // 2 - lateral // 2
-            lista_bloques.append(bloque_sup)
-
-            # Puerta (Corregido: el height de la puerta es el ancho_puerta)
-            puerta = Puerta(x_pared, y, width=grosor, height=ancho_puerta)
+            # Creamos la puerta en el hueco
+            w_p, h_p = (ancho_puerta, grosor) if es_horiz else (grosor, ancho_puerta)
+            puerta = Puerta(pos_eje if not es_horiz else x, 
+                            pos_eje if es_horiz else y, 
+                            int(w_p), int(h_p))
             lista_puertas.append(puerta)
-            lista_bloques.append(puerta)
-
-    # Construcción de las 4 paredes
-    crear_pared_horizontal(arriba, "NORTE" in direcciones_puerta)
-    crear_pared_horizontal(abajo, "SUR" in direcciones_puerta)
-    crear_pared_vertical(izquierda, "OESTE" in direcciones_puerta)
-    crear_pared_vertical(derecha, "ESTE" in direcciones_puerta)
+            lista_bloques.append(puerta) # Añadida a bloques para las colisiones físicas
 
     return lista_puertas, lista_bloques
