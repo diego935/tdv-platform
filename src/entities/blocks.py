@@ -56,9 +56,10 @@ class Puerta(arcade.Sprite):
     def interactuar(self):
         if self.estado == "cerrada":
             self.estado = "abriendo"
+            self.tiempo_estado = 0.0
         elif self.estado == "abierta":
             self.estado = "cerrando"
-        self.tiempo_estado = 0.0
+            self.tiempo_estado = 0.0
 
     def update(self, delta_time=1/60):
         if self.estado == "abriendo":

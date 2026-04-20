@@ -7,7 +7,7 @@ class ItemManager:
         if cls._instance is None:
             cls._instance = super(ItemManager, cls).__new__(cls)
             # Aquí vive la lista de Sprites u objetos en el suelo
-            cls._instance.items_on_ground = arcade.SpriteList() 
+            cls._instance.items_on_ground = arcade.SpriteList(use_spatial_hash=True) 
         return cls._instance
 
     def add_to_world(self, item):

@@ -1,6 +1,10 @@
 import arcade
 
 class AssetManager:
+    """
+    Es otro Singleton
+    
+    """
     _instance = None
     _textures = {}
 
@@ -15,6 +19,5 @@ class AssetManager:
                 self._textures[path] = arcade.load_texture(path)
             except Exception as e:
                 print(f"Error cargando {path}: {e}")
-                # Generamos una textura de emergencia para no ver cuadros morados
                 self._textures[path] = arcade.Texture.create_filled(f"err_{path}", (32, 32), arcade.color.MAGENTA)
         return self._textures[path]
