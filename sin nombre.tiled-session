@@ -1,0 +1,26 @@
+{
+    "activeFile": "assets/maps/mapa.tmx",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "assets/maps/mapa.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 375,
+                "y": 146.5
+            }
+        }
+    },
+    "map.height": 200,
+    "map.lastUsedFormat": "tmx",
+    "map.width": 200,
+    "openFiles": [
+        "assets/maps/mapa.tmx"
+    ],
+    "project": "sin nombre.tiled-project",
+    "property.type": "color",
+    "recentFiles": [
+        "assets/maps/mapa.tmx"
+    ]
+}
