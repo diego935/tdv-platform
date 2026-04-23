@@ -4,24 +4,37 @@
     ],
     "file.lastUsedOpenFilter": "Todos los archivos (*)",
     "fileStates": {
+        "": {
+            "scaleInDock": 0.125
+        },
         "assets/maps/mapa.tmx": {
-            "scale": 1,
-            "selectedLayer": 1,
+            "scale": 1.5,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 414,
-                "y": 136.5
+                "x": 55.333333333333314,
+                "y": 42.333333333333314
             }
+        },
+        "assets/tilesets/Ejemplo.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 4,
+            "scaleInEditor": 11
         }
     },
+    "last.imagePath": "C:/Users/D4NI/Documents/Tec.Videojuegos/tdv-platform/assets/tilesets",
     "map.height": 200,
     "map.lastUsedFormat": "tmx",
     "map.width": 200,
     "openFiles": [
-        "assets/maps/mapa.tmx"
+        "assets/maps/mapa.tmx",
+        "assets/tilesets/Ejemplo.tsx"
     ],
     "project": "sin nombre.tiled-project",
-    "property.type": "color",
+    "property.type": "object",
     "recentFiles": [
+        "assets/tilesets/Ejemplo.tsx",
         "assets/maps/mapa.tmx"
-    ]
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.type": 0
 }
