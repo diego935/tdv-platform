@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="32" tileheight="32" infinite="1" nextlayerid="5" nextobjectid="37">
+ <layer id="2" name="Layout" width="200" height="200" offsetx="16" offsety="17">
+  <data encoding="csv"/>
+ </layer>
+ <objectgroup id="3" name="Zonas" offsetx="16" offsety="17">
+  <object id="1" name="Spawnpoint" x="0" y="0">
+   <properties>
+    <property name="Color" type="color" value="#ff55ffff"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="26" name="Home" x="-160.667" y="-158.103" width="320" height="316.603"/>
+  <object id="31" name="Camino intermedio" x="160" y="-32" width="384" height="64"/>
+  <object id="35" name="Hostil 1" x="576" y="-96" width="249" height="178"/>
+ </objectgroup>
+ <objectgroup color="#f73117" id="4" name="Eventos" offsetx="16" offsety="17">
+  <object id="30" name="Puerta/Paso" x="128" y="-32" width="32" height="64"/>
+  <object id="34" name="Puerta/Paso" x="544" y="-32" width="32" height="64"/>
+ </objectgroup>
+</map>
