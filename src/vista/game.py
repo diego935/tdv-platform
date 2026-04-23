@@ -81,7 +81,7 @@ class VistaJuego(arcade.View):
             pedernal.center_y = random.randint(200, 400)
             
             # Los añadimos al Manager para que aparezcan en el suelo
-            ItemManager().add_to_world(pedernal)
+            self.item_manager.add_to_world(pedernal)
 
 
 

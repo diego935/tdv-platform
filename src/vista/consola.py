@@ -16,7 +16,8 @@ class ConsoleUI:
             "path": False,
             "graph": False,
             "test_nodes": False,
-            "blocks" : False
+            "blocks" : False,
+            "chunks": False
         }
         self.test_origin = None
         self.test_dest = None
@@ -38,6 +39,31 @@ class ConsoleUI:
         """Dibuja cosas en las coordenadas del juego (dentro de la cámara)"""
         if not self.active:
             return
+            
+        if self.flags["chunks"]:
+            # Obtenemos el tamaño de los chunks (por defecto 512 si no existe)
+            size = getattr(nav_manager, "chunk_size", 512)
+            
+            # Dibujamos un área alrededor de la cámara (puedes ajustar el rango)
+            window = arcade.get_window()
+            cam_x, cam_y = window.current_camera.position
+            
+            start_x = int((cam_x - window.width) // size) * size
+            end_x = int((cam_x + window.width) // size) * size
+            start_y = int((cam_y - window.height) // size) * size
+            end_y = int((cam_y + window.height) // size) * size
+
+            for x in range(start_x, end_x + size, size):
+                arcade.draw_line(x, start_y, x, end_y, arcade.color.ASH_GREY, 1)
+            for y in range(start_y, end_y + size, size):
+                arcade.draw_line(start_x, y, end_x, y, arcade.color.ASH_GREY, 1)
+            
+            # Opcional: Dibujar el ID del chunk en el centro
+            for x in range(start_x, end_x, size):
+                for y in range(start_y, end_y, size):
+                    cx, cy = x // size, y // size
+                    arcade.draw_text(f"[{cx},{cy}]", x + 5, y + 5, 
+                                     arcade.color.ASH_GREY, 8)
 
         # 1. Dibujar Hitboxes (rectángulos verdes alrededor de bloques)
         if self.flags["hitbox"]:
@@ -200,35 +226,27 @@ def cmd_nav(vista, args):
 
     return "Subcomando no válido.", "ERROR"
 def cmd_debug(vista, args):
-    """
-    Alterna la visualización de ayudas visuales.
-    Uso: debug [hitbox | path | graph | nodes]
-    """
     if not args:
-        # Si no hay argumentos, mostramos el estado actual de las banderas
         estados = ", ".join([f"{k}: {'ON' if v else 'OFF'}" for k, v in vista.console.flags.items()])
         return f"Flags actuales -> {estados}", "INFO"
     
     opcion = args[0].lower()
     
-    # Mapeo de nombres cortos a las llaves del diccionario flags
-    # Por si quieres escribir 'nodes' en lugar de 'test_nodes'
     mapping = {
         "hitbox": "hitbox",
         "path": "path",
         "graph": "graph",
-        "nodes": "test_nodes"
+        "nodes": "test_nodes",
+        "chunks": "chunks"  
     }
 
     if opcion in mapping:
         key = mapping[opcion]
-        # Invertimos el valor booleano
         vista.console.flags[key] = not vista.console.flags[key]
-        
         estado = "ACTIVADO" if vista.console.flags[key] else "DESACTIVADO"
         return f"Debug {opcion}: {estado}", "SUCCESS"
     
-    return f"La opción '{opcion}' no existe. Prueba con: hitbox, path, graph o nodes.", "ERROR"
+    return f"La opción '{opcion}' no existe. Prueba con: hitbox, path, graph, nodes o chunks.", "ERROR"
 
 
 
