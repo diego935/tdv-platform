@@ -1,13 +1,14 @@
 import arcade
 from config import ANCHO_VENTANA, ALTO_VENTANA, COLOR_FONDO_JUEGO
 from entities.player import Jugador
-from entities.enemy import Enemigo
+from entities.enemy import *
 from entities.blocks import *
 from vista.inventory import * 
 from vista.textos import TextManager 
 from items.item_manager import * 
 from items.items import * 
 from vista.hud import HUD
+from vista.consola import * 
 import random
 
 
@@ -22,6 +23,10 @@ class VistaJuego(arcade.View):
         self.camera = None
         self.hud = None 
         self.estado_actual = "MENU"
+        self.console = None
+        self.mouse_world_x = None 
+        self.mouse_world_y = None  
+        self.nav_manager = None
 
         self.show_inventory = False 
         self.izquierda_presionado = False
@@ -43,6 +48,8 @@ class VistaJuego(arcade.View):
         self.camera = arcade.camera.Camera2D()
         self.estado_actual ="JUGANDO"
         self.hud = HUD()
+        self.console = ConsoleUI()
+
         
 
         self.sprite_jugador = Jugador()
@@ -74,11 +81,12 @@ class VistaJuego(arcade.View):
             pedernal.center_y = random.randint(200, 400)
             
             # Los añadimos al Manager para que aparezcan en el suelo
-            ItemManager().add_to_world(pedernal)
+            self.item_manager.add_to_world(pedernal)
 
 
 
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
+        self.nav_manager = SistemaNavegacion(self.lista_bloques)
 
 
     def on_draw(self):
@@ -92,6 +100,7 @@ class VistaJuego(arcade.View):
             self.item_manager.draw()
             self.lista_enemigos.draw()
             self.lista_jugadores.draw()
+            self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager)
         
             # Dibujamos textos que están en el suelo o sobre objetos/NPCs
             self.text_manager.draw()
@@ -102,7 +111,10 @@ class VistaJuego(arcade.View):
         # El inventario suele ser fijo en pantalla para que el jugador lo vea siempre
         
         if self.show_inventory:
-            self.sprite_jugador.draw_inventory()    
+            self.sprite_jugador.draw_inventory() 
+               
+        if self.estado_actual == "CONSOLE":
+            self.console.draw()
 
     def cerca_con_margen(self, sprite1, sprite2, margen=10):
         dx = abs(sprite1.center_x - sprite2.center_x)
@@ -116,8 +128,8 @@ class VistaJuego(arcade.View):
     def on_update(self, delta_time):
         
         
-        if self.show_inventory: # Por si se quiere pausar el movimiento al abrir el inventario
-            return 
+        if self.show_inventory or self.estado_actual== "CONSOLE":
+            self.console.update(delta_time,self     )
 
         self.sprite_jugador.move(
         self.arriba_presionado,
@@ -133,52 +145,105 @@ class VistaJuego(arcade.View):
         self.lista_enemigos.update()
 
         ## Sincroniza el estado de las puerts
+        cambio_detectado = False
+
         for puerta in self.lista_puertas:
             if puerta.activa_colision and puerta not in self.lista_bloques:
                 self.lista_bloques.append(puerta)
+                cambio_detectado = True
             elif not puerta.activa_colision and puerta in self.lista_bloques:
                 self.lista_bloques.remove(puerta)
+                cambio_detectado = True
+
+        
+        if cambio_detectado:
+            self. nav_manager.actualizar_grafo_async()
 
         self.physics_engine.update()
         self.camera.position = self.sprite_jugador.position
         self.text_manager.update()
         self.item_manager.update()
-    def on_key_press(self, key, modifiers):
-        # --- 1. ACCIONES DE INTERFAZ (Prioridad máxima) ---
-        if key == arcade.key.TAB:
-            self.show_inventory = not self.show_inventory
-            return # Si tocamos la interfaz, no queremos que el jugador haga nada más
 
+    def on_text_input(self, text):
+        if self.estado_actual =="CONSOLE":
+            self.console.input_text += text
+
+
+    def on_key_press(self, key, modifiers):
+        # 1. Abrir/Cerrar consola
+        if key == arcade.key.F1:
+            if self.estado_actual == "CONSOLE":
+                self.estado_actual = "JUGANDO"
+                self.console.active = False
+            else:
+                self.estado_actual = "CONSOLE"
+                self.console.active = True
+                self.console.input_text = ""
+            return
+
+        # 2. SI LA CONSOLA ESTÁ ACTIVA
+        if self.estado_actual == "CONSOLE":
+            # Ejecutar comando
+            if key == arcade.key.ENTER:
+                self.procesar_comando(self.console.input_text)
+                self.console.input_text = ""
+                return
+            
+            # Borrar último carácter
+            elif key == arcade.key.BACKSPACE:
+                self.console.input_text = self.console.input_text[:-1]
+                return
+
+            # --- CAPTURA MANUAL DE CARACTERES ---
+            # Solo permitimos teclas que "escriben" (Letras, Números, Espacio, Guión)
+            if (key >= arcade.key.A and key <= arcade.key.Z) or \
+               (key >= arcade.key.KEY_0 and key <= arcade.key.KEY_9) or \
+               key == arcade.key.SPACE or key == arcade.key.MINUS:
+                
+                # Convertimos el código de tecla a carácter
+                char = chr(key)
+                
+                # Si SHIFT está pulsado, pasamos a mayúsculas
+                if modifiers & arcade.key.MOD_SHIFT:
+                    char = char.upper()
+                
+                self.console.input_text += char
+            
+            # MUY IMPORTANTE: Bloqueamos cualquier otra acción mientras la consola está abierta
+            return 
+
+        # 3. ACCIONES DEL INVENTARIO (Solo si consola cerrada)
         if self.show_inventory:
-            # Si el inventario está abierto, solo escuchamos la tecla Q para soltar
-            if key == arcade.key.Q:
+            if key == arcade.key.TAB:
+                self.show_inventory = False
+            elif key == arcade.key.Q:
                 self.ejecutar_soltar_item()
             return
 
-        # --- 2. ACCIONES DEL MUNDO (Solo si el inventario está cerrado) ---
-        
-        # Movimiento (Banderas)
+        # 4. ACCIONES DE JUEGO NORMAL
+        if key == arcade.key.TAB:
+            self.show_inventory = True
+            return
+
+        # Movimiento
         if key in [arcade.key.W, arcade.key.UP]: self.arriba_presionado = True
         elif key in [arcade.key.S, arcade.key.DOWN]: self.abajo_presionado = True
         elif key in [arcade.key.A, arcade.key.LEFT]: self.izquierda_presionado = True
         elif key in [arcade.key.D, arcade.key.RIGHT]: self.derecha_presionado = True
         elif key in [arcade.key.LSHIFT, arcade.key.RSHIFT]: self.shift_presionado = True
 
-        if key in [arcade.key.KEY_1, arcade.key.KEY_2, arcade.key.KEY_3, arcade.key.KEY_4]:
-            indice = key - arcade.key.KEY_1
-            
-            if self.estado_actual == "JUGANDO":
-                self.sprite_jugador.indice_activo = indice
-            elif self.estado_actual == "DIALOGO":
-                pass
-
-
-        # Interacción (Lógica de la Vista, porque implica otros objetos)
-        elif key == arcade.key.E:
+        # Interacción y Slots
+        if key == arcade.key.E:
             self.ejecutar_interaccion()
+        elif key in [arcade.key.KEY_1, arcade.key.KEY_2, arcade.key.KEY_3, arcade.key.KEY_4]:
+            self.sprite_jugador.indice_activo = key - arcade.key.KEY_1
+
 
     def ejecutar_interaccion(self):
-        """Lógica separada para no ensuciar el on_key_press"""
+        """
+        Lógica separada para no ensuciar el on_key_press
+        Aqui se maneja la inteeracción con, puertas, objetos, posiblemente dialogos, todo lo que se active con la e 
+        """
         for puerta in self.lista_puertas:
             if self.cerca_con_margen(self.sprite_jugador, puerta, 15):
                 puerta.interactuar()
@@ -195,11 +260,10 @@ class VistaJuego(arcade.View):
                 self.item_manager.add_to_world(objeto)
 
     def on_mouse_motion(self, x, y, dx, dy):
+        self.mouse_world_x = x + self.camera.position.x - self.window.width / 2
+        self.mouse_world_y = y + self.camera.position.y - self.window.height / 2
         if self.show_inventory:
-
             indice = self.sprite_jugador.vistaInventario.get_slot_at_pointer(x, y)
-            
-            # Guardamos el índice seleccionado para que el draw lo use
             self.sprite_jugador.indice_seleccionado = indice
 
 
@@ -224,3 +288,26 @@ class VistaJuego(arcade.View):
                 self.derecha_presionado = False
             elif key in [arcade.key.LSHIFT, arcade.key.RSHIFT]:
                 self.shift_presionado = False
+    
+
+    def procesar_comando(self, comando_raw):
+        partes = comando_raw.strip().split()
+        if not partes:
+            return
+
+        nombre_cmd = partes[0].lower()
+        args = partes[1:]
+        
+        self.console.add_to_history(f"> {comando_raw}")
+
+        # Buscamos si el comando existe en nuestro diccionario de comandos.py
+        if nombre_cmd in COMANDOS:
+            try:
+                # Ejecutamos la función pasando la vista (self) y los argumentos
+                resultado = COMANDOS[nombre_cmd](self, args)
+                if resultado:
+                    self.console.add_to_history(resultado)
+            except Exception as e:
+                self.console.add_to_history(f"Error de ejecución: {e}")
+        else:
+            self.console.add_to_history(f"Comando '{nombre_cmd}' no reconocido.")
