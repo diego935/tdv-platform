@@ -1,9 +1,11 @@
 import arcade
+from vista.asset_manager import AssetManager
 
 
 class BaseItem(arcade.Sprite):
     def __init__(self, item_id, name, sprite_path, description="", durability=100.0):
-        super().__init__(filename=sprite_path)
+        texture = AssetManager().get_texture(sprite_path)
+        super().__init__(texture, scale=0.5)
 
         self.id = item_id 
         self.name = name
