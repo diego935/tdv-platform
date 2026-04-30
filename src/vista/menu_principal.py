@@ -84,7 +84,7 @@ class MenuPrincipal(arcade.View):
         anchor_y="center",
         font_name="Times New Roman")
 
-        # TEXTO BOTÓN 2 (HISTORIA)
+        # TEXTO BOTÓN HISTORIA
         arcade.draw_text(
         "HISTORIA",
         center_x,
@@ -95,7 +95,7 @@ class MenuPrincipal(arcade.View):
         anchor_y="center",
         font_name="Times New Roman")
 
-        # TEXTO BOTÓN 3 (CONTROLES)
+        # TEXTO BOTÓN CONTROLES
         arcade.draw_text(
         "CONTROLES",
         center_x,
@@ -106,11 +106,36 @@ class MenuPrincipal(arcade.View):
         anchor_y="center",
         font_name="Times New Roman")
 
-        # Botones
-        for boton in self.botones:
-            boton.dibujar()
-
     def on_mouse_press(self, x, y, button, modifiers):
-        for boton in self.botones:
-            if boton.esta_pulsado(x, y):
-                print(f"Has pulsado: {boton.texto}")
+        center_x = self.window.width / 2
+        center_y = self.window.height / 2
+        half_width = self.window.width * 0.30
+        half_height = self.window.height * 0.06
+
+        # BOTÓN JUGAR
+        left = center_x - half_width
+        right = center_x + half_width
+        bottom = center_y + self.window.height * 0.02 - half_height
+        top = center_y + self.window.height * 0.10 + half_height
+
+        if left <= x <= right and bottom <= y <= top:
+            self.window.show_view(VistaJuego())
+            return
+
+        # BOTÓN HISTORIA
+        bottom = center_y - self.window.height * 0.16 - half_height
+        top = center_y - self.window.height * 0.14 + half_height
+
+        if left <= x <= right and bottom <= y <= top:
+            self.window.show_view(VistaHistoria())
+            return
+
+        # BOTÓN AJUSTES
+        bottom = center_y - self.window.height * 0.35 - half_height
+        top = center_y - self.window.height * 0.32 + half_height
+
+        if left <= x <= right and bottom <= y <= top:
+            self.window.show_view(VistaAjustes())
+            return
+
+    
