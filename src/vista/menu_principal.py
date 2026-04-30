@@ -1,5 +1,6 @@
 import arcade
-from Boton import Boton
+from vista_historia import VistaHistoria
+from vista_ajustes import VistaAjustes
 
 
 
