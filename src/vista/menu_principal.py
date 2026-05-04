@@ -1,6 +1,7 @@
 import arcade
 from vista_historia import VistaHistoria
 from vista_ajustes import VistaAjustes
+from menu import VistaJuego
 
 
 
