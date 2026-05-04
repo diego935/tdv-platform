@@ -187,6 +187,15 @@ def cmd_heal(vista, args):
     vista.sprite_jugador.vida = vista.sprite_jugador.stamina = 100
     return "Salud y stamina al máximo.", "SUCCESS"
 
+def cmd_dummy(vista, args):
+    try:
+        from entities.enemy import DummyEnemy
+        dummy = DummyEnemy(vista.mouse_world_x, vista.mouse_world_y)
+        vista.lista_enemigos.append(dummy)
+        return "Dummy enemigo creado!", "SUCCESS"
+    except Exception as e:
+        return f"Error: {e}", "ERROR"
+
 def cmd_bloque(vista, args):
     try:
         size = int(args[0]) if args else 32
@@ -278,6 +287,7 @@ COMANDOS = {
     "spawn": cmd_spawn,
     "tp": cmd_tp,
     "heal": cmd_heal,
+    "dummy": cmd_dummy,
     "bloque": cmd_bloque,
     "nav": cmd_nav,
     "debug": cmd_debug, 

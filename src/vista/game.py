@@ -161,7 +161,15 @@ class VistaJuego(arcade.View):
         self.lista_enemigos.update()
 
         for p in self.lista_proyectiles:
-            p.update(delta_time, self.lista_bloques, self.lista_enemigos)
+            if hasattr(p, 'update'):
+                p.update(delta_time, self.lista_bloques, self.lista_enemigos)
+            elif hasattr(p, 'on_update'):
+                p.on_update(delta_time)
+            if hasattr(p, 'update_enemies'):
+                p.update_enemies(self.lista_enemigos)
+            if hasattr(p, '_actualizar_posicion'):
+                p._actualizar_posicion()
+
         self.lista_proyectiles = [p for p in self.lista_proyectiles if not p.killed]
         
         # Update weapon cooldowns

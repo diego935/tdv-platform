@@ -11,7 +11,7 @@ from items.items import BaseItem
 # ==================== PROYECTIL ====================
 
 class Proyectil:
-    """Proyectil para armas de fuego (sin heredar de Sprite para evitar problemas)."""
+    """Proyectil para armas de fuego."""
 
     def __init__(
         self,
@@ -56,7 +56,7 @@ class Proyectil:
             for enemy in enemies_list:
                 if self._check_collision(enemy):
                     if hasattr(enemy, 'recibir_dano'):
-                        enemy.recibir_dano(self.damage)
+                        enemy.recibir_dano(self.damage, self.center_x, self.center_y)
                     elif hasattr(enemy, 'vida'):
                         enemy.vida -= self.damage
                     self.alive = False
@@ -75,31 +75,8 @@ class Proyectil:
         return dx < (self.radio + other.width / 2) and dy < (self.radio + other.height / 2)
 
     @property
-    def kill(self):
-        self.alive = False
-
-    @property
     def killed(self):
         return not self.alive
-
-    def on_collision_with_enemy(self, enemy):
-        """Called when the projectile collides with an enemy."""
-        if hasattr(enemy, 'recibir_dano'):
-            enemy.recibir_dano(self.damage)
-        elif hasattr(enemy, 'vida'):
-            enemy.vida -= self.damage
-        self.kill()
-
-    def on_collision_with_block(self, block):
-        """Called when the projectile collides with a block."""
-        self.kill()
-
-    def aplicar_daño(self, objetivo):
-        if hasattr(objetivo, 'recibir_dano'):
-            objetivo.recibir_dano(self.damage)
-        elif hasattr(objetivo, 'vida'):
-            objetivo.vida -= self.damage
-        self.kill()
 
 
 # ==================== WEAPON BASE ====================
@@ -274,7 +251,7 @@ class HitboxTemporal(arcade.SpriteSolidColor):
         super().__init__(
             width=int(width),
             height=int(height),
-            color=(255, 255, 255, 1)
+            color=(255, 255, 255, 200)
         )
 
         self.owner = owner
@@ -285,8 +262,19 @@ class HitboxTemporal(arcade.SpriteSolidColor):
         self.arc_angle = arc_angle
         self.offset_dist = offset_dist
         self._enemies_hit = set()
+        self.alive = True
 
         self._actualizar_posicion()
+
+    def draw(self):
+        pass
+
+    def update_enemies(self, enemies_list):
+        """Check collision with enemies"""
+        if not enemies_list:
+            return
+        for enemy in enemies_list:
+            self.verificar_colision(enemy)
 
     def _actualizar_posicion(self):
         if self.owner:
@@ -298,7 +286,11 @@ class HitboxTemporal(arcade.SpriteSolidColor):
         self._actualizar_posicion()
         self._timer += delta_time
         if self._timer >= self.lifetime:
-            self.kill()
+            self.alive = False
+
+    @property
+    def killed(self):
+        return not self.alive
 
     def verificar_colision(self, enemy) -> bool:
         enemy_id = id(enemy)
@@ -321,7 +313,7 @@ class HitboxTemporal(arcade.SpriteSolidColor):
 
     def _aplicar_daño(self, enemy):
         if hasattr(enemy, 'recibir_dano'):
-            enemy.recibir_dano(self.damage)
+            enemy.recibir_dano(self.damage, self.owner.center_x, self.owner.center_y)
         elif hasattr(enemy, 'vida'):
             enemy.vida -= self.damage
 
