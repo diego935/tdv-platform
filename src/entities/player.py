@@ -31,6 +31,14 @@ class Jugador(arcade.SpriteSolidColor):
         self.tasa_regen_stamina = 25
         #Curacion
         self.tasa_regen_hp = 15
+        self.direccion = "down"
+        self.texturas = {
+            "up": arcade.load_texture("assets/Jugador/Soldado mirando hacia arriba.png"),
+            "down": arcade.load_texture("assets/Jugador/Soldado mirando hacia abajo.png"),
+            "left": arcade.load_texture("assets/Jugador/Soldado mirando hacia izquierda.png"),
+            "right": arcade.load_texture("assets/Jugador/Soldado mirando hacia derecha.png"),
+        }
+
 
     def draw_inventory(self, mouse_pos=None): 
         self.vistaInventario.draw(self.inventory, self.vistaInventario._drag_source if hasattr(self.vistaInventario, '_drag_source') else None, mouse_pos)
@@ -72,6 +80,7 @@ class Jugador(arcade.SpriteSolidColor):
 
 
     def move(self, arriba, abajo, izq, der, shift, delta_time):
+        
 
         if self.curacion_pendiente > 0:
             cura_frame = self.velocidad_curacion * delta_time
@@ -108,13 +117,19 @@ class Jugador(arcade.SpriteSolidColor):
 
         if arriba and not abajo:
             self.change_y = self.velocidad_actual
+            self.direccion = "up"
         elif abajo and not arriba:
             self.change_y = -self.velocidad_actual
+            self.direccion = "down"
 
         if izq and not der:
             self.change_x = -self.velocidad_actual
+            self.direccion = "left"
         elif der and not izq:
             self.change_x = self.velocidad_actual
+            self.direccion = "right"
+
+        self.texture = self.texturas[self.direccion]
 
 
     def cambiar_slot(self, indice):
@@ -131,6 +146,7 @@ class Jugador(arcade.SpriteSolidColor):
         if arma and hasattr(arma, 'usar'):
             return arma.usar(self, target_x, target_y, proyectiles_list)
         return False 
+    
 
     def iniciar_curacion(self, cantidad, tiempo):
         """ Inicia un proceso de curación gradual """
