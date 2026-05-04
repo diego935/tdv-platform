@@ -76,13 +76,6 @@ class VistaJuego(arcade.View):
         self.sprite_jugador.position = (x_arcade, y_arcade)
         self.scene.add_sprite("Player", self.sprite_jugador)
 
-        # 4. Motor de física (usando la capa Layout para que el personaje no atraviese paredes)
-        self.physics_engine = arcade.PhysicsEngineSimple(
-            self.sprite_jugador, 
-            self.scene.get_sprite_list("Layout")
-        )
-        #------------------------------------------
-        
         self.window.background_color = COLOR_FONDO_JUEGO
 
         self.lista_jugadores = arcade.SpriteList()
@@ -99,22 +92,6 @@ class VistaJuego(arcade.View):
 
         self.lista_jugadores.append(self.sprite_jugador)
         
-        """puerta = Puerta(ANCHO_VENTANA // 2 + 300, ALTO_VENTANA // 2, width=100, height=300, tiempo_apertura=1.5, tiempo_cierre=1.0)
-        self.lista_puertas.append(puerta)
-        self.lista_bloques.append(puerta)"""
-
-        # puertas, bloques = crear_casa(
-        #     x=ANCHO_VENTANA // 2,
-        #     y=ALTO_VENTANA // 2,
-        #     ancho_habitable=500,
-        #     alto_habitable=500,
-        #     grosor=32,
-        #     direcciones_puerta=["NORTE", "ESTE"],
-        #     ancho_puerta=100
-        # )
-        # self.lista_puertas.extend(puertas)
-        # self.lista_bloques.extend(bloques)
-
         for i in range(10):
             pedernal = BaseItem(1, f"Pedernal {i+1}", "assets/items/Flint.png")
             
@@ -130,7 +107,15 @@ class VistaJuego(arcade.View):
         self.sprite_jugador.inventory[0] = Pistola()
         self.sprite_jugador.inventory[1] = Cuchillo()
 
+        # Motor de fisica - combinamos el tilemap con los bloques dinamicos
+        layout_layer = self.scene.get_sprite_list("Layout")
+        self.lista_bloques = arcade.SpriteList()
+        if layout_layer:
+            self.lista_bloques.extend(layout_layer)
+        
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
+        
+        # Sistema de navegacion - necesita los bloques para calcular rutas
         self.nav_manager = SistemaNavegacion(self.lista_bloques)
 
     def on_draw(self):
@@ -223,7 +208,7 @@ class VistaJuego(arcade.View):
 
         
         if cambio_detectado:
-            self. nav_manager.actualizar_grafo_async()
+            self.nav_manager.actualizar_grafo_async()
 
         self.physics_engine.update()
         self.camera.position = self.sprite_jugador.position
@@ -301,6 +286,8 @@ class VistaJuego(arcade.View):
         # Interacción y Slots
         if key == arcade.key.E:
             self.ejecutar_interaccion()
+        elif key == arcade.key.R:
+            self.ejecutar_recargar()
         elif key in [arcade.key.KEY_1, arcade.key.KEY_2, arcade.key.KEY_3, arcade.key.KEY_4]:
             self.sprite_jugador.indice_activo = key - arcade.key.KEY_1
 
@@ -318,6 +305,12 @@ class VistaJuego(arcade.View):
         # Si no hay puertas, intentamos recoger del suelo
         self.item_manager.intentar_recoger(self.sprite_jugador)
 
+    def ejecutar_recargar(self):
+        """Intenta recargar el arma activa."""
+        arma = self.sprite_jugador.obtener_arma_activa()
+        if arma and hasattr(arma, 'recargar'):
+            arma.recargar()
+
     def ejecutar_soltar_item(self):
         idx = self.sprite_jugador.indice_seleccionado # El que marca el ratón en el inventario
         if idx is not None:
@@ -326,8 +319,10 @@ class VistaJuego(arcade.View):
                 self.item_manager.add_to_world(objeto)
     
     def on_mouse_motion(self, x, y, dx, dy):
-        self.mouse_world_x = x + self.camera.position.x - self.window.width / 2
-        self.mouse_world_y = y + self.camera.position.y - self.window.height / 2
+        window = self.window
+        self.mouse_world_x, self.mouse_world_y = self.camera.unproject_with_origin(
+            x, y, window.width, window.height
+        )
         self.mouse_pos_x = x
         self.mouse_pos_y = y
         if self.show_inventory:
@@ -335,8 +330,10 @@ class VistaJuego(arcade.View):
             self.sprite_jugador.vistaInventario.set_hover(slot)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        self.mouse_world_x = x + self.camera.position.x - self.window.width / 2
-        self.mouse_world_y = y + self.camera.position.y - self.window.height / 2
+        window = self.window
+        self.mouse_world_x, self.mouse_world_y = self.camera.unproject_with_origin(
+            x, y, window.width, window.height
+        )
         self.mouse_pos_x = x
         self.mouse_pos_y = y
         if self.show_inventory and self.sprite_jugador.vistaInventario._drag_source is not None:
