@@ -3,9 +3,9 @@ from vista.inventory import *
 from vista.textos import *
 
 
-class Jugador(arcade.SpriteSolidColor):
+class Jugador(arcade.Sprite):
     def __init__(self):
-        super().__init__(32, 32, arcade.color.AQUAMARINE)
+        super().__init__()
         
         self.max_vida = 100.0
         self.vida = self.max_vida
@@ -38,6 +38,8 @@ class Jugador(arcade.SpriteSolidColor):
             "left": arcade.load_texture("assets/Jugador/Soldado hacia izquierda.png"),
             "right": arcade.load_texture("assets/Jugador/Soldado hacia derecha.png"),
         }
+        self.texture = self.texturas[self.direccion]
+        self.scale = 0.25
 
 
     def draw_inventory(self, mouse_pos=None): 
