@@ -1,6 +1,6 @@
 import arcade
 import time 
-from items.items import BaseItem
+from items.items import *
 from entities.blocks import * 
 from entities.pathfinding import SistemaNavegacion
 
@@ -171,11 +171,20 @@ class ConsoleUI:
 
 
 def cmd_spawn(vista, args):
-    nombre = args[0] if args else "Objeto"
-    nuevo_item = BaseItem(99, nombre.capitalize(), "../assets/items/Flint.png")
-    nuevo_item.center_x, nuevo_item.center_y = vista.sprite_jugador.center_x + 60, vista.sprite_jugador.center_y
+    nombre = args[0].lower() if args else "objeto"
+    
+    if nombre == "botiquin":
+        nuevo_item = Botiquin() 
+    else:
+        nuevo_item = BaseItem(99, nombre.capitalize(), "assets/items/Flint.png")
+    
+
+    nuevo_item.center_x = vista.sprite_jugador.center_x + 60
+    nuevo_item.center_y = vista.sprite_jugador.center_y
+    
     vista.item_manager.add_to_world(nuevo_item)
-    return f"Entidad '{nombre}' generada.", "SUCCESS"
+    
+    return f"Entidad '{nombre.capitalize()}' generada.", "SUCCESS"
 
 def cmd_tp(vista, args):
     if len(args) < 2: return "Error: Uso -> tp <x> <y>", "ERROR"

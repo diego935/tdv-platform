@@ -576,3 +576,53 @@ class Pistola(WeaponBase):
         return 1.0 - (self._timer_recarga / self._tiempo_recarga)
 
 
+class Botiquin(BaseItem):
+    """
+    Objeto recogible que cura gradualmente al jugador. 
+    """
+    def __init__(self):
+        super().__init__(
+            item_id=200,
+            name="Botiquín",
+            sprite_path="assets/items/botiquin.jpg",
+            description="Botiquín de primeros auxilios. Cura gradualmente al usarlo."
+        )
+        
+        # Todo esto ahora está correctamente dentro del __init__
+        self.cantidad_curacion = 15
+        self.tiempo_curacion = 3.0
+        self.cantidad_usos = 1
+        
+        # Variables necesarias para el cooldown (enfriamiento)
+        self.cooldown = 0.0 
+        self._timer_cooldown = 0.0
+        self._curando = False
+    
+    @property
+    def puede_usar(self) -> bool:
+        """Devuelve True si el botiquín se puede usar."""
+        return self._timer_cooldown <= 0
+    
+    def actualizar(self, delta_time: float):
+        """Actualiza el estado del botiquín."""
+        if self._timer_cooldown > 0:
+            self._timer_cooldown -= delta_time
+            if self._timer_cooldown < 0:
+                self._timer_cooldown = 0
+
+    def usar(self, owner, target_x=None, target_y=None, proyectiles_list=None) -> bool:
+        if not self.puede_usar:
+            return False
+
+        if hasattr(owner, 'iniciar_curacion'):
+            exito = owner.iniciar_curacion(self.cantidad_curacion, self.tiempo_curacion)
+            
+            if exito:
+                self.cantidad_usos -= 1
+                self._timer_cooldown = self.cooldown
+                
+                if self.cantidad_usos <= 0 and hasattr(owner, 'destruir_item_activo'):
+                    owner.destruir_item_activo()
+                return True
+                
+        return False
