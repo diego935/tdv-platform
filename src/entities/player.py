@@ -29,8 +29,8 @@ class Jugador(arcade.SpriteSolidColor):
         #Curacion
         self.tasa_regen_hp = 15
 
-    def draw_inventory(self): 
-        self.vistaInventario.draw(self.inventory, self.indice_seleccionado )
+    def draw_inventory(self, mouse_pos=None): 
+        self.vistaInventario.draw(self.inventory, self.vistaInventario._drag_source if hasattr(self.vistaInventario, '_drag_source') else None, mouse_pos)
 
 
     def recoger_objeto(self, objeto):
@@ -105,4 +105,14 @@ class Jugador(arcade.SpriteSolidColor):
     def cambiar_slot(self, indice):
         if 0 <= indice < 4:
             self.indice_activo = indice
-            ## TODO: Añadir sonidos 
+
+    def obtener_arma_activa(self):
+        if 0 <= self.indice_activo < len(self.inventory):
+            return self.inventory[self.indice_activo]
+        return None
+
+    def usar_arma_activa(self, target_x, target_y, proyectiles_list):
+        arma = self.obtener_arma_activa()
+        if arma and hasattr(arma, 'usar'):
+            return arma.usar(self, target_x, target_y, proyectiles_list)
+        return False 
