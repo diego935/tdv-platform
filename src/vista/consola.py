@@ -167,7 +167,7 @@ def cmd_spawn(vista, args):
 
 def cmd_tp(vista, args):
     if len(args) < 2: return "Error: Uso -> tp <x> <y>", "ERROR"
-    vista.sprite_jugador.position = (float(args[0]), float(args[1]))
+    vista.sprite_jugador.position = (float(args[0])*32, float(args[1])*32)
     vista.camera.position = vista.sprite_jugador.position
     return f"Teletransportado a {args[0]}, {args[1]}", "SUCCESS"
 

@@ -14,7 +14,7 @@ class Jugador(arcade.SpriteSolidColor):
         self.vel_correr = 10
         self.esta_corriendo = False
         self.stamina_agotada = False
-        self.capacidad = 8 # NOTE: Está hardcodeada la capacidad del invetario.  
+        self.capacidad = 8 # NOTE: Está hardcodeada la capacidad del inventario.  
         self.inventory = [None] * self.capacidad
         self.vistaInventario = BaseInventoryUI(self.capacidad) 
         self.indice_seleccionado = None
@@ -26,7 +26,8 @@ class Jugador(arcade.SpriteSolidColor):
         self.stamina_exhausted_delay = 3.0
         self.tasa_consumo_stamina = 25
         self.tasa_regen_stamina = 25
-        
+        #Curacion
+        self.tasa_regen_hp = 15
 
     def draw_inventory(self): 
         self.vistaInventario.draw(self.inventory, self.indice_seleccionado )

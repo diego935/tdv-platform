@@ -35,8 +35,45 @@ class VistaJuego(arcade.View):
         self.abajo_presionado = False
         self.shift_presionado = False
         
-
+        #Inicializar variables del mapa.
+        self.tile_map = None 
+        self.scene = None
+        self.physics_engine = None
+        
     def setup(self):
+        #Mapa--------------------------------------
+        map_name = "assets/maps/mapa.tmx"
+
+        layer_options = {
+           "Layout": {
+               "use_spatial_hash": True,
+           },
+        }
+        #Carga del tilemap:
+        self.tile_map = arcade.load_tilemap(map_name, scaling=1, layer_options=layer_options)
+        self.scene = arcade.Scene.from_tilemap(self.tile_map)
+
+        spawn_list = self.tile_map.object_lists["Eventos"]
+        spawn_point = next(obj for obj in spawn_list if obj.name == "Spawnpoint")
+
+        self.sprite_jugador = Jugador()
+        
+        x_tiled = spawn_point.shape[0]
+        y_tiled = spawn_point.shape[1]
+        altura_mapa_pixeles = self.tile_map.height * self.tile_map.tile_height * self.tile_map.scaling
+        x_arcade = x_tiled * self.tile_map.scaling
+        y_arcade = altura_mapa_pixeles - (y_tiled * self.tile_map.scaling)
+        
+        self.sprite_jugador.position = (x_arcade, y_arcade)
+        self.scene.add_sprite("Player", self.sprite_jugador)
+
+        # 4. Motor de física (usando la capa Layout para que el personaje no atraviese paredes)
+        self.physics_engine = arcade.PhysicsEngineSimple(
+            self.sprite_jugador, 
+            self.scene.get_sprite_list("Layout")
+        )
+        #------------------------------------------
+        
         self.window.background_color = COLOR_FONDO_JUEGO
 
         self.lista_jugadores = arcade.SpriteList()
@@ -50,31 +87,26 @@ class VistaJuego(arcade.View):
         self.hud = HUD()
         self.console = ConsoleUI()
 
-        
-
-        self.sprite_jugador = Jugador()
-        self.sprite_jugador.center_x = ANCHO_VENTANA // 2
-        self.sprite_jugador.center_y = ALTO_VENTANA // 2
         self.lista_jugadores.append(self.sprite_jugador)
         
         """puerta = Puerta(ANCHO_VENTANA // 2 + 300, ALTO_VENTANA // 2, width=100, height=300, tiempo_apertura=1.5, tiempo_cierre=1.0)
         self.lista_puertas.append(puerta)
         self.lista_bloques.append(puerta)"""
 
-        puertas, bloques = crear_casa(
-            x=ANCHO_VENTANA // 2,
-            y=ALTO_VENTANA // 2,
-            ancho_habitable=500,
-            alto_habitable=500,
-            grosor=32,
-            direcciones_puerta=["NORTE", "ESTE"],
-            ancho_puerta=100
-        )
-        self.lista_puertas.extend(puertas)
-        self.lista_bloques.extend(bloques)
+        # puertas, bloques = crear_casa(
+        #     x=ANCHO_VENTANA // 2,
+        #     y=ALTO_VENTANA // 2,
+        #     ancho_habitable=500,
+        #     alto_habitable=500,
+        #     grosor=32,
+        #     direcciones_puerta=["NORTE", "ESTE"],
+        #     ancho_puerta=100
+        # )
+        # self.lista_puertas.extend(puertas)
+        # self.lista_bloques.extend(bloques)
 
         for i in range(10):
-            pedernal = BaseItem(1, f"Pedernal {i+1}", "../assets/items/Flint.png")
+            pedernal = BaseItem(1, f"Pedernal {i+1}", "assets/items/Flint.png")
             
             # Posición aleatoria cerca del centro para probar
             pedernal.center_x = random.randint(200, 600)
@@ -83,24 +115,24 @@ class VistaJuego(arcade.View):
             # Los añadimos al Manager para que aparezcan en el suelo
             self.item_manager.add_to_world(pedernal)
 
-
-
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
         self.nav_manager = SistemaNavegacion(self.lista_bloques)
 
 
     def on_draw(self):
         self.clear()
-
         # --- 1. CAPA DEL MUNDO ---
         # Todo lo que esté aquí dentro se moverá cuando el jugador camine
         with self.camera.activate():
+            self.scene.draw()            
             self.lista_bloques.draw()
             self.lista_puertas.draw()
             self.item_manager.draw()
             self.lista_enemigos.draw()
             self.lista_jugadores.draw()
             self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager)
+
+            
         
             # Dibujamos textos que están en el suelo o sobre objetos/NPCs
             self.text_manager.draw()
@@ -127,7 +159,7 @@ class VistaJuego(arcade.View):
 
     def on_update(self, delta_time):
         
-        
+
         if self.show_inventory or self.estado_actual== "CONSOLE":
             self.console.update(delta_time,self     )
 
