@@ -30,7 +30,7 @@ class VistaJuego(arcade.View):
         self.mouse_world_x = None 
         self.mouse_world_y = None  
         self.nav_manager = None
-
+        
         self.show_inventory = False 
         self.izquierda_presionado = False
         self.derecha_presionado = False
@@ -44,84 +44,61 @@ class VistaJuego(arcade.View):
         self.MAX_ZOOM = 4.0
         
         #Inicializar variables del mapa.
-        self.tile_map = None 
-        self.scene = None
-        self.physics_engine = None
+        self.CAPAS = {
+            "suelo": "Suelo",
+            "muros": "Pared",  # Cambiado de "Layout" a "Pared" para que coincida con mapa_2.tmx
+            "eventos": "Eventos",
+            "zonas": "Zonas"
+        }
+        self.lista_enemigos = arcade.SpriteList()
+        self.lista_puertas = arcade.SpriteList()
+        self.lista_bloques = arcade.SpriteList()
+        self.lista_jugadores = arcade.SpriteList()
         
     def setup(self):
         #Mapa--------------------------------------
         map_name = "assets/maps/mapa.tmx"
-
-        layer_options = {
-           "Layout": {
-               "use_spatial_hash": True,
-           },
-        }
-        #Carga del tilemap:
+        layer_options = {self.CAPAS["muros"]: {"use_spatial_hash": True}}
         self.tile_map = arcade.load_tilemap(map_name, scaling=1, layer_options=layer_options)
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
-
-        spawn_list = self.tile_map.object_lists["Eventos"]
-        spawn_point = next(obj for obj in spawn_list if obj.name == "Spawnpoint")
-
-        self.sprite_jugador = Jugador()
-        
-        x_tiled = spawn_point.shape[0]
-        y_tiled = spawn_point.shape[1]
-        altura_mapa_pixeles = self.tile_map.height * self.tile_map.tile_height * self.tile_map.scaling
-        x_arcade = x_tiled * self.tile_map.scaling
-        y_arcade = altura_mapa_pixeles - (y_tiled * self.tile_map.scaling)
-        
-        self.sprite_jugador.position = (x_arcade, y_arcade)
-        self.scene.add_sprite("Player", self.sprite_jugador)
-
-        # 4. Motor de física (usando la capa Layout para que el personaje no atraviese paredes)
-        self.physics_engine = arcade.PhysicsEngineSimple(
-            self.sprite_jugador, 
-            self.scene.get_sprite_list("Layout")
-        )
-        #------------------------------------------
-        
-        self.window.background_color = COLOR_FONDO_JUEGO
+        map_height = self.tile_map.height * self.tile_map.tile_height
 
         self.lista_jugadores = arcade.SpriteList()
         self.lista_enemigos = arcade.SpriteList()
         self.lista_puertas = arcade.SpriteList()
-        self.lista_bloques= arcade.SpriteList()
+        self.lista_bloques = arcade.SpriteList()
         self.lista_proyectiles = []
-        self.item_manager = ItemManager() 
-        self.text_manager = TextManager()
+
+        eventos = self.tile_map.object_lists.get(self.CAPAS["eventos"], [])
+        spawn = next((obj for obj in eventos if obj.name == "Spawnpoint"), None)
+        
+        self.sprite_jugador = Jugador()
+        if spawn:
+            self.sprite_jugador.center_x = spawn.shape[0]
+            self.sprite_jugador.center_y = map_height - spawn.shape[1]
+        
+        self.scene.add_sprite("Player", self.sprite_jugador)
+        self.lista_jugadores.append(self.sprite_jugador)
+
+        muros_mapa = self.scene.get_sprite_list(self.CAPAS["muros"])
+        for muro in muros_mapa:
+            self.lista_bloques.append(muro)
+
+        # self.cargar_objetos_del_mapa()  # Eliminado temporalmente para evitar colisiones invisibles
+
         self.camera = CameraManager()
-        self.estado_actual ="JUGANDO"
         self.hud = HUD()
         self.console = ConsoleUI()
-
-        self.lista_jugadores.append(self.sprite_jugador)
+        self.item_manager = ItemManager() 
+        self.text_manager = TextManager()
         
-        """puerta = Puerta(ANCHO_VENTANA // 2 + 300, ALTO_VENTANA // 2, width=100, height=300, tiempo_apertura=1.5, tiempo_cierre=1.0)
-        self.lista_puertas.append(puerta)
-        self.lista_bloques.append(puerta)"""
-
-        # puertas, bloques = crear_casa(
-        #     x=ANCHO_VENTANA // 2,
-        #     y=ALTO_VENTANA // 2,
-        #     ancho_habitable=500,
-        #     alto_habitable=500,
-        #     grosor=32,
-        #     direcciones_puerta=["NORTE", "ESTE"],
-        #     ancho_puerta=100
-        # )
-        # self.lista_puertas.extend(puertas)
-        # self.lista_bloques.extend(bloques)
+        self.window.background_color = COLOR_FONDO_JUEGO
+        self.estado_actual = "JUGANDO"
 
         for i in range(10):
             pedernal = BaseItem(1, f"Pedernal {i+1}", "assets/items/Flint.png")
-            
-            # Posición aleatoria cerca del centro para probar
             pedernal.center_x = random.randint(200, 600)
             pedernal.center_y = random.randint(200, 400)
-            
-            # Los añadimos al Manager para que aparezcan en el suelo
             self.item_manager.add_to_world(pedernal)
 
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
@@ -204,20 +181,18 @@ class VistaJuego(arcade.View):
         if arma and hasattr(arma, 'actualizar'):
             arma.actualizar(delta_time)
 
-        ## Sincroniza el estado de las puerts
-        cambio_detectado = False
-
-        for puerta in self.lista_puertas:
-            if puerta.activa_colision and puerta not in self.lista_bloques:
-                self.lista_bloques.append(puerta)
-                cambio_detectado = True
-            elif not puerta.activa_colision and puerta in self.lista_bloques:
-                self.lista_bloques.remove(puerta)
-                cambio_detectado = True
-
+        # ## Sincroniza el estado de las puerts (Desactivado temporalmente)
+        # cambio_detectado = False
+        # for puerta in self.lista_puertas:
+        #     if puerta.activa_colision and puerta not in self.lista_bloques:
+        #         self.lista_bloques.append(puerta)
+        #         cambio_detectado = True
+        #     elif not puerta.activa_colision and puerta in self.lista_bloques:
+        #         self.lista_bloques.remove(puerta)
+        #         cambio_detectado = True
         
-        if cambio_detectado:
-            self. nav_manager.actualizar_grafo_async()
+        # if cambio_detectado:
+        #     self. nav_manager.actualizar_grafo_async()
 
         self.physics_engine.update()
         self.camera.position = self.sprite_jugador.position
@@ -408,3 +383,7 @@ class VistaJuego(arcade.View):
                 self.console.add_to_history(f"Error de ejecución: {e}")
         else:
             self.console.add_to_history(f"Comando '{nombre_cmd}' no reconocido.")
+
+    def cargar_objetos_del_mapa(self):
+        # Desactivado de momento para eliminar colisiones invisibles
+        pass

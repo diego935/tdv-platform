@@ -20,6 +20,7 @@
             "scaleInEditor": 1
         }
     },
+    "last.imagePath": "/home/d4ni/Documentos/tdv-platform/assets/tilesets",
     "openFiles": [
         "assets/maps/mapa.tmx",
         "assets/tilesets/Ejemplo.tsx"
@@ -28,5 +29,6 @@
     "recentFiles": [
         "assets/tilesets/Ejemplo.tsx",
         "assets/maps/mapa.tmx"
-    ]
+    ],
+    "tileset.lastUsedFormat": "tsx"
 }
