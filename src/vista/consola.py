@@ -2,7 +2,7 @@ import arcade
 import time 
 from items.items import BaseItem
 from entities.blocks import * 
-from entities.enemy import *
+from entities.pathfinding import SistemaNavegacion
 
 
 class ConsoleUI:
@@ -14,11 +14,12 @@ class ConsoleUI:
         self.flags = {
             "hitbox": False,
             "path": False,
-            "graph": False,
+            "grid": False,
             "test_nodes": False,
             "blocks" : False,
             "chunks": False
         }
+        self.block_timer = 0.0
         self.test_origin = None
         self.test_dest = None
         self.test_path = []
@@ -35,7 +36,7 @@ class ConsoleUI:
         self.history.append((text, color))
 
 
-    def draw_world(self, lista_bloques, lista_enemigos, nav_manager):
+    def draw_world(self, lista_bloques, lista_enemigos, nav_manager, sprite_jugador=None):
         """Dibuja cosas en las coordenadas del juego (dentro de la cámara)"""
         if not self.active:
             return
@@ -73,35 +74,46 @@ class ConsoleUI:
                 arcade.draw_rect_outline(enemigo.rect, arcade.color.RED, 2)
 
     
-        if self.flags["path"]:
+        if self.flags["path"] and sprite_jugador:
             for ene in lista_enemigos:
-                # Calculamos si ve al jugador
-                ve_jugador = arcade.has_line_of_sight(ene.position, jugador.position, lista_bloques)
+                ve_jugador = arcade.has_line_of_sight(ene.position, sprite_jugador.position, lista_bloques)
                 color = arcade.color.RED if ve_jugador else arcade.color.GRAY
-                
-                # Dibujamos una línea fina entre enemigo y jugador
-                arcade.draw_line(ene.center_x, ene.center_y, 
-                                jugador.center_x, jugador.center_y, 
+                arcade.draw_line(ene.center_x, ene.center_y,
+                                sprite_jugador.center_x, sprite_jugador.center_y,
                                 color, 1)
 
-        # 3. Dibujar el Grafo (los nodos del pathfinding)
-        if self.flags["graph"] and nav_manager.grafo:
-            nav_manager.grafo.draw()
+        # 2. Dibujar el Grid de pathfinding (celdas 32x32)
+        if self.flags["grid"] and nav_manager.grafo:
+            if hasattr(nav_manager.grafo, 'debug_dibujar_grid'):
+                nav_manager.grafo.debug_dibujar_grid(
+                    color_transitable=arcade.color.DARK_GREEN,
+                    color_bloqueado=arcade.color.DARK_RED,
+                    alpha=40
+                )
 
         if self.flags["test_nodes"]:
             # Dibujar origen (Amarillo)
             if self.test_origin:
-                arcade.draw_circle_filled(self.test_origin[0], self.test_origin[1], 7, arcade.color.YELLOW)
-                arcade.draw_text("TEST START", self.test_origin[0] + 10, self.test_origin[1] + 10, arcade.color.YELLOW, 9)
+                arcade.draw_circle_filled(self.test_origin[0], self.test_origin[1], 10, arcade.color.YELLOW)
+                arcade.draw_circle_outline(self.test_origin[0], self.test_origin[1], 10, arcade.color.BLACK, 2)
+                arcade.draw_text("START", self.test_origin[0] + 12, self.test_origin[1] + 12, arcade.color.YELLOW, 12)
 
             # Dibujar destino (Naranja)
             if self.test_dest:
-                arcade.draw_circle_filled(self.test_dest[0], self.test_dest[1], 7, arcade.color.ORANGE)
-                arcade.draw_text("TEST END", self.test_dest[0] + 10, self.test_dest[1] + 10, arcade.color.ORANGE, 9)
+                arcade.draw_circle_filled(self.test_dest[0], self.test_dest[1], 10, arcade.color.ORANGE)
+                arcade.draw_circle_outline(self.test_dest[0], self.test_dest[1], 10, arcade.color.BLACK, 2)
+                arcade.draw_text("END", self.test_dest[0] + 12, self.test_dest[1] + 12, arcade.color.ORANGE, 12)
 
             # Dibujar la línea del camino resultante
-            if self.test_path:
-                arcade.draw_line_strip(self.test_path, arcade.color.YELLOW, 3)
+            if self.test_path and len(self.test_path) > 1:
+                # Línea principal
+                arcade.draw_line_strip(self.test_path, arcade.color.CYAN, 4)
+                # Puntos de la ruta
+                for i, punto in enumerate(self.test_path):
+                    color = arcade.color.WHITE if i == 0 else arcade.color.LIME_GREEN if i == len(self.test_path) - 1 else arcade.color.CYAN
+                    radio = 6 if i in [0, len(self.test_path) - 1] else 4
+                    arcade.draw_circle_filled(punto[0], punto[1], radio, color)
+                    arcade.draw_circle_outline(punto[0], punto[1], radio, arcade.color.BLACK, 1)
 
 
     def update(self, delta_time, vista):
@@ -181,8 +193,7 @@ def cmd_bloque(vista, args):
         nuevo_bloque = Bloque(size, size, color=arcade.color.GRAY)
         nuevo_bloque.position = (vista.mouse_world_x, vista.mouse_world_y)
         vista.lista_bloques.append(nuevo_bloque)
-        # Importante: Si ponemos un bloque, el pathfinding debe enterarse
-        SistemaNavegacion().actualizar_grafo()
+        vista.nav_manager.actualizar_desde_bloques(vista.lista_bloques)
         return "Bloque creado.", "SUCCESS"
     except: return "Error en tamaño.", "ERROR"
 
@@ -192,39 +203,52 @@ def cmd_bloques(vista, args):
     return f"blocks = {con.flags['blocks']}", "SUCCESS"
 
 
-# --- NAVEGACIÓN UNIFICADA (Aquí es donde hemos limpiado) ---
-def cmd_nav(vista, args):
-    if not args: return "Uso: nav [start | end | calc | update | clear]", "INFO"
     
+def cmd_nav(vista, args):
+    """Comandos de navegacion/pathfinding."""
+    if not args:
+        return "Uso: nav [start | end | calc | update | clear]", "INFO"
+
     sub = args[0].lower()
-    nav = SistemaNavegacion()
+    nav = vista.nav_manager
     con = vista.console
 
     if sub == "start":
-        con.test_origin = (vista.mouse_world_x, vista.mouse_world_y)
+        mouse_x, mouse_y = vista.mouse_world_x, vista.mouse_world_y
+        con.test_origin = (mouse_x, mouse_y)
         con.flags["test_nodes"] = True
         return "Origen fijado.", "SUCCESS"
-        
+
     elif sub == "end":
-        con.test_dest = (vista.mouse_world_x, vista.mouse_world_y)
+        mouse_x, mouse_y = vista.mouse_world_x, vista.mouse_world_y
+        con.test_dest = (mouse_x, mouse_y)
         con.flags["test_nodes"] = True
         return "Destino fijado.", "SUCCESS"
-        
-    elif sub == "calc":
-        if not con.test_origin or not con.test_dest: return "Faltan puntos.", "ERROR"
-        con.test_path = nav.obtener_ruta(con.test_origin, con.test_dest)
-        return f"Ruta: {len(con.test_path)} puntos.", "SUCCESS" if con.test_path else "ERROR"
-    
-    elif sub == "update": 
-        nav.actualizar_grafo_async()
-    
+
+    if sub == "calc":
+        if not con.test_origin or not con.test_dest:
+            return "Faltan puntos.", "ERROR"
+        con.test_path = nav.encontrar_ruta(con.test_origin, con.test_dest)
+        if con.test_path is None:
+            con.test_path = []
+            return "No se encontró ruta.", "ERROR"
+        return f"Ruta: {len(con.test_path)} puntos.", "SUCCESS"
+
+    elif sub == "update":
+        nav.actualizar_desde_bloques(vista.lista_bloques)
+        return "Grid actualizando...", "INFO"
 
     elif sub == "clear":
         con.test_origin = con.test_dest = None
         con.test_path = []
-        return "Test de navegación limpio.", "INFO"
+        return "Test de navegacion limpio.", "INFO"
 
-    return "Subcomando no válido.", "ERROR"
+    return "Subcomando no valido.", "ERROR"
+
+
+
+
+
 def cmd_debug(vista, args):
     if not args:
         estados = ", ".join([f"{k}: {'ON' if v else 'OFF'}" for k, v in vista.console.flags.items()])
@@ -235,7 +259,7 @@ def cmd_debug(vista, args):
     mapping = {
         "hitbox": "hitbox",
         "path": "path",
-        "graph": "graph",
+        "grid": "grid",
         "nodes": "test_nodes",
         "chunks": "chunks"  
     }
@@ -246,7 +270,7 @@ def cmd_debug(vista, args):
         estado = "ACTIVADO" if vista.console.flags[key] else "DESACTIVADO"
         return f"Debug {opcion}: {estado}", "SUCCESS"
     
-    return f"La opción '{opcion}' no existe. Prueba con: hitbox, path, graph, nodes o chunks.", "ERROR"
+    return f"La opción '{opcion}' no existe. Prueba con: hitbox, path, grid, nodes o chunks.", "ERROR"
 
 
 

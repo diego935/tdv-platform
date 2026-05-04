@@ -1,12 +1,6 @@
 import arcade
-import pyvisgraph as vg
 import threading
-from shapely.geometry import box
-from shapely.ops import unary_union
-import numpy as np
-import networkx as nx
-import heapq
-import collections
+from entities.pathfinding import SistemaNavegacion
 
 
 

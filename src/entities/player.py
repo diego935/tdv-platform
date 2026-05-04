@@ -28,8 +28,8 @@ class Jugador(arcade.SpriteSolidColor):
         self.tasa_regen_stamina = 25
         
 
-    def draw_inventory(self): 
-        self.vistaInventario.draw(self.inventory, self.indice_seleccionado )
+    def draw_inventory(self, mouse_pos=None): 
+        self.vistaInventario.draw(self.inventory, self.vistaInventario._drag_source if hasattr(self.vistaInventario, '_drag_source') else None, mouse_pos)
 
 
     def recoger_objeto(self, objeto):
