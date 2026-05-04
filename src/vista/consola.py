@@ -1,8 +1,8 @@
 import arcade
 import time 
-from items.items import BaseItem
+from items.items import *
 from entities.blocks import * 
-from entities.pathfinding import SistemaNavegacion
+from entities.enemy import *
 
 
 class ConsoleUI:
@@ -171,15 +171,24 @@ class ConsoleUI:
 
 
 def cmd_spawn(vista, args):
-    nombre = args[0] if args else "Objeto"
-    nuevo_item = BaseItem(99, nombre.capitalize(), "../assets/items/Flint.png")
-    nuevo_item.center_x, nuevo_item.center_y = vista.sprite_jugador.center_x + 60, vista.sprite_jugador.center_y
+    nombre = args[0].lower() if args else "objeto"
+    
+    if nombre == "botiquin":
+        nuevo_item = Botiquin() 
+    else:
+        nuevo_item = BaseItem(99, nombre.capitalize(), "assets/items/Flint.png")
+    
+
+    nuevo_item.center_x = vista.sprite_jugador.center_x + 60
+    nuevo_item.center_y = vista.sprite_jugador.center_y
+    
     vista.item_manager.add_to_world(nuevo_item)
-    return f"Entidad '{nombre}' generada.", "SUCCESS"
+    
+    return f"Entidad '{nombre.capitalize()}' generada.", "SUCCESS"
 
 def cmd_tp(vista, args):
     if len(args) < 2: return "Error: Uso -> tp <x> <y>", "ERROR"
-    vista.sprite_jugador.position = (float(args[0]), float(args[1]))
+    vista.sprite_jugador.position = (float(args[0])*32, float(args[1])*32)
     vista.camera.position = vista.sprite_jugador.position
     return f"Teletransportado a {args[0]}, {args[1]}", "SUCCESS"
 
@@ -282,6 +291,19 @@ def cmd_debug(vista, args):
     return f"La opción '{opcion}' no existe. Prueba con: hitbox, path, grid, nodes o chunks.", "ERROR"
 
 
+def cmd_dmg(vista, args):
+    """Inflige daño al jugador. Uso: damage <cantidad> Por defecto el daño es 10"""
+    try:
+        cantidad = float(args[0]) if args else 10.0
+        
+        vista.sprite_jugador.vida -= cantidad
+        
+        if vista.sprite_jugador.vida < 0:
+            vista.sprite_jugador.vida = 0
+            
+        return f"Daño aplicado: -{cantidad} HP. Vida actual: {vista.sprite_jugador.vida}", "SUCCESS"
+    except ValueError:
+        return "Error: La cantidad de daño debe ser un número.", "ERROR"
 
 COMANDOS = {
     "spawn": cmd_spawn,
@@ -291,6 +313,6 @@ COMANDOS = {
     "bloque": cmd_bloque,
     "nav": cmd_nav,
     "debug": cmd_debug, 
-    "bloques": cmd_bloques
-
+    "bloques": cmd_bloques,
+    "damage": cmd_dmg,
 }

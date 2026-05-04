@@ -3,18 +3,21 @@ from vista.inventory import *
 from vista.textos import *
 
 
-class Jugador(arcade.SpriteSolidColor):
+class Jugador(arcade.Sprite):
     def __init__(self):
-        super().__init__(32, 32, arcade.color.AQUAMARINE)
+        super().__init__()
         
-        self.vida = 100
+        self.max_vida = 100.0
+        self.vida = self.max_vida
+        self.curacion_pendiente = 0.0
+        self.velocidad_curacion = 0.0
         self.municion = 30
         self.vel_caminar = 5
         self.velocidad = self.vel_caminar
         self.vel_correr = 10
         self.esta_corriendo = False
         self.stamina_agotada = False
-        self.capacidad = 8 # NOTE: Está hardcodeada la capacidad del invetario.  
+        self.capacidad = 8 # NOTE: Está hardcodeada la capacidad del inventario.  
         self.inventory = [None] * self.capacidad
         self.vistaInventario = BaseInventoryUI(self.capacidad) 
         self.indice_seleccionado = None
@@ -26,7 +29,18 @@ class Jugador(arcade.SpriteSolidColor):
         self.stamina_exhausted_delay = 3.0
         self.tasa_consumo_stamina = 25
         self.tasa_regen_stamina = 25
-        
+        #Curacion
+        self.tasa_regen_hp = 15
+        self.direccion = "down"
+        self.texturas = {
+            "up": arcade.load_texture("assets/Jugador/Soldado hacia arriba.png"),
+            "down": arcade.load_texture("assets/Jugador/Soldado hacia abajo.png"),
+            "left": arcade.load_texture("assets/Jugador/Soldado hacia izquierda.png"),
+            "right": arcade.load_texture("assets/Jugador/Soldado hacia derecha.png"),
+        }
+        self.texture = self.texturas[self.direccion]
+        self.scale = 0.15
+
 
     def draw_inventory(self, mouse_pos=None): 
         self.vistaInventario.draw(self.inventory, self.vistaInventario._drag_source if hasattr(self.vistaInventario, '_drag_source') else None, mouse_pos)
@@ -68,6 +82,19 @@ class Jugador(arcade.SpriteSolidColor):
 
 
     def move(self, arriba, abajo, izq, der, shift, delta_time):
+        
+
+        if self.curacion_pendiente > 0:
+            cura_frame = self.velocidad_curacion * delta_time
+            cura_frame = min(cura_frame, self.curacion_pendiente) # Evita pasarse
+            
+            self.vida += cura_frame
+            self.curacion_pendiente -= cura_frame
+            
+            # Tope máximo
+            if self.vida >= self.max_vida:
+                self.vida = self.max_vida
+                self.curacion_pendiente = 0.0
 
         intencion_movimiento = arriba or abajo or izq or der
         
@@ -92,13 +119,19 @@ class Jugador(arcade.SpriteSolidColor):
 
         if arriba and not abajo:
             self.change_y = self.velocidad_actual
+            self.direccion = "up"
         elif abajo and not arriba:
             self.change_y = -self.velocidad_actual
+            self.direccion = "down"
 
         if izq and not der:
             self.change_x = -self.velocidad_actual
+            self.direccion = "left"
         elif der and not izq:
             self.change_x = self.velocidad_actual
+            self.direccion = "right"
+
+        self.texture = self.texturas[self.direccion]
 
 
     def cambiar_slot(self, indice):
@@ -115,3 +148,17 @@ class Jugador(arcade.SpriteSolidColor):
         if arma and hasattr(arma, 'usar'):
             return arma.usar(self, target_x, target_y, proyectiles_list)
         return False 
+    
+
+    def iniciar_curacion(self, cantidad, tiempo):
+        """ Inicia un proceso de curación gradual """
+        if self.vida >= self.max_vida:
+            return False
+        self.curacion_pendiente += float(cantidad)
+        self.velocidad_curacion = float(cantidad) / float(tiempo)
+        return True
+
+    def destruir_item_activo(self):
+        """ Elimina el item actual del inventario (cuando se gasta) """
+        if 0 <= self.indice_activo < len(self.inventory):
+            self.inventory[self.indice_activo] = None
