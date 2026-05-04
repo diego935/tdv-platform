@@ -132,3 +132,15 @@ class Jugador(arcade.SpriteSolidColor):
             return arma.usar(self, target_x, target_y, proyectiles_list)
         return False 
 
+    def iniciar_curacion(self, cantidad, tiempo):
+        """ Inicia un proceso de curación gradual """
+        if self.vida >= self.max_vida:
+            return False
+        self.curacion_pendiente += float(cantidad)
+        self.velocidad_curacion = float(cantidad) / float(tiempo)
+        return True
+
+    def destruir_item_activo(self):
+        """ Elimina el item actual del inventario (cuando se gasta) """
+        if 0 <= self.indice_activo < len(self.inventory):
+            self.inventory[self.indice_activo] = None

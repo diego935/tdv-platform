@@ -291,6 +291,19 @@ def cmd_debug(vista, args):
     return f"La opción '{opcion}' no existe. Prueba con: hitbox, path, grid, nodes o chunks.", "ERROR"
 
 
+def cmd_dmg(vista, args):
+    """Inflige daño al jugador. Uso: damage <cantidad> Por defecto el daño es 10"""
+    try:
+        cantidad = float(args[0]) if args else 10.0
+        
+        vista.sprite_jugador.vida -= cantidad
+        
+        if vista.sprite_jugador.vida < 0:
+            vista.sprite_jugador.vida = 0
+            
+        return f"Daño aplicado: -{cantidad} HP. Vida actual: {vista.sprite_jugador.vida}", "SUCCESS"
+    except ValueError:
+        return "Error: La cantidad de daño debe ser un número.", "ERROR"
 
 COMANDOS = {
     "spawn": cmd_spawn,
@@ -300,6 +313,6 @@ COMANDOS = {
     "bloque": cmd_bloque,
     "nav": cmd_nav,
     "debug": cmd_debug, 
-    "bloques": cmd_bloques
-
+    "bloques": cmd_bloques,
+    "damage": cmd_dmg,
 }

@@ -173,7 +173,7 @@ class VistaJuego(arcade.View):
         
 
         if self.show_inventory or self.estado_actual== "CONSOLE":
-            self.console.update(delta_time,self     )
+            self.console.update(delta_time,self)
 
         self.sprite_jugador.move(
         self.arriba_presionado,
@@ -183,7 +183,9 @@ class VistaJuego(arcade.View):
         self.shift_presionado,
         delta_time
     )
-
+        arma = self.sprite_jugador.obtener_arma_activa()
+        if arma and hasattr(arma, 'actualizar'):
+            arma.actualizar(delta_time)
 
         self.lista_puertas.update(delta_time)
         self.lista_enemigos.update()
