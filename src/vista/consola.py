@@ -2,7 +2,7 @@ import arcade
 import time 
 from items.items import *
 from entities.blocks import * 
-from entities.pathfinding import SistemaNavegacion
+from entities.enemy import *
 
 
 class ConsoleUI:

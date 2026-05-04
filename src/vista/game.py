@@ -43,6 +43,7 @@ class VistaJuego(arcade.View):
         self.MIN_ZOOM = 0.2
         self.MAX_ZOOM = 4.0
         
+
         #Inicializar variables del mapa.
         self.CAPAS = {
             "suelo": "Suelo",
@@ -100,6 +101,11 @@ class VistaJuego(arcade.View):
             pedernal.center_x = random.randint(200, 600)
             pedernal.center_y = random.randint(200, 400)
             self.item_manager.add_to_world(pedernal)
+        
+        # Añadir Pistola al inventario del jugador (slot 0)
+        from items.weapons import Pistola, Cuchillo
+        self.sprite_jugador.inventory[0] = Pistola()
+        self.sprite_jugador.inventory[1] = Cuchillo()
 
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
         self.nav_manager = SistemaNavegacion(self.lista_bloques)
