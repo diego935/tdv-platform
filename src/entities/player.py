@@ -33,10 +33,10 @@ class Jugador(arcade.SpriteSolidColor):
         self.tasa_regen_hp = 15
         self.direccion = "down"
         self.texturas = {
-            "up": arcade.load_texture("assets/Jugador/Soldado mirando hacia arriba.png"),
-            "down": arcade.load_texture("assets/Jugador/Soldado mirando hacia abajo.png"),
-            "left": arcade.load_texture("assets/Jugador/Soldado mirando hacia izquierda.png"),
-            "right": arcade.load_texture("assets/Jugador/Soldado mirando hacia derecha.png"),
+            "up": arcade.load_texture("assets/Jugador/Soldado hacia arriba.png"),
+            "down": arcade.load_texture("assets/Jugador/Soldado hacia abajo.png"),
+            "left": arcade.load_texture("assets/Jugador/Soldado hacia izquierda.png"),
+            "right": arcade.load_texture("assets/Jugador/Soldado hacia derecha.png"),
         }
 
 
