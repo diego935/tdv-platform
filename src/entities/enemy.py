@@ -1,13 +1,42 @@
 import arcade
-import pyvisgraph as vg
 import threading
-from shapely.geometry import box
-from shapely.ops import unary_union
-import numpy as np
-import networkx as nx
-import heapq
-import collections
+from entities.pathfinding import SistemaNavegacion
 
+
+class DummyEnemy(arcade.SpriteSolidColor):
+    def __init__(self, x=0, y=0):
+        super().__init__(width=32, height=32, color=arcade.color.GREEN)
+        self.center_x = x
+        self.center_y = y
+        self.vida = 100
+        self._knockback_vel = (0, 0)
+        self._knockback_timer = 0.0
+        self._base_x = x
+        self._base_y = y
+
+    def recibir_dano(self, cantidad, fuente_x=None, fuente_y=None):
+        self.vida -= cantidad
+        if fuente_x is not None and fuente_y is not None:
+            dx = self.center_x - fuente_x
+            dy = self.center_y - fuente_y
+            dist = (dx**2 + dy**2)**0.5
+            if dist > 0:
+                self._knockback_vel = (dx/dist * 100, dy/dist * 100)
+                self._knockback_timer = 0.15
+                self._base_x = self.center_x
+                self._base_y = self.center_y
+        if self.vida <= 0:
+            self.kill()
+
+    def on_update(self, delta_time=1/60):
+        super().on_update(delta_time)
+        if self._knockback_timer > 0:
+            self._knockback_timer -= delta_time
+            self.center_x += self._knockback_vel[0] * delta_time
+            self.center_y += self._knockback_vel[1] * delta_time
+        else:
+            self._base_x = self.center_x
+            self._base_y = self.center_y
 
 
 class Enemigo(arcade.SpriteSolidColor):

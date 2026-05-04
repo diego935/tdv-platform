@@ -2,13 +2,16 @@ import arcade
 from config import ANCHO_VENTANA, ALTO_VENTANA, COLOR_FONDO_JUEGO
 from entities.player import Jugador
 from entities.enemy import *
+from entities.pathfinding import SistemaNavegacion
 from entities.blocks import *
 from vista.inventory import * 
 from vista.textos import TextManager 
 from items.item_manager import * 
 from items.items import * 
+from items.weapons import *
 from vista.hud import HUD
 from vista.consola import * 
+from vista.camera_manager import CameraManager
 import random
 
 
@@ -35,6 +38,11 @@ class VistaJuego(arcade.View):
         self.abajo_presionado = False
         self.shift_presionado = False
         
+        # Zoom settings
+        self.ZOOM_SENSITIVITY = 0.1
+        self.MIN_ZOOM = 0.2
+        self.MAX_ZOOM = 4.0
+        
 
     def setup(self):
         self.window.background_color = COLOR_FONDO_JUEGO
@@ -43,9 +51,10 @@ class VistaJuego(arcade.View):
         self.lista_enemigos = arcade.SpriteList()
         self.lista_puertas = arcade.SpriteList()
         self.lista_bloques= arcade.SpriteList()
+        self.lista_proyectiles = []
         self.item_manager = ItemManager() 
         self.text_manager = TextManager()
-        self.camera = arcade.camera.Camera2D()
+        self.camera = CameraManager()
         self.estado_actual ="JUGANDO"
         self.hud = HUD()
         self.console = ConsoleUI()
@@ -82,25 +91,31 @@ class VistaJuego(arcade.View):
             
             # Los añadimos al Manager para que aparezcan en el suelo
             self.item_manager.add_to_world(pedernal)
+        
+        # Añadir Pistola al inventario del jugador (slot 0)
+        from items.weapons import Pistola, Cuchillo
+        self.sprite_jugador.inventory[0] = Pistola()
+        self.sprite_jugador.inventory[1] = Cuchillo()
 
 
 
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
         self.nav_manager = SistemaNavegacion(self.lista_bloques)
 
-
     def on_draw(self):
         self.clear()
-
+        
         # --- 1. CAPA DEL MUNDO ---
         # Todo lo que esté aquí dentro se moverá cuando el jugador camine
         with self.camera.activate():
             self.lista_bloques.draw()
             self.lista_puertas.draw()
             self.item_manager.draw()
+            for p in self.lista_proyectiles:
+                p.draw()
             self.lista_enemigos.draw()
             self.lista_jugadores.draw()
-            self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager)
+            self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager, self.sprite_jugador)
         
             # Dibujamos textos que están en el suelo o sobre objetos/NPCs
             self.text_manager.draw()
@@ -111,8 +126,9 @@ class VistaJuego(arcade.View):
         # El inventario suele ser fijo en pantalla para que el jugador lo vea siempre
         
         if self.show_inventory:
-            self.sprite_jugador.draw_inventory() 
-               
+            mouse_pos = (self.mouse_pos_x, self.mouse_pos_y) if hasattr(self, 'mouse_pos_x') else None
+            self.sprite_jugador.draw_inventory(mouse_pos)
+
         if self.estado_actual == "CONSOLE":
             self.console.draw()
 
@@ -143,6 +159,15 @@ class VistaJuego(arcade.View):
 
         self.lista_puertas.update(delta_time)
         self.lista_enemigos.update()
+
+        for p in self.lista_proyectiles:
+            p.update(delta_time, self.lista_bloques, self.lista_enemigos)
+        self.lista_proyectiles = [p for p in self.lista_proyectiles if not p.killed]
+        
+        # Update weapon cooldowns
+        arma = self.sprite_jugador.obtener_arma_activa()
+        if arma and hasattr(arma, 'actualizar'):
+            arma.actualizar(delta_time)
 
         ## Sincroniza el estado de las puerts
         cambio_detectado = False
@@ -258,23 +283,54 @@ class VistaJuego(arcade.View):
             objeto = self.sprite_jugador.soltar_objeto(idx)
             if objeto:
                 self.item_manager.add_to_world(objeto)
-
+    
     def on_mouse_motion(self, x, y, dx, dy):
         self.mouse_world_x = x + self.camera.position.x - self.window.width / 2
         self.mouse_world_y = y + self.camera.position.y - self.window.height / 2
+        self.mouse_pos_x = x
+        self.mouse_pos_y = y
         if self.show_inventory:
-            indice = self.sprite_jugador.vistaInventario.get_slot_at_pointer(x, y)
-            self.sprite_jugador.indice_seleccionado = indice
+            slot = self.sprite_jugador.vistaInventario.get_slot_at_pointer(x, y)
+            self.sprite_jugador.vistaInventario.set_hover(slot)
 
+    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
+        self.mouse_world_x = x + self.camera.position.x - self.window.width / 2
+        self.mouse_world_y = y + self.camera.position.y - self.window.height / 2
+        self.mouse_pos_x = x
+        self.mouse_pos_y = y
+        if self.show_inventory and self.sprite_jugador.vistaInventario._drag_source is not None:
+            target = self.sprite_jugador.vistaInventario.get_slot_at_pointer(x, y)
+            if target != self.sprite_jugador.vistaInventario._drag_source and target is not None:
+                # Swap
+                src = self.sprite_jugador.vistaInventario._drag_source
+                self.sprite_jugador.inventory[src], self.sprite_jugador.inventory[target] = \
+                    self.sprite_jugador.inventory[target], self.sprite_jugador.inventory[src]
+                self.sprite_jugador.vistaInventario._drag_source = None
 
     def on_mouse_press(self, x, y, button, modifiers):
+        # If inventory is open, handle inventory
         if self.show_inventory and button == arcade.MOUSE_BUTTON_LEFT:
-            idx = self.sprite_jugador.indice_seleccionado
+            slot = self.sprite_jugador.vistaInventario.get_slot_at_pointer(x, y)
+            if slot is not None and slot < len(self.sprite_jugador.inventory):
+                if self.sprite_jugador.inventory[slot] is not None:
+                    self.sprite_jugador.vistaInventario._drag_source = slot
+            return
         
-            if idx is not None and self.sprite_jugador.inventory[idx] is not None:
-                # Aquí podrías soltarlo, usarlo o abrir su descripción
-                print(f"Has clickeado en: {self.sprite_jugador.inventory[idx].name}")
-                # self.sprite_jugador.soltar_objeto(idx)
+        # If not in inventory, shoot
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            if self.sprite_jugador:
+                target_x = self.mouse_world_x if self.mouse_world_x is not None else self.sprite_jugador.center_x + 100
+                target_y = self.mouse_world_y if self.mouse_world_y is not None else self.sprite_jugador.center_y
+                self.sprite_jugador.usar_arma_activa(target_x, target_y, self.lista_proyectiles)
+
+    def on_mouse_release(self, x, y, button, modifiers):
+        if self.show_inventory and button == arcade.MOUSE_BUTTON_LEFT:
+            if self.sprite_jugador.vistaInventario._drag_source is not None:
+                src = self.sprite_jugador.vistaInventario._drag_source
+                item = self.sprite_jugador.inventory[src]
+                if item:
+                    print(f"Click en: {item.name}")
+            self.sprite_jugador.vistaInventario._drag_source = None
 
     def on_key_release(self, key, modifiers):
             # Liberar movimiento
@@ -288,6 +344,12 @@ class VistaJuego(arcade.View):
                 self.derecha_presionado = False
             elif key in [arcade.key.LSHIFT, arcade.key.RSHIFT]:
                 self.shift_presionado = False
+
+    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        """Ajusta el zoom según el scroll del ratón."""
+        nuevo_zoom = self.camera.zoom + (scroll_y * self.ZOOM_SENSITIVITY)
+        self.camera.zoom = max(self.MIN_ZOOM, min(self.MAX_ZOOM, nuevo_zoom))
+
     
 
     def procesar_comando(self, comando_raw):
