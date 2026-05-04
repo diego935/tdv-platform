@@ -7,14 +7,17 @@ class Jugador(arcade.SpriteSolidColor):
     def __init__(self):
         super().__init__(32, 32, arcade.color.AQUAMARINE)
         
-        self.vida = 100
+        self.max_vida = 100.0
+        self.vida = self.max_vida
+        self.curacion_pendiente = 0.0
+        self.velocidad_curacion = 0.0
         self.municion = 30
         self.vel_caminar = 5
         self.velocidad = self.vel_caminar
         self.vel_correr = 10
         self.esta_corriendo = False
         self.stamina_agotada = False
-        self.capacidad = 8 # NOTE: Está hardcodeada la capacidad del invetario.  
+        self.capacidad = 8 # NOTE: Está hardcodeada la capacidad del inventario.  
         self.inventory = [None] * self.capacidad
         self.vistaInventario = BaseInventoryUI(self.capacidad) 
         self.indice_seleccionado = None
@@ -26,7 +29,8 @@ class Jugador(arcade.SpriteSolidColor):
         self.stamina_exhausted_delay = 3.0
         self.tasa_consumo_stamina = 25
         self.tasa_regen_stamina = 25
-        
+        #Curacion
+        self.tasa_regen_hp = 15
 
     def draw_inventory(self, mouse_pos=None): 
         self.vistaInventario.draw(self.inventory, self.vistaInventario._drag_source if hasattr(self.vistaInventario, '_drag_source') else None, mouse_pos)
@@ -68,6 +72,18 @@ class Jugador(arcade.SpriteSolidColor):
 
 
     def move(self, arriba, abajo, izq, der, shift, delta_time):
+
+        if self.curacion_pendiente > 0:
+            cura_frame = self.velocidad_curacion * delta_time
+            cura_frame = min(cura_frame, self.curacion_pendiente) # Evita pasarse
+            
+            self.vida += cura_frame
+            self.curacion_pendiente -= cura_frame
+            
+            # Tope máximo
+            if self.vida >= self.max_vida:
+                self.vida = self.max_vida
+                self.curacion_pendiente = 0.0
 
         intencion_movimiento = arriba or abajo or izq or der
         
@@ -115,3 +131,4 @@ class Jugador(arcade.SpriteSolidColor):
         if arma and hasattr(arma, 'usar'):
             return arma.usar(self, target_x, target_y, proyectiles_list)
         return False 
+
