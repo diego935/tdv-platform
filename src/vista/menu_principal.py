@@ -120,7 +120,9 @@ class MenuPrincipal(arcade.View):
         top = center_y + self.window.height * 0.10 + half_height
 
         if left <= x <= right and bottom <= y <= top:
-            self.window.show_view(VistaJuego())
+            vista_juego = VistaJuego()
+            vista_juego.setup()
+            self.window.show_view(vista_juego)
             return
 
         # BOTÓN HISTORIA

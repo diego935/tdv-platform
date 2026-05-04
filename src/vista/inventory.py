@@ -3,6 +3,9 @@ from vista.textos import *
 
 
 class BaseInventoryUI:
+    # Constants
+    COLUMNS = 4
+    
     def __init__(self, capacity: int, box_size: int = 80, padding: int = 20):
         self.capacity = capacity
         self.box_size = box_size
@@ -21,17 +24,20 @@ class BaseInventoryUI:
         self._drag_source = None
         self._hover_index = None
 
-    def get_slot_at_pointer(self, mouse_x, mouse_y):
+    def _get_grid_metrics(self):
+        """Calculate grid metrics - returns (start_x, start_y)."""
         window = arcade.get_window()
-        
-        columns = 4
-        grid_width = (columns * self.box_size) + ((columns - 1) * self.padding)
+        grid_width = (self.COLUMNS * self.box_size) + ((self.COLUMNS - 1) * self.padding)
         start_x = (window.width - grid_width) / 2 + (self.box_size / 2)
         start_y = (window.height / 2) + (self.box_size / 2) + (self.padding / 2)
+        return start_x, start_y
+
+    def get_slot_at_pointer(self, mouse_x, mouse_y):
+        start_x, start_y = self._get_grid_metrics()
 
         for i in range(self.capacity):
-            col = i % columns
-            row = i // columns
+            col = i % self.COLUMNS
+            row = i // self.COLUMNS
             
             cx = start_x + (col * (self.box_size + self.padding))
             cy = start_y - (row * (self.box_size + self.padding))
@@ -53,15 +59,11 @@ class BaseInventoryUI:
             self.background_color
         )
 
-        # Grid
-        columns = 4
-        grid_width = (columns * self.box_size) + ((columns - 1) * self.padding)
-        start_x = (window.width - grid_width) / 2 + (self.box_size / 2)
-        start_y = (window.height / 2) + (self.box_size / 2) + (self.padding / 2)
+        start_x, start_y = self._get_grid_metrics()
 
         for i in range(self.capacity):
-            col = i % columns
-            row = i // columns
+            col = i % self.COLUMNS
+            row = i // self.COLUMNS
 
             current_x = start_x + (col * (self.box_size + self.padding))
             current_y = start_y - (row * (self.box_size + self.padding))
