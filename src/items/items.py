@@ -611,17 +611,18 @@ class Botiquin(BaseItem):
                 self._timer_cooldown = 0
 
     def usar(self, owner, target_x=None, target_y=None, proyectiles_list=None) -> bool:
-            if not self.puede_usar:
-                return False
+        if not self.puede_usar:
+            return False
+        
+        exito = False
+        if hasattr(owner, 'iniciar_curacion'):
+            exito = owner.iniciar_curacion(self.cantidad_curacion, self.tiempo_curacion)
+        
+        if exito:
+            self.cantidad_usos -= 1
+            if self.cantidad_usos <= 0 and hasattr(owner, 'destruir_item_activo'):
+                owner.destruir_item_activo()
+            return True
             
-            exito = False
-
-            if hasattr(owner, 'iniciar_curacion'):
-                exito = owner.iniciar_curacion(self.cantidad_curacion, self.tiempo_curacion)
-            
-            if exito:
-                self.cantidad_usos -= 1
-                if self.cantidad_usos <= 0 and hasattr(owner, 'destruir_item_activo'):
-                    owner.destruir_item_activo()
-                return True
+        return False
                 
