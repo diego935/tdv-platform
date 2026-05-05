@@ -38,7 +38,7 @@ class Jugador(arcade.Sprite):
             "right": assets.get_texture("assets/Jugador/Soldado hacia derecha.png"),
         }
         self.texture = self.texturas[self.direccion]
-        self.scale = 0.025
+        self.scale = 0.035
 
 
     def draw_inventory(self, mouse_pos=None): 
