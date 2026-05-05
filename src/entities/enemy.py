@@ -47,6 +47,8 @@ class Enemigo(arcade.SpriteSolidColor):
         self.ruta = []
         self.velocidad = 2
         self.vista = 500
+        self.nav = SistemaNavegacion()
+
 
     def establecer_ruta(self, destino, nav_manager):
         self.pos_origen = self.position
@@ -58,8 +60,7 @@ class Enemigo(arcade.SpriteSolidColor):
         if distancia > self.vista:
             return False
 
-        nav = SistemaNavegacion()
-        return nav.tiene_linea_de_vision(self.position, jugador.position)
+        return self.nav.tiene_linea_de_vision(self.position, jugador.position)
 
     def move(self):
         if not self.ruta:

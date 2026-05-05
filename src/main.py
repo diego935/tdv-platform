@@ -1,6 +1,6 @@
 import arcade
 from config import ANCHO_VENTANA, ALTO_VENTANA, TITULO_VENTANA
-from vista.menu import MenuPrincipal
+from vista.menu_principal import MenuPrincipal
 
 def main():
     window = arcade.Window(ANCHO_VENTANA, ALTO_VENTANA, TITULO_VENTANA)
@@ -10,5 +10,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

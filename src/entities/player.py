@@ -1,6 +1,7 @@
 import arcade
 from vista.inventory import *
 from vista.textos import *
+from vista.asset_manager import AssetManager
 
 
 class Jugador(arcade.Sprite):
@@ -11,12 +12,9 @@ class Jugador(arcade.Sprite):
         self.vida = self.max_vida
         self.curacion_pendiente = 0.0
         self.velocidad_curacion = 0.0
-        self.municion = 30
         self.vel_caminar = 5
         self.velocidad = self.vel_caminar
         self.vel_correr = 10
-        self.esta_corriendo = False
-        self.stamina_agotada = False
         self.capacidad = 8 # NOTE: Está hardcodeada la capacidad del inventario.  
         self.inventory = [None] * self.capacidad
         self.vistaInventario = BaseInventoryUI(self.capacidad) 
@@ -32,11 +30,12 @@ class Jugador(arcade.Sprite):
         #Curacion
         self.tasa_regen_hp = 15
         self.direccion = "down"
+        assets = AssetManager()
         self.texturas = {
-            "up": arcade.load_texture("assets/Jugador/Soldado hacia arriba.png"),
-            "down": arcade.load_texture("assets/Jugador/Soldado hacia abajo.png"),
-            "left": arcade.load_texture("assets/Jugador/Soldado hacia izquierda.png"),
-            "right": arcade.load_texture("assets/Jugador/Soldado hacia derecha.png"),
+            "up": assets.get_texture("assets/Jugador/Soldado hacia arriba.png"),
+            "down": assets.get_texture("assets/Jugador/Soldado hacia abajo.png"),
+            "left": assets.get_texture("assets/Jugador/Soldado hacia izquierda.png"),
+            "right": assets.get_texture("assets/Jugador/Soldado hacia derecha.png"),
         }
         self.texture = self.texturas[self.direccion]
         self.scale = 0.15
