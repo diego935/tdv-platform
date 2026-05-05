@@ -11,11 +11,21 @@ class MenuPrincipal(arcade.View):
     def __init__(self):
         super().__init__()
         self.botones = []
-        arcade.set_background_color(arcade.color.BLACK_LEATHER_JACKET)
+        #arcade.set_background_color(arcade.color.BLACK_LEATHER_JACKET)
+        self.bg_texture = arcade.load_texture("assets/fondos/fondo_principal.png")
         
 
     def on_draw(self):
         self.clear()
+
+        arcade.draw_texture_rect(
+        self.bg_texture,
+        arcade.XYWH(
+            self.window.width // 2,
+            self.window.height // 2,
+            self.window.width,
+            self.window.height
+        ))
 
         center_x = self.window.width / 2
         center_y = self.window.height / 2
