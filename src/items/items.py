@@ -55,8 +55,13 @@ class Botiquin(BaseItem):
         
         if exito:
             self.cantidad_usos -= 1
-            if self.cantidad_usos <= 0 and hasattr(owner, 'destruir_item_activo'):
-                owner.destruir_item_activo()
+            if self.cantidad_usos <= 0:
+                # Buscar este item en el inventario del owner y eliminarlo
+                if hasattr(owner, 'inventory'):
+                    for i, item in enumerate(owner.inventory):
+                        if item is self:
+                            owner.inventory[i] = None
+                            break
             return True
             
         return False

@@ -1,4 +1,5 @@
 import arcade
+import time
 from config import ANCHO_VENTANA, ALTO_VENTANA, COLOR_FONDO_JUEGO
 from entities.player import Jugador
 from entities.enemy import *
@@ -48,6 +49,11 @@ class VistaJuego(arcade.View):
         self.tile_map = None 
         self.scene = None
         self.physics_engine = None
+        
+        # Variables para doble click en inventario
+        self._ultimo_click_slot = None
+        self._ultimo_click_tiempo = 0.0
+        self._DOUBLE_CLICK_DELAY = 0.3  # Segundos para considerar doble click
         
     def setup(self):
         #Mapa--------------------------------------
@@ -118,6 +124,45 @@ class VistaJuego(arcade.View):
         # Sistema de navegacion - necesita los bloques para calcular rutas
         self.nav_manager = SistemaNavegacion(self.lista_bloques)
 
+        # Enemigos de prueba con IA
+        from entities.enemy import EnemigoIA
+
+        # enemy1: patrulla waypoints fijos
+        enemigo1 = EnemigoIA(
+            x=500, y=300,
+            tipo_patrulla=EnemigoIA.TIPO_WAYPOINT,
+            waypoints=[(500, 300), (700, 300), (700, 500), (500, 500)],
+            velocidad=100,
+            velocidad_patrulla=60,
+            vista_rango=400,
+            tiempo_buscar=3.0
+        )
+        self.lista_enemigos.append(enemigo1)
+
+        # enemigo2: patrulla area aleatoria
+        enemigo2 = EnemigoIA(
+            x=200, y=500,
+            tipo_patrulla=EnemigoIA.TIPO_AREA,
+            area_center=(200, 500),
+            area_radio=150,
+            velocidad=100,
+            velocidad_patrulla=50,
+            vista_rango=350,
+            tiempo_buscar=2.5
+        )
+        self.lista_enemigos.append(enemigo2)
+
+        # enemigo3: patrulla por paredes
+        enemigo3 = EnemigoIA(
+            x=800, y=200,
+            tipo_patrulla=EnemigoIA.TIPO_PAREDES,
+            velocidad=120,
+            velocidad_patrulla=70,
+            vista_rango=300,
+            tiempo_buscar=2.0
+        )
+        self.lista_enemigos.append(enemigo3)
+
     def on_draw(self):
         self.clear()
         
@@ -176,7 +221,14 @@ class VistaJuego(arcade.View):
     )
 
         self.lista_puertas.update(delta_time)
-        self.lista_enemigos.update()
+        
+        # Update enemigos IA
+        for enemigo in self.lista_enemigos:
+            if hasattr(enemigo, 'update'):
+                if hasattr(enemigo, 'puede_ver_player'):
+                    enemigo.update(delta_time, self.sprite_jugador, self.lista_bloques, self.nav_manager)
+                else:
+                    enemigo.update(delta_time)
 
         for p in self.lista_proyectiles:
             if hasattr(p, 'update'):
@@ -350,7 +402,22 @@ class VistaJuego(arcade.View):
         if self.show_inventory and button == arcade.MOUSE_BUTTON_LEFT:
             slot = self.sprite_jugador.vistaInventario.get_slot_at_pointer(x, y)
             if slot is not None and slot < len(self.sprite_jugador.inventory):
-                if self.sprite_jugador.inventory[slot] is not None:
+                item = self.sprite_jugador.inventory[slot]
+                # Detectar doble click en mismo slot
+                ahora = time.time()
+                es_doble_click = (
+                    slot == self._ultimo_click_slot and 
+                    ahora - self._ultimo_click_tiempo < self._DOUBLE_CLICK_DELAY
+                )
+                # Actualizar tracking de clicks
+                self._ultimo_click_slot = slot
+                self._ultimo_click_tiempo = ahora
+                
+                # Si hay item, tiene método usar, y es doble click → usar
+                if item and hasattr(item, 'usar') and es_doble_click:
+                    item.usar(self.sprite_jugador, None, None, None)
+                elif item is not None:
+                    # Solo guardar para arrastar si no es doble click
                     self.sprite_jugador.vistaInventario._drag_source = slot
             return
         
