@@ -149,7 +149,7 @@ class Pistola(WeaponBase):
         super().__init__(
             item_id=100,
             nombre="Pistola",
-            sprite_path="../assets/items/Pistola.jpg",
+            sprite_path="assets/items/Pistola.jpg",
             damage=25,
             cooldown=0.4,
             rango=800.0,
@@ -327,7 +327,7 @@ class Cuchillo(WeaponBase):
         super().__init__(
             item_id=101,
             nombre="Cuchillo",
-            sprite_path="../assets/items/Cuchillo.jpg",
+            sprite_path="assets/items/Cuchillo.jpg",
             damage=40,
             cooldown=0.6,
             rango=80.0,
