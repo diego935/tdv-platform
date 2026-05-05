@@ -130,7 +130,7 @@ class EnemigoIA(arcade.SpriteSolidColor):
         tipo_ataque: str = "melee",
         dano_ataque: float = 10.0,
         rango_ataque: float = 40.0,
-        tiempo_cortesia: float = 2.0
+        tiempo_cortesia: float = 4.0
     ):
         super().__init__(width=32, height=32, color=arcade.color.RED)
         self.center_x = x
@@ -183,8 +183,9 @@ class EnemigoIA(arcade.SpriteSolidColor):
 
     def on_draw(self):
         super().on_draw()
-        # Dibujar estado del enemigo
-        color_estado = {
+        
+        # Texto de estado
+        color_texto = {
             self.ESTADO_PATRULLAR: arcade.color.GREEN,
             self.ESTADO_PERSEGUIR: arcade.color.RED,
             self.ESTADO_BUSCAR: arcade.color.YELLOW,
@@ -196,7 +197,7 @@ class EnemigoIA(arcade.SpriteSolidColor):
             self.estado.upper(),
             self.center_x,
             self.center_y + 25,
-            color_estado,
+            color_texto,
             font_size=8,
             anchor_x="center"
         )
@@ -341,6 +342,7 @@ class EnemigoIA(arcade.SpriteSolidColor):
         """Cambia de estado."""
         if self.estado != nuevo_estado:
             self.estado = nuevo_estado
+            
             if nuevo_estado == self.ESTADO_BUSCAR:
                 self.ruta_actual = []
             elif nuevo_estado == self.ESTADO_RETURN:
