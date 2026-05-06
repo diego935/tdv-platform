@@ -1,10 +1,11 @@
 import arcade
 
 class FloatingMessage:
-    def __init__(self, text, x, y):
+    def __init__(self, text, x, y, color=(255, 255, 255)):
         self.text = text
         self.x = x
         self.y = y
+        self.color = color  # RGB tuple
         self.alpha = 255  # Opacidad total al inicio
         self.speed = 0.5  # Qué tan rápido sube
         self.fade_rate = 2 # Qué tan rápido desaparece
@@ -22,8 +23,9 @@ class FloatingMessage:
 
     def draw(self):
         if self.active:
-            # Creamos el color blanco con la transparencia actual
-            color = (255, 255, 255, self.alpha)
+            # Creamos el color con la transparencia actual
+            r, g, b = self.color
+            color = (r, g, b, self.alpha)
             arcade.draw_text(
                 self.text, 
                 self.x, 
@@ -31,7 +33,7 @@ class FloatingMessage:
                 color, 
                 font_size=12, 
                 anchor_x="center",
-                font_name="Arial" # O tu fuente por defecto
+                font_name="Arial"
             )
 
 
@@ -47,10 +49,9 @@ class TextManager:
         return cls._instance 
         ## NOTE: Esto es un singleton, es una clase que solo es instanciada una vez, las siguientes veces que se intenta devuelve la clase ya instanciada.
 
-    def show_message(self, text, x, y):
-        # Import local para evitar errores de importación circular
+    def show_message(self, text, x, y, color=(255, 255, 255)):
         from vista.inventory import FloatingMessage 
-        nuevo = FloatingMessage(text, x, y)
+        nuevo = FloatingMessage(text, x, y, color)
         self.floating_messages.append(nuevo)
 
     def update(self):

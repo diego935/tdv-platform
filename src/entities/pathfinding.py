@@ -89,7 +89,6 @@ class GridPathfinder:
             inicio = time.time()
             self._actualizar_grid_sync(self._bloques_pendientes, padding)
             duracion = time.time() - inicio
-            print(f"[GridPathfinder] Grid actualizado en {duracion:.3f}s - {len(self.grid)} celdas")
         except Exception as e:
             print(f"[GridPathfinder] Error en actualización: {e}")
         finally:

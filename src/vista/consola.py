@@ -205,6 +205,50 @@ def cmd_dummy(vista, args):
     except Exception as e:
         return f"Error: {e}", "ERROR"
 
+def cmd_enemigo(vista, args):
+    """Crea EnemigoIA. Uso: enemigo [waypoint|area|paredes] [radio] [dano]"""
+    try:
+        from entities.enemy import EnemigoIA
+        
+        tipo = args[0].lower() if args else "waypoint"
+        radio = int(args[1]) if len(args) > 1 else 150
+        dano = float(args[2]) if len(args) > 2 else 10.0
+        
+        x = vista.mouse_world_x
+        y = vista.mouse_world_y
+        
+        if tipo == "waypoint":
+            enemigo = EnemigoIA(
+                x=x, y=y,
+                tipo_patrulla=EnemigoIA.TIPO_WAYPOINT,
+                waypoints=[(x, y), (x+100, y), (x+100, y+100), (x, y+100)],
+                vista_rango=400,
+                dano_ataque=dano
+            )
+        elif tipo == "area":
+            enemigo = EnemigoIA(
+                x=x, y=y,
+                tipo_patrulla=EnemigoIA.TIPO_AREA,
+                area_center=(x, y),
+                area_radio=radio,
+                vista_rango=350,
+                dano_ataque=dano
+            )
+        elif tipo == "paredes":
+            enemigo = EnemigoIA(
+                x=x, y=y,
+                tipo_patrulla=EnemigoIA.TIPO_PAREDES,
+                vista_rango=300,
+                dano_ataque=dano
+            )
+        else:
+            return f"Tipo '{tipo}' no válido. Usa: waypoint, area o paredes", "ERROR"
+        
+        vista.lista_enemigos.append(enemigo)
+        return f"EnemigoIA ({tipo}) creado en ({x}, {y}) - Daño: {dano}", "SUCCESS"
+    except Exception as e:
+        return f"Error: {e}", "ERROR"
+
 def cmd_bloque(vista, args):
     try:
         size = int(args[0]) if args else 32
@@ -310,6 +354,7 @@ COMANDOS = {
     "tp": cmd_tp,
     "heal": cmd_heal,
     "dummy": cmd_dummy,
+    "enemigo": cmd_enemigo,
     "bloque": cmd_bloque,
     "nav": cmd_nav,
     "debug": cmd_debug, 

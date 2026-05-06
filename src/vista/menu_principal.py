@@ -1,7 +1,8 @@
 import arcade
-from vista_historia import VistaHistoria
-from vista_ajustes import VistaAjustes
-from menu import VistaJuego
+from vista.vista_historia import VistaHistoria
+from vista.vista_ajustes import VistaAjustes
+from vista.vista_partidas import VistaPartidas
+from vista.menu import VistaJuego
 
 
 
@@ -10,11 +11,21 @@ class MenuPrincipal(arcade.View):
     def __init__(self):
         super().__init__()
         self.botones = []
-        arcade.set_background_color(arcade.color.BLACK_LEATHER_JACKET)
+        #arcade.set_background_color(arcade.color.BLACK_LEATHER_JACKET)
+        self.bg_texture = arcade.load_texture("assets/fondos/fondo_principal.png")
         
 
     def on_draw(self):
         self.clear()
+
+        arcade.draw_texture_rect(
+        self.bg_texture,
+        arcade.XYWH(
+            self.window.width // 2,
+            self.window.height // 2,
+            self.window.width,
+            self.window.height
+        ))
 
         center_x = self.window.width / 2
         center_y = self.window.height / 2
@@ -39,11 +50,11 @@ class MenuPrincipal(arcade.View):
 
     
         arcade.draw_lrbt_rectangle_filled(
-        center_x - half_width,
-        center_x + half_width,
-        center_y + self.window.height * 0.02 - half_height,
-        center_y + self.window.height * 0.10 + half_height,
-        arcade.color.SMOKY_BLACK)
+            center_x - half_width,
+            center_x + half_width,
+            center_y + self.window.height * 0.02 - half_height,
+            center_y + self.window.height * 0.10 + half_height,
+            arcade.color.SMOKY_BLACK)
 
         arcade.draw_lrbt_rectangle_outline(center_x - half_width, center_x + half_width, bottom1, top1, arcade.color.VENETIAN_RED, 3)
 
@@ -53,11 +64,11 @@ class MenuPrincipal(arcade.View):
         top2 = center_y - self.window.height * 0.14 + half_height
 
         arcade.draw_lrbt_rectangle_filled(
-        center_x - half_width,
-        center_x + half_width,
-        center_y - self.window.height * 0.16 - half_height,
-        center_y - self.window.height * 0.14 + half_height,
-        arcade.color.SMOKY_BLACK)
+            center_x - half_width,
+            center_x + half_width,
+            center_y - self.window.height * 0.16 - half_height,
+            center_y - self.window.height * 0.14 + half_height,
+            arcade.color.SMOKY_BLACK)
 
         arcade.draw_lrbt_rectangle_outline(center_x - half_width, center_x + half_width, bottom2, top2, arcade.color.VENETIAN_RED, 3)
 
@@ -67,11 +78,11 @@ class MenuPrincipal(arcade.View):
         top3 = center_y - self.window.height * 0.32 + half_height
 
         arcade.draw_lrbt_rectangle_filled(
-        center_x - half_width,
-        center_x + half_width,
-        center_y - self.window.height * 0.35 - half_height,
-        center_y - self.window.height * 0.32 + half_height,
-        arcade.color.SMOKY_BLACK)
+            center_x - half_width,
+            center_x + half_width,
+            center_y - self.window.height * 0.35 - half_height,
+            center_y - self.window.height * 0.32 + half_height,
+            arcade.color.SMOKY_BLACK)
 
         arcade.draw_lrbt_rectangle_outline(center_x - half_width, center_x + half_width, bottom3, top3, arcade.color.VENETIAN_RED, 3)
 
@@ -114,16 +125,15 @@ class MenuPrincipal(arcade.View):
         half_width = self.window.width * 0.30
         half_height = self.window.height * 0.06
 
-        # BOTÓN JUGAR
+        # BOTÓN JUGAR -> VA A VISTA PARTIDAS
         left = center_x - half_width
         right = center_x + half_width
         bottom = center_y + self.window.height * 0.02 - half_height
         top = center_y + self.window.height * 0.10 + half_height
 
         if left <= x <= right and bottom <= y <= top:
-            vista_juego = VistaJuego()
-            vista_juego.setup()
-            self.window.show_view(vista_juego)
+            vista_partidas = VistaPartidas()
+            self.window.show_view(vista_partidas)
             return
 
         # BOTÓN HISTORIA
@@ -141,5 +151,3 @@ class MenuPrincipal(arcade.View):
         if left <= x <= right and bottom <= y <= top:
             self.window.show_view(VistaAjustes())
             return
-
-    

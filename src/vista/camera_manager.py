@@ -29,6 +29,16 @@ class CameraManager:
         """Convierte coordenadas de pantalla a coordenadas del mundo."""
         return self.camera.unproject(screen_pos)
 
+    def unproject_with_origin(self, screen_x, screen_y, window_width, window_height):
+        """Convierte coordenadas de pantalla a coordenadas del mundo considerando zoom y posición de cámara."""
+        cam_x, cam_y = self.camera.position
+        zoom = self.camera.zoom
+        
+        world_x = (screen_x - window_width / 2) / zoom + cam_x
+        world_y = (screen_y - window_height / 2) / zoom + cam_y
+        
+        return world_x, world_y
+
     def project(self, world_pos):
         """Convierte coordenadas del mundo a coordenadas de pantalla."""
         return self.camera.project(world_pos)
