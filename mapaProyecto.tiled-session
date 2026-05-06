@@ -2,18 +2,22 @@
     "activeFile": "assets/maps/mapa.tmx",
     "expandedProjectPaths": [
         "assets",
-        "assets/tilesets",
         ".",
-        "assets/maps"
+        "assets/maps",
+        "assets/tilesets"
     ],
     "fileStates": {
         "assets/maps/mapa.tmx": {
-            "scale": 2,
+            "scale": 0.33,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 3132.5,
-                "y": 3175.75
+                "x": 3493.939393939394,
+                "y": 3971.212121212121
             }
+        },
+        "assets/maps/pared_ejemplo.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "assets/tilesets/Ejemplo.tsx": {
             "scaleInDock": 1,
@@ -23,10 +27,12 @@
     "last.imagePath": "/home/d4ni/Documentos/tdv-platform/assets/tilesets",
     "openFiles": [
         "assets/maps/mapa.tmx",
-        "assets/tilesets/Ejemplo.tsx"
+        "assets/tilesets/Ejemplo.tsx",
+        "assets/maps/pared_ejemplo.tsx"
     ],
     "project": "mapaProyecto.tiled-project",
     "recentFiles": [
+        "assets/maps/pared_ejemplo.tsx",
         "assets/tilesets/Ejemplo.tsx",
         "assets/maps/mapa.tmx"
     ],
