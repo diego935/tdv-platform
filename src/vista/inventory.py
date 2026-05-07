@@ -114,3 +114,58 @@ class BaseInventoryUI:
                 mx, my = mouse_pos
                 item_rect = arcade.rect.XYWH(mx, my, self.box_size * 0.7, self.box_size * 0.7)
                 arcade.draw_texture_rect(texture=item.texture, rect=item_rect, alpha=200)
+
+
+class NotaUI:
+    def __init__(self):
+        self.panel_width = 500
+        self.panel_height = 350
+
+    def draw(self, titulo, texto):
+        window = arcade.get_window()
+        if not window:
+            return
+
+        center_x = window.width // 2
+        center_y = window.height // 2
+
+        arcade.draw_rect_filled(
+            arcade.rect.XYWH(center_x, center_y, self.panel_width, self.panel_height),
+            (20, 15, 10, 230)
+        )
+        arcade.draw_rect_outline(
+            arcade.rect.XYWH(center_x, center_y, self.panel_width, self.panel_height),
+            arcade.color.GOLD,
+            border_width=3
+        )
+
+        arcade.draw_text(
+            titulo,
+            center_x - self.panel_width // 2 + 20,
+            center_y + self.panel_height // 2 - 40,
+            arcade.color.GOLD,
+            font_size=20,
+            bold=True
+        )
+
+        lines = texto.split('\n')
+        y_pos = center_y + self.panel_height // 2 - 80
+        for line in lines:
+            arcade.draw_text(
+                line,
+                center_x - self.panel_width // 2 + 20,
+                y_pos,
+                arcade.color.WHITE,
+                font_size=14,
+                width=self.panel_width - 40,
+                align="left"
+            )
+            y_pos -= 20
+
+        arcade.draw_text(
+            "Presiona E o ESC para cerrar",
+            center_x,
+            center_y - self.panel_height // 2 + 30,
+            arcade.color.GRAY,
+            font_size=12
+        )
