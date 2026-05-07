@@ -1,6 +1,6 @@
 import arcade
 from vista.menu_navegacion import MenuNavegacion
-from vista.menu import VistaJuego
+from vista.game import VistaJuego
 
 
 class VistaPartidas(MenuNavegacion):
