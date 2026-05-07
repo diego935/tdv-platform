@@ -2,8 +2,7 @@ import arcade
 from vista.vista_historia import VistaHistoria
 from vista.vista_ajustes import VistaAjustes
 from vista.vista_partidas import VistaPartidas
-from vista.menu import VistaJuego
-
+from vista.game import VistaJuego
 
 
 class MenuPrincipal(arcade.View):
