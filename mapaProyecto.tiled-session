@@ -1,18 +1,18 @@
 {
     "activeFile": "assets/maps/mapa.tmx",
     "expandedProjectPaths": [
-        "assets",
         ".",
         "assets/maps",
-        "assets/tilesets"
+        "assets/tilesets",
+        "assets"
     ],
     "fileStates": {
         "assets/maps/mapa.tmx": {
-            "scale": 0.33,
+            "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 3493.939393939394,
-                "y": 3971.212121212121
+                "x": 3317,
+                "y": 3587.5
             }
         },
         "assets/maps/pared_ejemplo.tsx": {
