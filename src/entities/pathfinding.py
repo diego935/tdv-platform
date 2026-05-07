@@ -3,8 +3,7 @@ import threading
 import time
 from typing import List, Tuple, Optional, Set, Callable, Dict
 import arcade
-
-CELL_SIZE = 32
+from config import CELL_SIZE 
 
 
 class Nodo:
@@ -363,7 +362,7 @@ class SistemaNavegacion:
             cls._instance = super(SistemaNavegacion, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, lista_bloques=None, cell_size=32):
+    def __init__(self, lista_bloques=None, cell_size=CELL_SIZE):
         if not hasattr(self, 'inicializado'):
             self.cell_size = cell_size
             self.bloques_referencia = lista_bloques

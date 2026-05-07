@@ -146,7 +146,7 @@ class Jugador(arcade.Sprite):
     def usar_arma_activa(self, target_x, target_y, proyectiles_list):
         arma = self.obtener_arma_activa()
         if arma and hasattr(arma, 'usar'):
-            return arma.usar(self, target_x, target_y, proyectiles_list, self.height/4)
+            return arma.usar(self, target_x, target_y, proyectiles_list)
         return False 
     
 

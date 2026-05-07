@@ -40,60 +40,6 @@ class DummyEnemy(arcade.SpriteSolidColor):
             self._base_y = self.center_y
 
 
-class Enemigo(arcade.SpriteSolidColor):
-    def __init__(self):
-        super().__init__(width=32, height=32, color=arcade.color.RED)
-        self.vida = 50
-        self.pos_origen = None
-        self.pos_destino = None
-        self.ruta = []
-        self.velocidad = 2
-        self.vista = 500
-        self.nav = SistemaNavegacion()
-
-
-    def establecer_ruta(self, destino, nav_manager):
-        self.pos_origen = self.position
-        self.pos_destino = destino
-        self.ruta = nav_manager.obtener_ruta(self.pos_origen, self.pos_destino)
-
-    def check_jugador_en_vista(self, jugador):
-        distancia = arcade.get_distance_between_sprites(self, jugador)
-        if distancia > self.vista:
-            return False
-
-        return self.nav.tiene_linea_de_vision(self.position, jugador.position)
-
-    def move(self):
-        if not self.ruta:
-            return
-
-        destino_x, destino_y = self.ruta[0]
-        
-        if self.center_x < destino_x:
-            self.change_x = self.velocidad
-        elif self.center_x > destino_x:
-            self.change_x = -self.velocidad
-        else:
-            self.change_x = 0
-
-        if self.center_y < destino_y:
-            self.change_y = self.velocidad
-        elif self.center_y > destino_y:
-            self.change_y = -self.velocidad
-        else:
-            self.change_y = 0
-
-        distancia = arcade.get_distance(self.center_x, self.center_y, destino_x, destino_y)
-        if distancia < 5:
-            self.ruta.pop(0)
-            if not self.ruta:
-                self.change_x = 0
-                self.change_y = 0
-
-
-# ==================== ENEMIGO IA ====================
-
 class EnemigoIA(arcade.SpriteSolidColor):
     """
     Enemigo con FSM de IA y 3 tipos de patrulla:
@@ -122,17 +68,15 @@ class EnemigoIA(arcade.SpriteSolidColor):
         waypoints: list = None,
         area_center: tuple = None,
         area_radio: float = 100,
-        velocidad: float = 80,
-        velocidad_patrulla: float = 40,
-        vista_rango: float = 300,
+        velocidad: float = 200,
+        velocidad_patrulla: float = 50,
+        vista_rango: float = 32*25,
         tiempo_buscar: float = 3.0,
         tiempo_esperar: float = 1.0,
         tipo_ataque: str = "melee",
         dano_ataque: float = 10.0,
         rango_ataque: float = 40.0,
-        tiempo_cortesia: float = 4.0,
-        distancia_recalculo: float = 120.0,
-        tiempo_recalculo: float = 0.3
+        tiempo_cortesia: float = 4.0
     ):
         super().__init__(width=32, height=32, color=arcade.color.RED)
         self.center_x = x
@@ -182,11 +126,6 @@ class EnemigoIA(arcade.SpriteSolidColor):
         self._knockback_timer = 0.0
         self._base_x = x
         self._base_y = y
-
-        self.distancia_recalculo = distancia_recalculo
-        self.tiempo_recalculo = tiempo_recalculo
-        self._timer_recalculo = 0.0
-        self._ultima_pos_player_ruta = None
 
     def on_draw(self):
         super().on_draw()
@@ -247,7 +186,7 @@ class EnemigoIA(arcade.SpriteSolidColor):
 
         return True
 
-    def _check_transiciones(self, player, blocks_list, nav_manager):
+    def _check_transiciones(self, player, blocks_list, nav_manager, deltatime):
         """Transiciones entre estados de la FSM."""
 
         if self._knockback_timer > 0:
@@ -260,7 +199,7 @@ class EnemigoIA(arcade.SpriteSolidColor):
             self._timer_cortesia = self.tiempo_cortesia
             self._tiene_vista = True
         elif self._timer_cortesia > 0:
-            self._timer_cortesia -= 1/60
+            self._timer_cortesia -= deltatime
             puede_ver = True  # Durante cortesía, sigue persiguiendo
         
         # Check distancia para ataque melee
@@ -275,9 +214,8 @@ class EnemigoIA(arcade.SpriteSolidColor):
 
         elif self.estado == self.ESTADO_PERSEGUIR:
             if not puede_ver and self._timer_cortesia <= 0:
-                self.ultima_pos_player = self.ultima_pos_player or (
-                    self.center_x, self.center_y
-                )
+                if self.ultima_pos_player is None:
+                    self.ultima_pos_player = (player.center_x, player.center_y)
                 self.cambiar_estado(self.ESTADO_BUSCAR)
                 self.tiempo_busqueda = 0.0
             elif self._llegado_a_destino(player.position, blocks_list):
@@ -439,50 +377,17 @@ class EnemigoIA(arcade.SpriteSolidColor):
         return self.pos_origen
 
     def _update_perseguir(self, delta_time, player, blocks_list, nav_manager):
-        """Update del estado PERSEGUIR con pathfinding reactivo."""
+        """Update del estado PERSEGUIR."""
         if player is None:
             return
 
         destino = (player.center_x, player.center_y)
 
-        dx_player = destino[0] - self.center_x
-        dy_player = destino[1] - self.center_y
-        distancia_player = math.sqrt(dx_player*dx_player + dy_player*dy_player)
-
-        distancia_para_no_recalcular = 90
-        if distancia_player < distancia_para_no_recalcular:
-            self.change_x = (dx_player / distancia_player) * self.velocidad
-            self.change_y = (dy_player / distancia_player) * self.velocidad
-            return
-
-        necesita_recalculo = False
-
-        if not self.ruta_actual:
-            necesita_recalculo = True
-        elif self._llegado_a_destino(destino, blocks_list):
-            necesita_recalculo = True
-        else:
-            if self._ultima_pos_player_ruta is None:
-                necesita_recalculo = True
-            else:
-                dx = destino[0] - self._ultima_pos_player_ruta[0]
-                dy = destino[1] - self._ultima_pos_player_ruta[1]
-                distancia_movida = math.sqrt(dx*dx + dy*dy)
-                if distancia_movida > self.distancia_recalculo:
-                    necesita_recalculo = True
-
-        self._timer_recalculo += delta_time
-        if self._timer_recalculo >= self.tiempo_recalculo:
-            if distancia_player > distancia_para_no_recalcular:
-                self._timer_recalculo = 0
-                necesita_recalculo = True
-
-        if necesita_recalculo:
+        if not self.ruta_actual or self._llegado_a_destino(destino, blocks_list):
             self.ruta_actual = nav_manager.encontrar_ruta(
                 self.position,
                 destino
             ) or []
-            self._ultima_pos_player_ruta = destino
 
         self._mover_por_ruta(self.velocidad)
 
@@ -571,7 +476,7 @@ class EnemigoIA(arcade.SpriteSolidColor):
         elif self.estado == self.ESTADO_RETURN:
             self._update_return(delta_time, blocks_list, nav_manager)
 
-        self._check_transiciones(player, blocks_list, nav_manager)
+        self._check_transiciones(player, blocks_list, nav_manager, delta_time)
 
         self.center_x += self.change_x * delta_time
         self.center_y += self.change_y * delta_time

@@ -4,3 +4,6 @@ TITULO_VENTANA = "Pill of Silence"
 
 COLOR_FONDO_MENU = (20, 20, 20)
 COLOR_FONDO_JUEGO = (47, 79, 79)
+
+
+CELL_SIZE = 64
