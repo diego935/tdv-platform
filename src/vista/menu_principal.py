@@ -35,9 +35,9 @@ class MenuPrincipal(arcade.View):
         arcade.draw_text(
             "MUNDO CAÍDO",
             self.window.width / 2,
-            self.window.height - 150,
+            self.window.height - 200,
             arcade.color.VENETIAN_RED,
-            80,
+            130,
             anchor_x="center",
             font_name="Impact"
         )
