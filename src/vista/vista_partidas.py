@@ -11,7 +11,7 @@ class VistaPartidas(MenuNavegacion):
         arcade.draw_text(
             "SELECCION DE PARTIDA", 
             self.window.width / 2, 
-            self.window.height / 2 + 150, 
+            self.window.height / 2 + 220, 
             arcade.color.GOLDENROD, 
             40, 
             anchor_x="center",
@@ -19,11 +19,12 @@ class VistaPartidas(MenuNavegacion):
         )
 
         # BOTONES DE PARTIDAS
-        boton_width = 400
-        boton_height = 80
+        boton_width = 500 
+        boton_height = 110
         center_x = self.window.width / 2
-        y_nueva = self.window.height / 2 + 60
-        y_seguir = self.window.height / 2 - 60
+        
+        y_nueva = self.window.height / 2 + 80
+        y_seguir = self.window.height / 2 - 80
 
         for y, texto in [(y_nueva, "NUEVA PARTIDA"), (y_seguir, "CONTINUAR PARTIDA")]:
             left_btn = center_x - boton_width / 2
@@ -40,7 +41,7 @@ class VistaPartidas(MenuNavegacion):
                 center_x, 
                 y, 
                 color_texto, 
-                25,
+                28, # Aumenté un poco el tamaño de fuente para que llene el nuevo espacio
                 anchor_x="center", 
                 anchor_y="center", 
                 font_name="Times New Roman"

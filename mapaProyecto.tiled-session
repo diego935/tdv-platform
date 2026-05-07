@@ -2,39 +2,77 @@
     "activeFile": "assets/maps/mapa.tmx",
     "expandedProjectPaths": [
         ".",
-        "assets/maps",
+        "assets",
         "assets/tilesets",
-        "assets"
+        "assets/maps"
     ],
     "fileStates": {
+        "assets/maps/Carretera.tsx": {
+            "scaleInDock": 0.5,
+            "scaleInEditor": 1
+        },
+        "assets/maps/campoPlantas.tsx": {
+            "scaleInDock": 0.33,
+            "scaleInEditor": 1
+        },
         "assets/maps/mapa.tmx": {
-            "scale": 1,
+            "scale": 0.33,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 3317,
-                "y": 3587.5
+                "x": 2715.151515151515,
+                "y": 1631.8181818181818
             }
         },
         "assets/maps/pared_ejemplo.tsx": {
             "scaleInDock": 1,
+            "scaleInEditor": 16
+        },
+        "assets/maps/quitaMiedos.tsx": {
+            "scaleInDock": 0.5,
             "scaleInEditor": 1
         },
+        "assets/maps/quitamiedos.tsx": {
+            "scaleInDock": 0.125,
+            "scaleInEditor": 0.25
+        },
         "assets/tilesets/Ejemplo.tsx": {
+            "scaleInDock": 0.5,
+            "scaleInEditor": 1.5
+        },
+        "assets/tilesets/bloqueHitbox.tsx": {
             "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "assets/tilesets/carretera.tsx": {
+            "scaleInDock": 0.75,
+            "scaleInEditor": 1
+        },
+        "assets/tilesets/sueloCampo.tsx": {
+            "scaleInDock": 0.5,
             "scaleInEditor": 1
         }
     },
     "last.imagePath": "/home/d4ni/Documentos/tdv-platform/assets/tilesets",
     "openFiles": [
         "assets/maps/mapa.tmx",
-        "assets/tilesets/Ejemplo.tsx",
-        "assets/maps/pared_ejemplo.tsx"
+        "assets/tilesets/sueloCampo.tsx",
+        "assets/tilesets/carretera.tsx",
+        "assets/tilesets/bloqueHitbox.tsx",
+        "assets/maps/quitaMiedos.tsx",
+        "assets/maps/campoPlantas.tsx"
     ],
     "project": "mapaProyecto.tiled-project",
     "recentFiles": [
+        "assets/maps/campoPlantas.tsx",
+        "assets/maps/quitaMiedos.tsx",
+        "assets/tilesets/bloqueHitbox.tsx",
+        "assets/tilesets/carretera.tsx",
+        "assets/tilesets/sueloCampo.tsx",
+        "assets/maps/mapa.tmx",
+        "assets/maps/quitamiedos.tsx",
+        "assets/maps/Carretera.tsx",
         "assets/maps/pared_ejemplo.tsx",
-        "assets/tilesets/Ejemplo.tsx",
-        "assets/maps/mapa.tmx"
+        "assets/tilesets/Ejemplo.tsx"
     ],
     "tileset.lastUsedFormat": "tsx"
 }
