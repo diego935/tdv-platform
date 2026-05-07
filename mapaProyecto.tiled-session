@@ -7,6 +7,10 @@
         "assets"
     ],
     "fileStates": {
+        "assets/maps/Carretera.tsx": {
+            "scaleInDock": 0.5,
+            "scaleInEditor": 1
+        },
         "assets/maps/mapa.tmx": {
             "scale": 1,
             "selectedLayer": 0,
@@ -17,11 +21,15 @@
         },
         "assets/maps/pared_ejemplo.tsx": {
             "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInEditor": 16
+        },
+        "assets/maps/quitamiedos.tsx": {
+            "scaleInDock": 0.125,
+            "scaleInEditor": 0.25
         },
         "assets/tilesets/Ejemplo.tsx": {
-            "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInDock": 0.5,
+            "scaleInEditor": 1.5
         }
     },
     "last.imagePath": "/home/d4ni/Documentos/tdv-platform/assets/tilesets",
@@ -32,6 +40,8 @@
     ],
     "project": "mapaProyecto.tiled-project",
     "recentFiles": [
+        "assets/maps/quitamiedos.tsx",
+        "assets/maps/Carretera.tsx",
         "assets/maps/pared_ejemplo.tsx",
         "assets/tilesets/Ejemplo.tsx",
         "assets/maps/mapa.tmx"
