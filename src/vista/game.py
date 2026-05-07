@@ -6,6 +6,7 @@ from entities.enemy import *
 from entities.pathfinding import SistemaNavegacion
 from entities.blocks import *
 from vista.inventory import * 
+from vista.inventory import NotaUI 
 from vista.textos import TextManager 
 from items.item_manager import * 
 from items.items import * 
@@ -32,7 +33,7 @@ class VistaJuego(arcade.View):
         self.mouse_world_y = None  
         self.nav_manager = None
         
-        self.show_inventory = False 
+        self.show_inventory = False
         self.izquierda_presionado = False
         self.derecha_presionado = False
         self.arriba_presionado = False
@@ -108,6 +109,13 @@ class VistaJuego(arcade.View):
             pedernal.center_y = random.randint(200, 400)
             self.item_manager.add_to_world(pedernal)
         
+        nota_prueba = Nota(500, "Nota del survivalista",
+            "Día 45 de la escasez.\n\nLos suministros se agotan rápidamente.\nDebo encontrar otra fuente de agua\nantes de que sea demasiado tarde.\n\nEl viejo molino al norte podría\ntener algo útil...",
+            "assets/items/Flint.png")
+        nota_prueba.center_x = 0
+        nota_prueba.center_y = 0
+        self.item_manager.add_to_world(nota_prueba)
+        
         from items.weapons import Pistola, Cuchillo
         self.sprite_jugador.inventory[0] = Pistola()
         self.sprite_jugador.inventory[1] = Cuchillo()
@@ -170,6 +178,9 @@ class VistaJuego(arcade.View):
             mouse_pos = (self.mouse_pos_x, self.mouse_pos_y) if hasattr(self, 'mouse_pos_x') else None
             self.sprite_jugador.draw_inventory(mouse_pos)
 
+        if self.sprite_jugador.vistaNota:
+            NotaUI().draw(self.sprite_jugador.vistaNota.titulo, self.sprite_jugador.vistaNota.texto)
+
         if self.estado_actual == "CONSOLE":
             self.console.draw()
 
@@ -179,8 +190,11 @@ class VistaJuego(arcade.View):
         return (dx < (sprite1.width / 2 + sprite2.width / 2 + margen) and dy < (sprite1.height / 2 + sprite2.height / 2 + margen))
 
     def on_update(self, delta_time):
-        if self.show_inventory or self.estado_actual== "CONSOLE":
-            self.console.update(delta_time,self)
+        if self.estado_actual == "CONSOLE":
+            self.console.update(delta_time, self)
+            return
+        if self.show_inventory or self.sprite_jugador.vistaNota:
+            return
 
         self.sprite_jugador.move(
             self.arriba_presionado,
@@ -252,6 +266,11 @@ class VistaJuego(arcade.View):
                     char = char.upper()
                 self.console.input_text += char
             return 
+
+        if self.sprite_jugador.vistaNota:
+            if key == arcade.key.E or key == arcade.key.ESCAPE:
+                self.sprite_jugador.vistaNota = None
+            return
 
         if self.show_inventory:
             if key == arcade.key.TAB:

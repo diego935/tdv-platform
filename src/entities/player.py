@@ -17,7 +17,8 @@ class Jugador(arcade.Sprite):
         self.vel_correr = 10
         self.capacidad = 8 # NOTE: Está hardcodeada la capacidad del inventario.  
         self.inventory = [None] * self.capacidad
-        self.vistaInventario = BaseInventoryUI(self.capacidad) 
+        self.vistaInventario = BaseInventoryUI(self.capacidad)
+        self.vistaNota = None 
         self.indice_seleccionado = None
         self.indice_activo = 0
         self.stamina = 100; 

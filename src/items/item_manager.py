@@ -22,9 +22,7 @@ class ItemManager:
         self.items_on_ground.draw()
 
     def intentar_recoger(self, jugador):
-            # Recorremos los items que están en el suelo
             for item in self.items_on_ground:
-                # Si el jugador está cerca del item
                 if arcade.get_distance_between_sprites(jugador, item) < 50:
                     exito = jugador.recoger_objeto(item)
                     
@@ -32,3 +30,10 @@ class ItemManager:
                         self.items_on_ground.remove(item)
                         return True
             return False
+
+    def get_items_cercanos(self, jugador, distancia):
+        items_cercanos = []
+        for item in self.items_on_ground:
+            if arcade.get_distance_between_sprites(jugador, item) < distancia:
+                items_cercanos.append(item)
+        return items_cercanos

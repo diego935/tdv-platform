@@ -48,20 +48,19 @@ class Botiquin(BaseItem):
     def usar(self, owner, target_x=None, target_y=None, proyectiles_list=None) -> bool:
         if not self.puede_usar:
             return False
-        
-        exito = False
-        if hasattr(owner, 'iniciar_curacion'):
-            exito = owner.iniciar_curacion(self.cantidad_curacion, self.tiempo_curacion)
-        
-        if exito:
-            self.cantidad_usos -= 1
-            if self.cantidad_usos <= 0:
-                # Buscar este item en el inventario del owner y eliminarlo
-                if hasattr(owner, 'inventory'):
-                    for i, item in enumerate(owner.inventory):
-                        if item is self:
-                            owner.inventory[i] = None
-                            break
-            return True
-            
-        return False
+
+
+class Nota(BaseItem):
+    def __init__(self, item_id, titulo, texto, sprite_path):
+        super().__init__(
+            item_id=item_id,
+            name=titulo,
+            sprite_path=sprite_path,
+            description=""
+        )
+        self.titulo = titulo
+        self.texto = texto
+
+    def usar(self, owner, target_x=None, target_y=None, proyectiles_list=None) -> bool:
+        owner.vistaNota = self
+        return True
