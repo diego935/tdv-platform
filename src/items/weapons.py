@@ -168,16 +168,16 @@ class Pistola(WeaponBase):
     def puede_usar(self) -> bool:
         return (self._timer_cooldown <= 0 and not self.esta_recargando and self.municion_actual > 0)
 
-    def usar(self, owner, target_x, target_y, proyectiles_list) -> bool:
+    def usar(self, owner, target_x, target_y, proyectiles_list, altura=0) -> bool:
         if not self.puede_usar:
             return False
 
-        angle_rad = math.atan2(target_y - owner.center_y, target_x - owner.center_x)
+        angle_rad = math.atan2(target_y - owner.center_y- altura, target_x - owner.center_x)
         angle_deg = math.degrees(angle_rad)
 
         proyectil = Proyectil(
             x=owner.center_x,
-            y=owner.center_y,
+            y=owner.center_y + altura,
             angle=angle_deg,
             damage=self.damage,
             velocidad=self.velocidad_proyectil,

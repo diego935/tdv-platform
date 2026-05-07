@@ -130,7 +130,9 @@ class EnemigoIA(arcade.SpriteSolidColor):
         tipo_ataque: str = "melee",
         dano_ataque: float = 10.0,
         rango_ataque: float = 40.0,
-        tiempo_cortesia: float = 4.0
+        tiempo_cortesia: float = 4.0,
+        distancia_recalculo: float = 120.0,
+        tiempo_recalculo: float = 0.3
     ):
         super().__init__(width=32, height=32, color=arcade.color.RED)
         self.center_x = x
@@ -180,6 +182,11 @@ class EnemigoIA(arcade.SpriteSolidColor):
         self._knockback_timer = 0.0
         self._base_x = x
         self._base_y = y
+
+        self.distancia_recalculo = distancia_recalculo
+        self.tiempo_recalculo = tiempo_recalculo
+        self._timer_recalculo = 0.0
+        self._ultima_pos_player_ruta = None
 
     def on_draw(self):
         super().on_draw()
@@ -432,17 +439,50 @@ class EnemigoIA(arcade.SpriteSolidColor):
         return self.pos_origen
 
     def _update_perseguir(self, delta_time, player, blocks_list, nav_manager):
-        """Update del estado PERSEGUIR."""
+        """Update del estado PERSEGUIR con pathfinding reactivo."""
         if player is None:
             return
 
         destino = (player.center_x, player.center_y)
 
-        if not self.ruta_actual or self._llegado_a_destino(destino, blocks_list):
+        dx_player = destino[0] - self.center_x
+        dy_player = destino[1] - self.center_y
+        distancia_player = math.sqrt(dx_player*dx_player + dy_player*dy_player)
+
+        distancia_para_no_recalcular = 90
+        if distancia_player < distancia_para_no_recalcular:
+            self.change_x = (dx_player / distancia_player) * self.velocidad
+            self.change_y = (dy_player / distancia_player) * self.velocidad
+            return
+
+        necesita_recalculo = False
+
+        if not self.ruta_actual:
+            necesita_recalculo = True
+        elif self._llegado_a_destino(destino, blocks_list):
+            necesita_recalculo = True
+        else:
+            if self._ultima_pos_player_ruta is None:
+                necesita_recalculo = True
+            else:
+                dx = destino[0] - self._ultima_pos_player_ruta[0]
+                dy = destino[1] - self._ultima_pos_player_ruta[1]
+                distancia_movida = math.sqrt(dx*dx + dy*dy)
+                if distancia_movida > self.distancia_recalculo:
+                    necesita_recalculo = True
+
+        self._timer_recalculo += delta_time
+        if self._timer_recalculo >= self.tiempo_recalculo:
+            if distancia_player > distancia_para_no_recalcular:
+                self._timer_recalculo = 0
+                necesita_recalculo = True
+
+        if necesita_recalculo:
             self.ruta_actual = nav_manager.encontrar_ruta(
                 self.position,
                 destino
             ) or []
+            self._ultima_pos_player_ruta = destino
 
         self._mover_por_ruta(self.velocidad)
 
