@@ -3,9 +3,9 @@ from vista.asset_manager import AssetManager
 
 
 class BaseItem(arcade.Sprite):
-    def __init__(self, item_id, name, sprite_path, description="", durability=100.0):
+    def __init__(self, item_id, name, sprite_path, description="", durability=100.0, scale = 0.5):
         texture = AssetManager().get_texture(sprite_path)
-        super().__init__(texture, scale=0.5)
+        super().__init__(texture, scale=scale)
 
         self.id = item_id 
         self.name = name
@@ -51,12 +51,13 @@ class Botiquin(BaseItem):
 
 
 class Nota(BaseItem):
-    def __init__(self, item_id, titulo, texto, sprite_path):
+    def __init__(self, item_id, nombre, titulo, texto, sprite_path):
         super().__init__(
             item_id=item_id,
-            name=titulo,
+            name=nombre,
             sprite_path=sprite_path,
-            description=""
+            description="",
+            scale= 0.05
         )
         self.titulo = titulo
         self.texto = texto

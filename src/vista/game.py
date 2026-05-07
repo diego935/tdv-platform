@@ -109,11 +109,11 @@ class VistaJuego(arcade.View):
             pedernal.center_y = random.randint(200, 400)
             self.item_manager.add_to_world(pedernal)
         
-        nota_prueba = Nota(500, "Nota del survivalista",
-            "Día 45 de la escasez.\n\nLos suministros se agotan rápidamente.\nDebo encontrar otra fuente de agua\nantes de que sea demasiado tarde.\n\nEl viejo molino al norte podría\ntener algo útil...",
-            "assets/items/Flint.png")
-        nota_prueba.center_x = 0
-        nota_prueba.center_y = 0
+        nota_prueba = Nota(500, "NOTA", "SE BUSCAN KORUS",
+            "Si alguien lee esto...\nYo de niña tenía unos muñecos... \ny los he perdido \n¿me ayudas a encontrarlos? \n\nquizás recibas algo a cambio :)",
+            "assets/items/Nota.png")
+        nota_prueba.center_x = 106*32
+        nota_prueba.center_y = 101*32
         self.item_manager.add_to_world(nota_prueba)
         
         from items.weapons import Pistola, Cuchillo
@@ -268,7 +268,7 @@ class VistaJuego(arcade.View):
             return 
 
         if self.sprite_jugador.vistaNota:
-            if key == arcade.key.E or key == arcade.key.ESCAPE:
+            if key == arcade.key.E:
                 self.sprite_jugador.vistaNota = None
             return
 

@@ -163,7 +163,7 @@ class NotaUI:
             y_pos -= 20
 
         arcade.draw_text(
-            "Presiona E o ESC para cerrar",
+            "Presiona E para cerrar",
             center_x,
             center_y - self.panel_height // 2 + 30,
             arcade.color.GRAY,
