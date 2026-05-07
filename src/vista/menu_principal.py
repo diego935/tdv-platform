@@ -33,7 +33,7 @@ class MenuPrincipal(arcade.View):
 
         # Título
         arcade.draw_text(
-            "MUNDO CAÍDO",
+            "PILL OF SILENCE",
             self.window.width / 2,
             self.window.height - 200,
             arcade.color.VENETIAN_RED,
