@@ -164,6 +164,10 @@ class Pistola(WeaponBase):
         self.velocidad_proyectil = 600.0
         self.lifetime_proyectil = 2.0
 
+        # SONIDOS
+        self.sonido_disparo = arcade.load_sound("assets/sonidos/disparo.wav")
+        self.sonido_recarga = arcade.load_sound("assets/sonidos/recarga.wav")
+
     @property
     def puede_usar(self) -> bool:
         return (self._timer_cooldown <= 0 and not self.esta_recargando and self.municion_actual > 0)
@@ -185,6 +189,7 @@ class Pistola(WeaponBase):
         )
 
         proyectiles_list.append(proyectil)
+        arcade.play_sound(self.sonido_disparo)
         self.municion_actual -= 1
         self.iniciar_cooldown()
         return True
@@ -197,6 +202,7 @@ class Pistola(WeaponBase):
 
         self.esta_recargando = True
         self._timer_recarga = self._tiempo_recarga
+        arcade.play_sound(self.sonido_recarga)
         return True
 
     def actualizar(self, delta_time: float):
