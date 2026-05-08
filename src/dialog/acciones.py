@@ -79,7 +79,7 @@ def ejecutar_accion(accion: str, vista) -> None:
         else:
             item = BaseItem(1, param, "assets/items/Flint.png")
         
-        item.center_x = vista.sprite_jugador.center_x + 32
+        item.center_x = vista.sprite_jugador.center_x
         item.center_y = vista.sprite_jugador.center_y
         _safe_call('item_manager_add_item', item)
     elif tipo == "cerrar":

@@ -14,6 +14,7 @@ from items.weapons import *
 from vista.hud import HUD
 from vista.consola import * 
 from vista.camera_manager import CameraManager
+from vista.asset_manager import AssetManager
 import random
 from items.weapons import Pistola, Cuchillo
 
@@ -93,6 +94,19 @@ class VistaJuego(arcade.View):
         eventos = self.tile_map.object_lists.get(self.CAPAS["eventos"], [])
         spawn = next((obj for obj in eventos if obj.name == "Spawnpoint"), None)
         self.lista_npcs = self.tile_map.object_lists.get(self.CAPAS["npcs"], [])
+        
+        # Crear sprites para NPCs desde objetos Tiled
+        self.lista_npc_sprites = arcade.SpriteList()
+        for npc_obj in self.lista_npcs:
+            props = getattr(npc_obj, 'properties', {})
+            sprite_path = props.get('sprite', '')
+            if sprite_path:
+                tex = AssetManager().get_texture(sprite_path)
+                npc_sprite = arcade.Sprite(tex, scale=0.11)
+                npc_sprite.center_x = npc_obj.shape[0][0]
+                npc_sprite.center_y = npc_obj.shape[0][1]
+                self.lista_npc_sprites.append(npc_sprite)
+        
         self.sprite_jugador = Jugador()
         if spawn:
             self.sprite_jugador.center_x = spawn.shape[0]
@@ -101,7 +115,11 @@ class VistaJuego(arcade.View):
         self.scene.add_sprite("Player", self.sprite_jugador)
         self.lista_jugadores.append(self.sprite_jugador)
 
-        # Solo las PAREDES van a la lista de colisión 
+        # Añadir NPCs a la lista de colisiones
+        for npc_sprite in self.lista_npc_sprites:
+            self.lista_bloques.append(npc_sprite)
+        
+        # Solo las PAREDES van a la lista de colisión
         muros_mapa = self.scene.get_sprite_list(self.CAPAS["muros"])
         if muros_mapa:
             for muro in muros_mapa:
@@ -178,6 +196,7 @@ class VistaJuego(arcade.View):
                 p.draw()
             self.lista_enemigos.draw()
             self.lista_jugadores.draw()
+            self.lista_npc_sprites.draw()
             self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager, self.sprite_jugador)
             self.text_manager.draw()
 
@@ -328,11 +347,11 @@ class VistaJuego(arcade.View):
                 else:
                     dialog_file = dialogo
                     nodo_inicial = 'saludo'
-                npc_x = npc.shape[0][0]
-                npc_y = npc.shape[0][1]
+                npc_x = (npc.shape[0][0] + npc.shape[2][0]) / 2
+                npc_y = (npc.shape[0][1] + npc.shape[2][1]) / 2
                 dx = abs(self.sprite_jugador.center_x - npc_x)
                 dy = abs(self.sprite_jugador.center_y - npc_y)
-                if dx < 48 and dy < 48:
+                if dx < 100 and dy < 100:
                     self.dm.cargar_dialogo(dialog_file)
                     self.dm.iniciar(nodo_inicial)
                     self.estado_actual = "DIALOGO"
