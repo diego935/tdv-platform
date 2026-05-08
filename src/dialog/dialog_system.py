@@ -1,5 +1,6 @@
 import json
 import os
+import arcade
 from typing import Callable, Optional
 
 
@@ -68,17 +69,28 @@ class DialogSystem:
         if not self.nodo_accion or not self._vista:
             return
         
-        from dialog.acciones import obtener_accion, ejecutar_accion
-        accion = obtener_accion(self._nombre_dialogo, self.nodo_accion)
-        if accion:
+        from dialog.acciones import ejecutar_accion
+        accion = self.nodo_accion
+        
+        if ":" in accion or accion in ["cerrar", "debug"]:
             ejecutar_accion(accion, self._vista)
+        else:
+            from dialog.acciones import obtener_accion
+            accion_real = obtener_accion(self._nombre_dialogo, accion)
+            if accion_real:
+                ejecutar_accion(accion_real, self._vista)
 
     def seleccionar_opcion(self, numero: str) -> bool:
         if numero not in self.opciones:
             return False
+        
         siguiente_nodo = self.opciones[numero]
+        
         self.mostrar_nodo(siguiente_nodo)
-        self.ejecutar_accion_actual()
+        
+        if self.nodo_accion:
+            self.ejecutar_accion_actual()
+        
         return True
 
     def cerrar(self) -> None:
@@ -87,6 +99,24 @@ class DialogSystem:
         self.nodo_actual = None
         self.opciones = {}
         self._notificar_cambio()
+
+    def on_key_press(self, key) -> bool:
+        """Maneja input del jugador. Returns True si el diálogo debe cerrar."""
+        if not self.dialogo_activo:
+            return True
+        
+        if key == arcade.key.E:
+            self.cerrar()
+            return True
+        elif key in [arcade.key.KEY_1, arcade.key.KEY_2, arcade.key.KEY_3, 
+                     arcade.key.KEY_4, arcade.key.KEY_5]:
+            num = str(key - arcade.key.KEY_1 + 1)
+            self.seleccionar_opcion(num)
+            return False
+        return False
+
+    def get_vista(self):
+        return self._vista
 
     def registrar_accion(self, nombre: str, callback: Callable) -> None:
         self.acciones[nombre] = callback

@@ -17,6 +17,9 @@ from vista.camera_manager import CameraManager
 import random
 from items.weapons import Pistola, Cuchillo
 
+from dialog import DialogManager
+from vista.dialog_ui import DialogUI
+
 
 
 class VistaJuego(arcade.View):
@@ -34,6 +37,8 @@ class VistaJuego(arcade.View):
         self.mouse_world_x = None 
         self.mouse_world_y = None  
         self.nav_manager = None
+        self.dm = None
+        self.lista_npcs = []
         
         self.show_inventory = False
         self.izquierda_presionado = False
@@ -53,7 +58,8 @@ class VistaJuego(arcade.View):
             "suelo": "Suelo",
             "muros": "Pared",
             "eventos": "Eventos",
-            "zonas": "Zonas"
+            "zonas": "Zonas",
+            "npcs" : "NPCs"
         }
         self.lista_enemigos = arcade.SpriteList()
         self.lista_puertas = arcade.SpriteList()
@@ -86,7 +92,7 @@ class VistaJuego(arcade.View):
         # Configurar Jugador y Spawn
         eventos = self.tile_map.object_lists.get(self.CAPAS["eventos"], [])
         spawn = next((obj for obj in eventos if obj.name == "Spawnpoint"), None)
-        
+        self.lista_npcs = self.tile_map.object_lists.get(self.CAPAS["npcs"], [])
         self.sprite_jugador = Jugador()
         if spawn:
             self.sprite_jugador.center_x = spawn.shape[0]
@@ -123,6 +129,8 @@ class VistaJuego(arcade.View):
 
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
         self.nav_manager = SistemaNavegacion(self.lista_bloques)
+        self.dm = DialogManager()
+        self.dm.set_vista(self)
 
         from entities.enemy import EnemigoIA
 
@@ -182,6 +190,9 @@ class VistaJuego(arcade.View):
         if self.sprite_jugador.vistaNota:
             NotaUI().draw(self.sprite_jugador.vistaNota.titulo, self.sprite_jugador.vistaNota.texto)
 
+        if self.estado_actual == "DIALOGO":
+            DialogUI().draw(self.dm.nodo_texto, self.dm.obtener_opciones())
+
         if self.estado_actual == "CONSOLE":
             self.console.draw()
 
@@ -194,7 +205,7 @@ class VistaJuego(arcade.View):
         if self.estado_actual == "CONSOLE":
             self.console.update(delta_time, self)
             return
-        if self.show_inventory or self.sprite_jugador.vistaNota:
+        if self.estado_actual == "DIALOGO" or self.show_inventory or self.sprite_jugador.vistaNota:
             return
 
         self.sprite_jugador.move(
@@ -280,6 +291,11 @@ class VistaJuego(arcade.View):
                 self.ejecutar_soltar_item()
             return
 
+        if self.dm and self.estado_actual == "DIALOGO":
+            if self.dm.on_key_press(key):
+                self.estado_actual = "JUGANDO"
+            return
+
         if key == arcade.key.TAB:
             self.show_inventory = True
             return
@@ -302,6 +318,26 @@ class VistaJuego(arcade.View):
             if self.cerca_con_margen(self.sprite_jugador, puerta, 15):
                 puerta.interactuar()
                 return 
+        
+        for npc in self.lista_npcs:
+            props = getattr(npc, 'properties', None)
+            if props and props.get('dialogo'):
+                dialogo = props['dialogo']
+                if ':' in dialogo:
+                    dialog_file, nodo_inicial = dialogo.split(':', 1)
+                else:
+                    dialog_file = dialogo
+                    nodo_inicial = 'saludo'
+                npc_x = npc.shape[0][0]
+                npc_y = npc.shape[0][1]
+                dx = abs(self.sprite_jugador.center_x - npc_x)
+                dy = abs(self.sprite_jugador.center_y - npc_y)
+                if dx < 48 and dy < 48:
+                    self.dm.cargar_dialogo(dialog_file)
+                    self.dm.iniciar(nodo_inicial)
+                    self.estado_actual = "DIALOGO"
+                    return
+        
         self.item_manager.intentar_recoger(self.sprite_jugador)
 
     def ejecutar_recargar(self):
@@ -390,3 +426,10 @@ class VistaJuego(arcade.View):
 
     def cargar_objetos_del_mapa(self):
         pass
+    
+    def cerrar_dialogo(self):
+        if self.dm:
+            self.dm.cerrar()
+    
+    def item_manager_add_item(self, item):
+        self.item_manager.add_to_world(item)

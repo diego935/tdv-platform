@@ -1,5 +1,7 @@
 import json
 import os
+from items.items import Botiquin
+from items.items import BaseItem
 
 
 _acciones_cache = {}
@@ -7,18 +9,28 @@ _acciones_cache = {}
 _ITEM_FACTORY = {}
 
 
+def _get_vista():
+    """Get vista safely."""
+    from dialog.dialog_system import DialogManager
+    dm = DialogManager()
+    return dm.get_vista() if dm else None
+
+
 def _init_item_factory():
     """Inicializa la factory de items."""
     global _ITEM_FACTORY
     if _ITEM_FACTORY:
         return
-    try:
-        from items.items import Botiquin
-        _ITEM_FACTORY = {
-            "Botiquin": Botiquin,
-        }
-    except ImportError:
-        pass
+    _ITEM_FACTORY = {
+        "Botiquin": Botiquin,
+    }
+
+
+def _safe_call(method_name, *args):
+    """Safe method call."""
+    vista = _get_vista()
+    if vista and hasattr(vista, method_name):
+        getattr(vista, method_name)(*args)
 
 
 def cargar_acciones(nombre_dialogo: str) -> dict:
@@ -38,6 +50,7 @@ def cargar_acciones(nombre_dialogo: str) -> dict:
 
 
 def ejecutar_accion(accion: str, vista) -> None:
+    """Ejecuta una acción del diálogo."""
     if not accion:
         return
     
@@ -47,12 +60,16 @@ def ejecutar_accion(accion: str, vista) -> None:
         tipo = accion
         param = ""
     
+    vista = vista or _get_vista()
+    if not vista:
+        return
+    
     if tipo == "quitar-vida":
         cantidad = int(param) if param.isdigit() else 10
-        vista.quitar_vida(cantidad)
+        vista.sprite_jugador.recibir_dano(cantidad)
     elif tipo == "curar":
         cantidad = int(param) if param.isdigit() else 10
-        vista.curar(cantidad)
+        vista.sprite_jugador.iniciar_curacion(cantidad)
     elif tipo == "dar-item":
         _init_item_factory()
         param = param.strip()
@@ -60,16 +77,13 @@ def ejecutar_accion(accion: str, vista) -> None:
             ItemClass = _ITEM_FACTORY[param]
             item = ItemClass()
         else:
-            from items.items import BaseItem
             item = BaseItem(1, param, "assets/items/Flint.png")
         
-        # Position item near player
         item.center_x = vista.sprite_jugador.center_x + 32
         item.center_y = vista.sprite_jugador.center_y
-        vista.item_manager.add_to_world(item)
-        print(f"[Dialog] Has recibido: {param}")
+        _safe_call('item_manager_add_item', item)
     elif tipo == "cerrar":
-        vista.cerrar_dialogo()
+        _safe_call('cerrar_dialogo')
     elif tipo == "debug":
         print(f"[Dialog] {param}")
 

@@ -340,11 +340,7 @@ def cmd_dmg(vista, args):
     try:
         cantidad = float(args[0]) if args else 10.0
         
-        vista.sprite_jugador.vida -= cantidad
-        
-        if vista.sprite_jugador.vida < 0:
-            vista.sprite_jugador.vida = 0
-            
+        vista.sprite_jugador.recibir_dano(cantidad)
         return f"Daño aplicado: -{cantidad} HP. Vida actual: {vista.sprite_jugador.vida}", "SUCCESS"
     except ValueError:
         return "Error: La cantidad de daño debe ser un número.", "ERROR"

@@ -162,3 +162,20 @@ class Jugador(arcade.Sprite):
         """ Elimina el item actual del inventario (cuando se gasta) """
         if 0 <= self.indice_activo < len(self.inventory):
             self.inventory[self.indice_activo] = None
+
+    def recibir_dano(self, cantidad: float, fuente_x: float = None, fuente_y: float = None):
+        self.vida -= cantidad
+        if fuente_x is not None and fuente_y is not None:
+            dx = self.center_x - fuente_x
+            dy = self.center_y - fuente_y
+            dist = math.sqrt(dx*dx + dy*dy)
+            if dist > 0:
+                self._knockback_vel = (dx/dist * 100, dy/dist * 100)
+                self._knockback_timer = 0.15
+                self._base_x = self.center_x
+                self._base_y = self.center_y
+        if self.vida <= 0:
+            self.vida =0
+            
+            #Aqui se llama a la pantalla de muerte
+            pass 
