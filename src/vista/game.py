@@ -15,6 +15,8 @@ from vista.hud import HUD
 from vista.consola import * 
 from vista.camera_manager import CameraManager
 import random
+from items.weapons import Pistola, Cuchillo
+
 
 
 class VistaJuego(arcade.View):
@@ -116,7 +118,6 @@ class VistaJuego(arcade.View):
         nota_prueba.center_y = 101*32
         self.item_manager.add_to_world(nota_prueba)
         
-        from items.weapons import Pistola, Cuchillo
         self.sprite_jugador.inventory[0] = Pistola()
         self.sprite_jugador.inventory[1] = Cuchillo()
 
