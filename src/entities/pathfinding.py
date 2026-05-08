@@ -1,8 +1,9 @@
 import heapq
 import threading
 import time
-from typing import List, Tuple, Optional, Set, Callable
+from typing import List, Tuple, Optional, Set, Callable, Dict
 import arcade
+from config import CELL_SIZE 
 
 
 class Nodo:
@@ -35,7 +36,7 @@ class Nodo:
 
 
 class GridPathfinder:
-    def __init__(self, cell_size: int = 32):
+    def __init__(self, cell_size: int = CELL_SIZE):
         self.cell_size = cell_size
         self.grid: dict = {}
         self.world_bounds = None
@@ -55,6 +56,10 @@ class GridPathfinder:
         self._callback_completado: Optional[Callable] = None
         self._bloques_pendientes = None
         self.bloques_referencia = None
+
+        self._cache_rutas: Dict[Tuple, List[Tuple[float, float]]] = {}
+        self._cache_max_size = 50
+        self._version_grid_cache = 0
 
     def _mundo_a_grid(self, x: float, y: float) -> Tuple[int, int]:
         return (int(x // self.cell_size), int(y // self.cell_size))
@@ -143,6 +148,12 @@ class GridPathfinder:
                 self.grid[(gx, gy)] = Nodo(gx, gy, transitable)
 
         self._grid_actualizado = True
+        self._cache_rutas.clear()
+
+    def _guardar_en_cache(self, clave: Tuple, ruta: List[Tuple[float, float]]):
+        if len(self._cache_rutas) >= self._cache_max_size:
+            self._cache_rutas.pop(next(iter(self._cache_rutas)))
+        self._cache_rutas[clave] = ruta
 
     def esta_actualizando(self) -> bool:
         return self._actualizando
@@ -181,6 +192,10 @@ class GridPathfinder:
 
         inicio_grid = self._mundo_a_grid(inicio[0], inicio[1])
         fin_grid = self._mundo_a_grid(fin[0], fin[1])
+
+        cache_key = (inicio_grid, fin_grid)
+        if cache_key in self._cache_rutas:
+            return self._cache_rutas[cache_key]
 
         nodo_inicio = self.grid.get(inicio_grid)
         nodo_fin = self.grid.get(fin_grid)
@@ -229,7 +244,9 @@ class GridPathfinder:
                 continue
 
             if nodo_actual == nodo_fin:
-                return self._reconstruir_ruta(nodo_fin)
+                ruta_encontrada = self._reconstruir_ruta(nodo_fin)
+                self._guardar_en_cache(cache_key, ruta_encontrada)
+                return ruta_encontrada
 
             cerrada.add(nodo_actual)
 
@@ -345,7 +362,7 @@ class SistemaNavegacion:
             cls._instance = super(SistemaNavegacion, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, lista_bloques=None, cell_size=32):
+    def __init__(self, lista_bloques=None, cell_size=CELL_SIZE):
         if not hasattr(self, 'inicializado'):
             self.cell_size = cell_size
             self.bloques_referencia = lista_bloques

@@ -40,60 +40,6 @@ class DummyEnemy(arcade.SpriteSolidColor):
             self._base_y = self.center_y
 
 
-class Enemigo(arcade.SpriteSolidColor):
-    def __init__(self):
-        super().__init__(width=32, height=32, color=arcade.color.RED)
-        self.vida = 50
-        self.pos_origen = None
-        self.pos_destino = None
-        self.ruta = []
-        self.velocidad = 2
-        self.vista = 500
-        self.nav = SistemaNavegacion()
-
-
-    def establecer_ruta(self, destino, nav_manager):
-        self.pos_origen = self.position
-        self.pos_destino = destino
-        self.ruta = nav_manager.obtener_ruta(self.pos_origen, self.pos_destino)
-
-    def check_jugador_en_vista(self, jugador):
-        distancia = arcade.get_distance_between_sprites(self, jugador)
-        if distancia > self.vista:
-            return False
-
-        return self.nav.tiene_linea_de_vision(self.position, jugador.position)
-
-    def move(self):
-        if not self.ruta:
-            return
-
-        destino_x, destino_y = self.ruta[0]
-        
-        if self.center_x < destino_x:
-            self.change_x = self.velocidad
-        elif self.center_x > destino_x:
-            self.change_x = -self.velocidad
-        else:
-            self.change_x = 0
-
-        if self.center_y < destino_y:
-            self.change_y = self.velocidad
-        elif self.center_y > destino_y:
-            self.change_y = -self.velocidad
-        else:
-            self.change_y = 0
-
-        distancia = arcade.get_distance(self.center_x, self.center_y, destino_x, destino_y)
-        if distancia < 5:
-            self.ruta.pop(0)
-            if not self.ruta:
-                self.change_x = 0
-                self.change_y = 0
-
-
-# ==================== ENEMIGO IA ====================
-
 class EnemigoIA(arcade.SpriteSolidColor):
     """
     Enemigo con FSM de IA y 3 tipos de patrulla:
@@ -122,9 +68,9 @@ class EnemigoIA(arcade.SpriteSolidColor):
         waypoints: list = None,
         area_center: tuple = None,
         area_radio: float = 100,
-        velocidad: float = 80,
-        velocidad_patrulla: float = 40,
-        vista_rango: float = 300,
+        velocidad: float = 200,
+        velocidad_patrulla: float = 50,
+        vista_rango: float = 32*25,
         tiempo_buscar: float = 3.0,
         tiempo_esperar: float = 1.0,
         tipo_ataque: str = "melee",
@@ -240,7 +186,7 @@ class EnemigoIA(arcade.SpriteSolidColor):
 
         return True
 
-    def _check_transiciones(self, player, blocks_list, nav_manager):
+    def _check_transiciones(self, player, blocks_list, nav_manager, deltatime):
         """Transiciones entre estados de la FSM."""
 
         if self._knockback_timer > 0:
@@ -253,7 +199,7 @@ class EnemigoIA(arcade.SpriteSolidColor):
             self._timer_cortesia = self.tiempo_cortesia
             self._tiene_vista = True
         elif self._timer_cortesia > 0:
-            self._timer_cortesia -= 1/60
+            self._timer_cortesia -= deltatime
             puede_ver = True  # Durante cortesía, sigue persiguiendo
         
         # Check distancia para ataque melee
@@ -268,9 +214,8 @@ class EnemigoIA(arcade.SpriteSolidColor):
 
         elif self.estado == self.ESTADO_PERSEGUIR:
             if not puede_ver and self._timer_cortesia <= 0:
-                self.ultima_pos_player = self.ultima_pos_player or (
-                    self.center_x, self.center_y
-                )
+                if self.ultima_pos_player is None:
+                    self.ultima_pos_player = (player.center_x, player.center_y)
                 self.cambiar_estado(self.ESTADO_BUSCAR)
                 self.tiempo_busqueda = 0.0
             elif self._llegado_a_destino(player.position, blocks_list):
@@ -531,7 +476,7 @@ class EnemigoIA(arcade.SpriteSolidColor):
         elif self.estado == self.ESTADO_RETURN:
             self._update_return(delta_time, blocks_list, nav_manager)
 
-        self._check_transiciones(player, blocks_list, nav_manager)
+        self._check_transiciones(player, blocks_list, nav_manager, delta_time)
 
         self.center_x += self.change_x * delta_time
         self.center_y += self.change_y * delta_time

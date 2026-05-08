@@ -172,12 +172,12 @@ class Pistola(WeaponBase):
         if not self.puede_usar:
             return False
 
-        angle_rad = math.atan2(target_y - owner.center_y, target_x - owner.center_x)
+        angle_rad = math.atan2(target_y - owner.center_y - owner.height/4, target_x - owner.center_x)
         angle_deg = math.degrees(angle_rad)
 
         proyectil = Proyectil(
             x=owner.center_x,
-            y=owner.center_y,
+            y=owner.center_y + owner.height/4,
             angle=angle_deg,
             damage=self.damage,
             velocidad=self.velocidad_proyectil,
