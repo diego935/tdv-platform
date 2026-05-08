@@ -103,8 +103,8 @@ class VistaJuego(arcade.View):
             if sprite_path:
                 tex = AssetManager().get_texture(sprite_path)
                 npc_sprite = arcade.Sprite(tex, scale=0.11)
-                npc_sprite.center_x = npc_obj.shape[0][0]
-                npc_sprite.center_y = npc_obj.shape[0][1]
+                npc_sprite.center_x = (npc_obj.shape[0][0] + npc_obj.shape[2][0]) / 2
+                npc_sprite.center_y = (npc_obj.shape[0][1] + npc_obj.shape[2][1]) / 2
                 self.lista_npc_sprites.append(npc_sprite)
         
         self.sprite_jugador = Jugador()
@@ -135,7 +135,7 @@ class VistaJuego(arcade.View):
             pedernal.center_y = random.randint(200, 400)
             self.item_manager.add_to_world(pedernal)
         
-        nota_prueba = Nota(500, "NOTA", "SE BUSCAN KORUS",
+        nota_prueba = Nota(500, "Se busca", "SE BUSCAN KORUS",
             "Si alguien lee esto...\nYo de niña tenía unos muñecos... \ny los he perdido \n¿me ayudas a encontrarlos? \n\nquizás recibas algo a cambio :)",
             "assets/items/Nota.png")
         nota_prueba.center_x = 106*32
@@ -351,7 +351,7 @@ class VistaJuego(arcade.View):
                 npc_y = (npc.shape[0][1] + npc.shape[2][1]) / 2
                 dx = abs(self.sprite_jugador.center_x - npc_x)
                 dy = abs(self.sprite_jugador.center_y - npc_y)
-                if dx < 100 and dy < 100:
+                if dx < 80 and dy < 120:
                     self.dm.cargar_dialogo(dialog_file)
                     self.dm.iniciar(nodo_inicial)
                     self.estado_actual = "DIALOGO"

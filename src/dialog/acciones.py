@@ -79,8 +79,24 @@ def ejecutar_accion(accion: str, vista) -> None:
         else:
             item = BaseItem(1, param, "assets/items/Flint.png")
         
-        item.center_x = vista.sprite_jugador.center_x
-        item.center_y = vista.sprite_jugador.center_y
+        px = vista.sprite_jugador.center_x
+        py = vista.sprite_jugador.center_y
+        
+        npc = vista.lista_npcs[0]
+        npc_shape = npc.shape
+        nx = (npc_shape[0][0] + npc_shape[2][0]) / 2
+        ny = (npc_shape[0][1] + npc_shape[2][1]) / 2        
+        offset = 120
+        if px > nx + offset:
+            item.center_x = px - offset
+        else:
+            item.center_x = px + offset
+            
+        if py > ny + offset:
+            item.center_y = py - offset
+        else:
+            item.center_y = py + offset
+        
         _safe_call('item_manager_add_item', item)
     elif tipo == "cerrar":
         _safe_call('cerrar_dialogo')
