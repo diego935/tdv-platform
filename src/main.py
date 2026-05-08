@@ -16,7 +16,7 @@ class PantallaCompleta(arcade.Window):
                 
 
 def main():
-    
+   
     window = PantallaCompleta(ANCHO_VENTANA, ALTO_VENTANA, TITULO_VENTANA)
     vista_menu = MenuPrincipal()
     window.show_view(vista_menu)

@@ -29,7 +29,7 @@ class Jugador(arcade.Sprite):
         self.tasa_consumo_stamina = 25
         self.tasa_regen_stamina = 25
         #Curacion
-        self.tasa_regen_hp = 15
+        self.tasa_regen_hp = 25
         self.direccion = "down"
         assets = AssetManager()
         self.texturas = {

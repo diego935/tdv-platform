@@ -6,6 +6,7 @@
         "assets/tilesets",
         "assets/maps"
     ],
+    "file.lastUsedOpenFilter": "Todos los archivos (*)",
     "fileStates": {
         "assets/maps/Carretera.tsx": {
             "scaleInDock": 0.5,
@@ -43,6 +44,10 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "assets/tilesets/campoPlantas.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "assets/tilesets/carretera.tsx": {
             "scaleInDock": 0.75,
             "scaleInEditor": 1
@@ -52,6 +57,7 @@
             "scaleInEditor": 1
         }
     },
+    "last.externalTilesetPath": "/home/d4ni/Documentos/tdv-platform/assets/tilesets",
     "last.imagePath": "/home/d4ni/Documentos/tdv-platform/assets/tilesets",
     "openFiles": [
         "assets/maps/mapa.tmx",
@@ -63,8 +69,9 @@
     ],
     "project": "mapaProyecto.tiled-project",
     "recentFiles": [
-        "assets/maps/campoPlantas.tsx",
+        "assets/tilesets/campoPlantas.tsx",
         "assets/maps/quitaMiedos.tsx",
+        "assets/maps/campoPlantas.tsx",
         "assets/tilesets/bloqueHitbox.tsx",
         "assets/tilesets/carretera.tsx",
         "assets/tilesets/sueloCampo.tsx",
@@ -74,5 +81,6 @@
         "assets/maps/pared_ejemplo.tsx",
         "assets/tilesets/Ejemplo.tsx"
     ],
+    "tileset.lastUsedFilter": "Archivos de conjuntos de patrones Tiled (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx"
 }
