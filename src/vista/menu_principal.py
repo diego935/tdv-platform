@@ -12,6 +12,7 @@ class MenuPrincipal(arcade.View):
         self.botones = []
         #arcade.set_background_color(arcade.color.BLACK_LEATHER_JACKET)
         self.bg_texture = arcade.load_texture("assets/fondos/fondo_principal.png")
+        arcade.load_font("assets/fuentes/fuente_menu_principal.ttf")
         
 
     def on_draw(self):
@@ -36,10 +37,10 @@ class MenuPrincipal(arcade.View):
             "PILL OF SILENCE",
             self.window.width / 2,
             self.window.height - 200,
-            arcade.color.VENETIAN_RED,
+            (170, 20, 20),
             130,
             anchor_x="center",
-            font_name="Impact"
+            font_name="Waruna"
         )
 
         # BOTÓN 1 (JUGAR)
