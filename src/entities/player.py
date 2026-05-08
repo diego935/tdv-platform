@@ -158,8 +158,11 @@ class Jugador(arcade.Sprite):
         self.velocidad_curacion = float(cantidad) / float(tiempo)
         return True
 
-    def destruir_item_activo(self):
+    def destruir_item_activo(self, slot= None):
         """ Elimina el item actual del inventario (cuando se gasta) """
+        if slot: 
+            self.inventory[slot] = None 
+            return
         if 0 <= self.indice_activo < len(self.inventory):
             self.inventory[self.indice_activo] = None
 

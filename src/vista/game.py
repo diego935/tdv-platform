@@ -365,9 +365,9 @@ class VistaJuego(arcade.View):
             arma.recargar()
 
     def ejecutar_soltar_item(self):
-        idx = self.sprite_jugador.indice_seleccionado
-        if idx is not None:
-            objeto = self.sprite_jugador.soltar_objeto(idx)
+        slot = self.sprite_jugador.vistaInventario.get_slot_at_pointer(self.mouse_pos_x, self.mouse_pos_y)
+        if slot is not None:
+            objeto = self.sprite_jugador.soltar_objeto(slot)
             if objeto:
                 self.item_manager.add_to_world(objeto)
     
@@ -396,7 +396,7 @@ class VistaJuego(arcade.View):
     def on_mouse_press(self, x, y, button, modifiers):
         if self.show_inventory and button == arcade.MOUSE_BUTTON_LEFT:
             slot = self.sprite_jugador.vistaInventario.get_slot_at_pointer(x, y)
-            if slot is not None and slot < len(self.sprite_jugador.inventory):
+            if slot and slot < len(self.sprite_jugador.inventory):
                 item = self.sprite_jugador.inventory[slot]
                 ahora = time.time()
                 es_doble_click = (slot == self._ultimo_click_slot and ahora - self._ultimo_click_tiempo < self._DOUBLE_CLICK_DELAY)
@@ -404,7 +404,7 @@ class VistaJuego(arcade.View):
                 self._ultimo_click_tiempo = ahora
                 
                 if item and hasattr(item, 'usar') and es_doble_click:
-                    item.usar(self.sprite_jugador, None, None, None)
+                    item.usar(self.sprite_jugador, slot, None, None, None)
                 elif item is not None:
                     self.sprite_jugador.vistaInventario._drag_source = slot
             return
