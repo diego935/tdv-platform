@@ -1,0 +1,32 @@
+{
+    "saludo": {
+        "texto": "¡Hola, viajero! ¿Qué necesitas?",
+        "accion": "",
+        "opciones": {"1": "dañar", "2": "item", "3": "nada", "4": "adios"}
+    },
+    "dañar": {
+        "texto": "¡Te quito 10 de vida!",
+        "accion": "dano",
+        "opciones": {"1": "saludo"}
+    },
+    "item": {
+        "texto": "Toma,agarrate un botiquin.",
+        "accion": "dar-item:Botiquin",
+        "opciones": {"1": "saludo"}
+    },
+    "nada": {
+        "texto": "Hmm, okay...",
+        "accion": "",
+        "opciones": {"1": "saludo"}
+    },
+    "adios": {
+        "texto": "¡Hasta luego!",
+        "accion": "cerrar",
+        "opciones": {}
+    },
+    "_acciones": {
+        "dano": "quitar-vida:10",
+        "dar-item": "dar-item:Botiquin",
+        "cerrar": "cerrar"
+    }
+}
