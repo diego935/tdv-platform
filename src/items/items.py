@@ -31,9 +31,8 @@ class Botiquin(BaseItem):
         self.cantidad_curacion = 15
         self.tiempo_curacion = 3.0
         self.cantidad_usos = 1
-        self.cooldown = 0.0 
+        self.cooldown = 1.0  
         self._timer_cooldown = 0.0
-        self._curando = False
     
     @property
     def puede_usar(self) -> bool:
@@ -42,12 +41,23 @@ class Botiquin(BaseItem):
     def actualizar(self, delta_time: float):
         if self._timer_cooldown > 0:
             self._timer_cooldown -= delta_time
-            if self._timer_cooldown < 0:
-                self._timer_cooldown = 0
 
     def usar(self, owner, target_x=None, target_y=None, proyectiles_list=None) -> bool:
         if not self.puede_usar:
             return False
+
+        se_pudo_curar = owner.iniciar_curacion(self.cantidad_curacion, self.tiempo_curacion)
+
+        if se_pudo_curar:
+            self.cantidad_usos -= 1
+            self._timer_cooldown = self.cooldown
+            
+            if self.cantidad_usos <= 0:
+                owner.destruir_item_activo()
+            
+            return True
+        
+        return False
 
 
 class Nota(BaseItem):
