@@ -66,6 +66,12 @@ class VistaPartidas(MenuNavegacion):
 
         # NUEVA PARTIDA -> VA A VISTA JUEGO
         if left_btn <= x <= right_btn and bottom_btn <= y <= top_btn:
+
+            if self.window.player_musica is not None:
+
+                arcade.stop_sound(self.window.player_musica)
+                self.window.player_musica = None
+
             vista_juego = VistaJuego()
             vista_juego.setup()
             self.window.show_view(vista_juego)
