@@ -41,6 +41,10 @@ class Jugador(arcade.Sprite):
         self.texture = self.texturas[self.direccion]
         self.scale = 0.035
 
+        self.sonido_pasos = arcade.load_sound("assets/sonidos/caminar.wav")
+        self.player_pasos = None
+        self.sonando_pasos = False
+
 
     def draw_inventory(self, mouse_pos=None): 
         self.vistaInventario.draw(self.inventory, self.vistaInventario._drag_source if hasattr(self.vistaInventario, '_drag_source') else None, mouse_pos)
@@ -132,6 +136,23 @@ class Jugador(arcade.Sprite):
             self.direccion = "right"
 
         self.texture = self.texturas[self.direccion]
+
+        #sonido movimiento
+        moviendose = self.change_x != 0 or self.change_y != 0
+
+        if moviendose:
+
+            if not self.sonando_pasos:
+
+                self.player_pasos = self.sonido_pasos.play(loop=True, volume=0.3)
+                self.sonando_pasos = True
+
+        else:
+
+            if self.sonando_pasos:
+
+                arcade.stop_sound(self.player_pasos)
+                self.sonando_pasos = False
 
 
     def cambiar_slot(self, indice):
