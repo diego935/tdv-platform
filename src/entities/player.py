@@ -44,6 +44,7 @@ class Jugador(arcade.Sprite):
         self.sonido_pasos = arcade.load_sound("assets/sonidos/caminar.wav")
         self.player_pasos = None
         self.sonando_pasos = False
+        self.speed_sonido = 1.0
 
 
     def draw_inventory(self, mouse_pos=None): 
@@ -139,19 +140,33 @@ class Jugador(arcade.Sprite):
 
         #sonido movimiento
         moviendose = self.change_x != 0 or self.change_y != 0
+        corriendo = (shift and moviendose and self.stamina > 0 and self.velocidad_actual == self.vel_correr)
 
         if moviendose:
 
+            velocidad_sonido = 1.5 if corriendo else 1.0
+
             if not self.sonando_pasos:
 
-                self.player_pasos = self.sonido_pasos.play(loop=True, volume=0.3)
+                self.player_pasos = self.sonido_pasos.play(loop=True, volume=0.3, speed=velocidad_sonido)
+
                 self.sonando_pasos = True
+                self.speed_sonido = velocidad_sonido
+
+            elif self.speed_sonido != velocidad_sonido:
+
+                arcade.stop_sound(self.player_pasos)
+
+                self.player_pasos = self.sonido_pasos.play(loop=True, volume=0.3, speed=velocidad_sonido)
+
+                self.speed_sonido = velocidad_sonido
 
         else:
 
             if self.sonando_pasos:
 
                 arcade.stop_sound(self.player_pasos)
+
                 self.sonando_pasos = False
 
 
