@@ -13,7 +13,32 @@ class MenuPrincipal(arcade.View):
         #arcade.set_background_color(arcade.color.BLACK_LEATHER_JACKET)
         self.bg_texture = arcade.load_texture("assets/fondos/fondo_principal.png")
         arcade.load_font("assets/fuentes/fuente_menu_principal.ttf")
-        
+
+
+    def on_show_view(self):
+
+        if not hasattr(self.window, "musica_menu"):
+
+           self.window.musica_menu = arcade.load_sound("assets/musica/banda_sonora.mp3", streaming=True)
+
+        if not hasattr(self.window, "player_musica"):
+
+            self.window.player_musica = None
+
+        self.reproducir_musica()
+
+    def reproducir_musica(self):
+
+        if self.window.player_musica is None:
+
+            self.window.player_musica = self.window.musica_menu.play(volume=0.5, loop=True)
+
+    def detener_musica(self):
+
+        if self.window.player_musica is not None:
+
+            arcade.stop_sound(self.window.player_musica)
+            self.window.player_musica = None
 
     def on_draw(self):
         self.clear()
