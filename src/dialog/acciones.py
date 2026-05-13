@@ -87,12 +87,12 @@ def ejecutar_accion(accion: str, vista) -> None:
         nx = (npc_shape[0][0] + npc_shape[2][0]) / 2
         ny = (npc_shape[0][1] + npc_shape[2][1]) / 2        
         offset = 120
-        if px > nx + offset:
+        if px > nx:
             item.center_x = px - offset
         else:
             item.center_x = px + offset
             
-        if py > ny + offset:
+        if py > ny:
             item.center_y = py - offset
         else:
             item.center_y = py + offset

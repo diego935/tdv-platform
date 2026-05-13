@@ -20,23 +20,7 @@ class BaseItem(arcade.Sprite):
 
 
     def usar(self, owner, slot, target_x=None, target_y=None, proyectiles_list=None) -> bool:
-            print(self.puede_usar)
-            if not self.puede_usar:
-                return False
-
-            se_pudo_curar = owner.iniciar_curacion(self.cantidad_curacion, self.tiempo_curacion)
-            print("Se pudo curar:" ,se_pudo_curar)
-
-            if se_pudo_curar:
-                self.cantidad_usos -= 1
-                self._timer_cooldown = self.cooldown
-                
-                if self.cantidad_usos <= 0:
-                    owner.destruir_item_activo()
-                
-                return True
-            
-            return False
+        pass
 
 
 class Botiquin(BaseItem):
@@ -62,7 +46,7 @@ class Botiquin(BaseItem):
         if self._timer_cooldown > 0:
             self._timer_cooldown -= delta_time
 
-    def usar(self, owner, slot, target_x=None, target_y=None, proyectiles_list=None) -> bool:
+    def usar(self, owner,slot=None, target_x=None, target_y=None, proyectiles_list=None) -> bool:
         print(self.puede_usar)
         if not self.puede_usar:
             return False
@@ -75,10 +59,9 @@ class Botiquin(BaseItem):
             self._timer_cooldown = self.cooldown
             
             if self.cantidad_usos <= 0:
-                owner.destruir_item_activo(slot)
-            
+                owner.destruir_item_activo(slot if slot else None)
+
             return True
-        
         return False
 
 

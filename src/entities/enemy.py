@@ -279,6 +279,10 @@ class EnemigoIA(arcade.SpriteSolidColor):
 
     def _llegado_a_waypoint_aux(self, waypoint, tolerancia: float = 10) -> bool:
         """Helper para check waypoint."""
+        if waypoint is None:
+            return False
+        if self.center_x is None or self.center_y is None:
+            return False
         dx = self.center_x - waypoint[0]
         dy = self.center_y - waypoint[1]
         return math.sqrt(dx*dx + dy*dy) < tolerancia
@@ -323,14 +327,18 @@ class EnemigoIA(arcade.SpriteSolidColor):
     def _update_patrulla_area(self, delta_time, nav_manager):
         """Patrulla aleatoria dentro de un área."""
         if self._llegado_a_waypoint_aux(self.waypoint_actual):
-            nuevo_punto = self._generar_punto_area()
-            self.waypoint_actual = nuevo_punto
-            self.ruta = nav_manager.encontrar_ruta(
-                self.position,
-                self.waypoint_actual
-            ) or []
-
-        self._mover_por_ruta(self.velocidad_patrulla)
+            self.waypoint_actual = self._generar_punto_area()
+        
+        dx = self.waypoint_actual[0] - self.center_x
+        dy = self.waypoint_actual[1] - self.center_y
+        dist = math.sqrt(dx*dx + dy*dy)
+        
+        if dist > 0:
+            self.change_x = (dx / dist) * self.velocidad_patrulla
+            self.change_y = (dy / dist) * self.velocidad_patrulla
+        else:
+            self.change_x = 0
+            self.change_y = 0
 
     def _generar_punto_area(self) -> tuple:
         """Genera punto aleatorio dentro del área."""
