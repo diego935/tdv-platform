@@ -28,7 +28,7 @@ class Botiquin(BaseItem):
         super().__init__(
             item_id=200,
             name="Botiquin",
-            sprite_path="assets/items/botiquin.jpg",
+            sprite_path="assets/items/botiquin.png",
             description="Botiquin de primeros auxilios. Cura gradualmente al usarlo."
         )
         
