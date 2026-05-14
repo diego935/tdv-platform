@@ -2,7 +2,7 @@
     "saludo": {
         "texto": "¡Hola, viajero! ¿Qué necesitas?",
         "accion": "",
-        "opciones": {"1": "dañar", "2": "item", "3": "nada", "4": "adios"}
+        "opciones": {"1": "dañar", "2": "item", "3": "Por que no te dañan mis balas?", "4": "adios"}
     },
     "dañar": {
         "texto": "¡Te quito 10 de vida!",
@@ -14,8 +14,8 @@
         "accion": "dar-item:Botiquin",
         "opciones": {"1": "saludo"}
     },
-    "nada": {
-        "texto": "Hmm, okay...",
+    "Por que no te dañan mis balas?": {
+        "texto": "De puro comer espinacas",
         "accion": "",
         "opciones": {"1": "saludo"}
     },
