@@ -30,6 +30,7 @@ class Jugador(arcade.Sprite):
         self.tasa_consumo_stamina = 25
         self.tasa_regen_stamina = 25
         self.slow_timer = 0.0
+        self.slowed = 1
         self.poison_timer = 0.0
         self.poison_damage = 0.0
         #Curacion
@@ -152,22 +153,20 @@ class Jugador(arcade.Sprite):
             self.change_x = self.velocidad_actual
             self.direccion = "right"
 
+        self.change_x *= self.slowed
+        self.change_y *= self.slowed
+        
         moviendose = self.change_x != 0 or self.change_y != 0
-
         if self.direccion == "right" and moviendose:
-
             self.timer_animacion += delta_time
-
             if self.timer_animacion >= self.velocidad_animacion:
-
                 self.timer_animacion = 0
                 self.frame_animacion += 1
-
                 if self.frame_animacion >= len(self.texturas_right_walk):
                     self.frame_animacion = 0
 
             self.texture = self.texturas_right_walk[self.frame_animacion]
-
+        
         else:
             self.texture = self.texturas[self.direccion]
 
@@ -175,16 +174,18 @@ class Jugador(arcade.Sprite):
         #sonido movimiento
         corriendo = (shift and moviendose and self.stamina > 0 and self.velocidad_actual == self.vel_correr)
 
-        if self.slow_timer > 0:
-            self.slow_timer -= delta_time
-            if self.slow_timer <= 0:
-                self.velocidad = self.base_speed  # restaurar velocidad
+# restaurar velocidad
     
         # Manejar veneno
         if self.poison_timer > 0:
             self.poison_timer -= delta_time
             # Daño por segundo (ajusta el divisor según prefieras)
             self.recibir_dano(self.poison_damage * delta_time)
+
+        if self.slow_timer > 0:
+            self.slow_timer -= delta_time
+            if self.slow_timer <= 0:
+                self.slowed = 1
 
         if moviendose:
             velocidad_sonido = 1.5 if corriendo else 1.0
@@ -257,14 +258,14 @@ class Jugador(arcade.Sprite):
 
 
 
-    def pisa_trampa(self, daño_base: int, daño_veneno: float, tiempo_veneno: float, tiempo_slow: float): 
+    def pisa_trampa(self, daño_base: int, daño_veneno: float, tiempo_veneno: float, tiempo_slow: float, porcentajeSlow:float): 
         # Daño instantáneo
         self.recibir_dano(daño_base)
         
         # Slow - reducir velocidad temporalmente
         self.slow_timer = tiempo_slow
         self.base_speed = self.vel_caminar  # guarda velocidad original
-        self.velocidad = self.vel_caminar * 0.5  # 50% de velocidad
+        self.slowed=  porcentajeSlow 
         
         # Veneno - daño progresivo
         self.poison_timer = tiempo_veneno

@@ -118,7 +118,7 @@ class MissionCoin(arcade.Sprite):
             )
 
 class SpikeTrap(arcade.Sprite):
-    def __init__(self, x, y, damage_veneno = 20, tiempo_veneno= 3, tiempo_slow = 5, dano_base = 20):
+    def __init__(self, x, y, damage_veneno = 20, tiempo_veneno= 3, tiempo_slow = 5, dano_base = 20, porcentajeSlow: float = 0.4):
         
         if (damage_veneno >0 and tiempo_veneno > 0): 
             texture = AssetManager().get_texture("assets/items/trampaVenenosa.png")
@@ -134,11 +134,12 @@ class SpikeTrap(arcade.Sprite):
         self.damage_veneno = damage_veneno
         self.tiempo_veneno= tiempo_veneno
         self.tiempo_slow = tiempo_slow
+        self.porcentajeSlow= porcentajeSlow
 
     def activar(self, player):
         """Se ejecuta automáticamente cuando el jugador la pisa."""
         # 1. Aplicamos daño y knockback
-        player.pisa_trampa(self.damage, self.damage_veneno, self.tiempo_veneno, self.tiempo_slow )
+        player.pisa_trampa(self.damage, self.damage_veneno, self.tiempo_veneno, self.tiempo_slow, self.porcentajeSlow )
         
         
         # 2. Mostramos el feedback visual
