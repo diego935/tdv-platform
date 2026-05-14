@@ -16,6 +16,8 @@ from vista.consola import *
 from vista.camera_manager import CameraManager
 from vista.asset_manager import AssetManager
 import random
+from entities.enemy import EnemigoIA
+from items.colections import InteractionManager, SpikeTrap,MissionCoin
 from items.weapons import Pistola, Cuchillo
 
 from dialog import DialogManager
@@ -128,12 +130,6 @@ class VistaJuego(arcade.View):
         self.camera = CameraManager()
         self.hud = HUD()
         self.console = ConsoleUI()
-
-        for i in range(10):
-            pedernal = BaseItem(1, f"Pedernal {i+1}", "assets/items/Flint.png")
-            pedernal.center_x = random.randint(200, 600)
-            pedernal.center_y = random.randint(200, 400)
-            self.item_manager.add_to_world(pedernal)
         
         nota_prueba = Nota(500, "Se busca", "SE BUSCAN KORUS",
             "Si alguien lee esto...\nYo de niña tenía unos muñecos... \ny los he perdido \n¿me ayudas a encontrarlos? \n\nquizás recibas algo a cambio :)",
@@ -149,41 +145,24 @@ class VistaJuego(arcade.View):
         self.nav_manager = SistemaNavegacion(self.lista_bloques)
         self.dm = DialogManager()
         self.dm.set_vista(self)
+        # En tu setup del juego
+        self.im = InteractionManager(self.sprite_jugador)
 
-        from entities.enemy import EnemigoIA
+        # Añadir trampa
+        trampa = SpikeTrap(106*32, 110*32)
+        self.im.add_trap(trampa, trampa.activar)
 
-        enemigo1 = EnemigoIA(
-            x=500, y=300,
-            tipo_patrulla=EnemigoIA.TIPO_WAYPOINT,
-            waypoints=[(500, 300), (700, 300), (700, 500), (500, 500)],
-            velocidad=100,
-            velocidad_patrulla=60,
-            vista_rango=400,
-            tiempo_buscar=3.0
-        )
-        self.lista_enemigos.append(enemigo1)
-
-        enemigo2 = EnemigoIA(
-            x=200, y=500,
-            tipo_patrulla=EnemigoIA.TIPO_AREA,
-            area_center=(200, 500),
-            area_radio=150,
-            velocidad=100,
-            velocidad_patrulla=50,
-            vista_rango=350,
-            tiempo_buscar=2.5
-        )
-        self.lista_enemigos.append(enemigo2)
-
-        enemigo3 = EnemigoIA(
-            x=800, y=200,
-            tipo_patrulla=EnemigoIA.TIPO_PAREDES,
-            velocidad=120,
-            velocidad_patrulla=70,
-            vista_rango=300,
-            tiempo_buscar=2.0
-        )
-        self.lista_enemigos.append(enemigo3)
+        # Añadir monedas
+        for i in range(3):
+            coin = MissionCoin((100 + (i*8))*32, 105*32)
+            
+            # Tienes que pasarle la categoría y las dos funciones de la moneda
+            self.im.add_collectible(
+                coin, 
+                coin.categoria,         # "monedas_ancestrales"
+                coin.al_recoger,        # Función al recoger una
+                MissionCoin.mision_completada  # Función al recoger todas
+            )
 
     def on_draw(self):
         self.clear()
@@ -194,6 +173,7 @@ class VistaJuego(arcade.View):
             self.item_manager.draw()
             for p in self.lista_proyectiles:
                 p.draw()
+            self.im.draw()
             self.lista_enemigos.draw()
             self.lista_jugadores.draw()
             self.lista_npc_sprites.draw()
@@ -265,6 +245,7 @@ class VistaJuego(arcade.View):
         self.camera.position = self.sprite_jugador.position
         self.text_manager.update()
         self.item_manager.update()
+        self.im.update()
 
     def on_text_input(self, text):
         if self.estado_actual =="CONSOLE":

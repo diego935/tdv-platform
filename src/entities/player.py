@@ -2,6 +2,7 @@ import arcade
 from vista.inventory import *
 from vista.textos import *
 from vista.asset_manager import AssetManager
+import math
 
 
 class Jugador(arcade.Sprite):
