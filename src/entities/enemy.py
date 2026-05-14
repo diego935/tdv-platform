@@ -40,7 +40,7 @@ class DummyEnemy(arcade.SpriteSolidColor):
             self._base_y = self.center_y
 
 
-class EnemigoIA(arcade.SpriteSolidColor):
+class EnemigoIA(arcade.Sprite):
     """
     Enemigo con FSM de IA y 3 tipos de patrulla:
     - WAYPOINT_FIJO: patrulla entre puntos fijos
@@ -78,7 +78,17 @@ class EnemigoIA(arcade.SpriteSolidColor):
         rango_ataque: float = 40.0,
         tiempo_cortesia: float = 4.0
     ):
-        super().__init__(width=32, height=32, color=arcade.color.RED)
+        super().__init__()
+
+
+        self.texture_up = arcade.load_texture("assets/Enemigo/enemigo hacia arriba.png")
+        self.texture_down = arcade.load_texture("assets/Enemigo/enemigo hacia abajo.png")
+        self.texture_left = arcade.load_texture("assets/Enemigo/enemigo hacia izquierda.png")
+        self.texture_right = arcade.load_texture("assets/Enemigo/enemigo hacia derecha.png")
+
+        self.texture = self.texture_down
+
+        self.scale = 0.020
         self.center_x = x
         self.center_y = y
         self.vida = 100
@@ -488,6 +498,21 @@ class EnemigoIA(arcade.SpriteSolidColor):
 
         self.center_x += self.change_x * delta_time
         self.center_y += self.change_y * delta_time
+        if abs(self.change_x) > abs(self.change_y):
+
+            if self.change_x > 0:
+                self.texture = self.texture_right
+
+            elif self.change_x < 0:
+                self.texture = self.texture_left
+
+        else:
+
+            if self.change_y > 0:
+                self.texture = self.texture_up
+
+            elif self.change_y < 0:
+                self.texture = self.texture_down
 
     def recibir_dano(self, cantidad: float, fuente_x: float = None, fuente_y: float = None):
         """Recibe daño del player."""
