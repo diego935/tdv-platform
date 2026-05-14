@@ -74,6 +74,7 @@ class VistaPartidas(MenuNavegacion):
 
             vista_juego = VistaJuego()
             vista_juego.setup()
+            
             self.window.show_view(vista_juego)
             return
 
