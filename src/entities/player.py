@@ -39,8 +39,20 @@ class Jugador(arcade.Sprite):
             "left": assets.get_texture("assets/Jugador/Soldado hacia izquierda.png"),
             "right": assets.get_texture("assets/Jugador/Soldado hacia derecha.png"),
         }
+
+        self.texturas_right_walk = [
+        arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_0.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_1.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_2.png")]
+
+        self.frame_animacion = 0
+        self.timer_animacion = 0
+        self.velocidad_animacion = 0.12
+
         self.texture = self.texturas[self.direccion]
+        
         self.scale = 0.035
+        self.original_scale = self.scale
 
         self.sonido_pasos = arcade.load_sound("assets/sonidos/caminar.wav")
         self.player_pasos = None
@@ -137,10 +149,27 @@ class Jugador(arcade.Sprite):
             self.change_x = self.velocidad_actual
             self.direccion = "right"
 
-        self.texture = self.texturas[self.direccion]
+        moviendose = self.change_x != 0 or self.change_y != 0
+
+        if self.direccion == "right" and moviendose:
+
+            self.timer_animacion += delta_time
+
+            if self.timer_animacion >= self.velocidad_animacion:
+
+                self.timer_animacion = 0
+                self.frame_animacion += 1
+
+                if self.frame_animacion >= len(self.texturas_right_walk):
+                    self.frame_animacion = 0
+
+            self.texture = self.texturas_right_walk[self.frame_animacion]
+
+        else:
+            self.texture = self.texturas[self.direccion]
+
 
         #sonido movimiento
-        moviendose = self.change_x != 0 or self.change_y != 0
         corriendo = (shift and moviendose and self.stamina > 0 and self.velocidad_actual == self.vel_correr)
 
         if moviendose:
