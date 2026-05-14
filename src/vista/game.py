@@ -151,6 +151,12 @@ class VistaJuego(arcade.View):
         # Añadir trampa
         trampa = SpikeTrap(106*32, 110*32)
         self.im.add_trap(trampa, trampa.activar)
+        trampa = SpikeTrap(108*32, 110*32)
+        self.im.add_trap(trampa, trampa.activar)
+        trampa = SpikeTrap(109*32, 110*32)
+        self.im.add_trap(trampa, trampa.activar)
+        trampa = SpikeTrap(110*32, 110*32)
+        self.im.add_trap(trampa, trampa.activar)
 
         # Añadir monedas
         for i in range(3):

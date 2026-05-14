@@ -181,6 +181,8 @@ class Jugador(arcade.Sprite):
             self.poison_timer -= delta_time
             # Daño por segundo (ajusta el divisor según prefieras)
             self.recibir_dano(self.poison_damage * delta_time)
+            if self.poison_timer<=0: 
+                self.color = arcade.color.WHITE
 
         if self.slow_timer > 0:
             self.slow_timer -= delta_time
@@ -256,17 +258,15 @@ class Jugador(arcade.Sprite):
             pass 
 
 
-
-
     def pisa_trampa(self, daño_base: int, daño_veneno: float, tiempo_veneno: float, tiempo_slow: float, porcentajeSlow:float): 
         # Daño instantáneo
         self.recibir_dano(daño_base)
         
         # Slow - reducir velocidad temporalmente
         self.slow_timer = tiempo_slow
-        self.base_speed = self.vel_caminar  # guarda velocidad original
         self.slowed=  porcentajeSlow 
         
         # Veneno - daño progresivo
-        self.poison_timer = tiempo_veneno
-        self.poison_damage = daño_veneno
+        self.poison_timer += tiempo_veneno
+        self.poison_damage = max(daño_veneno, self.poison_damage)
+        self.color = arcade.color.GREEN

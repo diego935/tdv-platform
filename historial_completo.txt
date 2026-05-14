@@ -1,0 +1,1206 @@
+----------------------------------------
+Commit: 3383151
+Autor: diego935
+Fecha: 2026-05-14
+Mensaje: Merge remote-tracking branch 'refs/remotes/origin/main' merge
+----------------------------------------
+Commit: 789b8ad
+Autor: diego935
+Fecha: 2026-05-14
+Mensaje: trampas compeltas
+13	12	src/entities/player.py
+3	2	src/items/colections.py
+
+----------------------------------------
+Commit: 27923ad
+Autor: Hector del Caño
+Fecha: 2026-05-14
+Mensaje: hacia abajo
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_0.png
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_1.png
+
+----------------------------------------
+Commit: ab69537
+Autor: Hector del Caño
+Fecha: 2026-05-14
+Mensaje: a ver
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_0.png
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_1.png
+
+----------------------------------------
+Commit: db14bb7
+Autor: Hector del Caño
+Fecha: 2026-05-14
+Mensaje: cambio escala enemigo
+27	2	src/entities/enemy.py
+
+----------------------------------------
+Commit: a451d33
+Autor: Hector del Caño
+Fecha: 2026-05-14
+Mensaje: sprites resizeados
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_0.png
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_1.png
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_2.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_0.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_1.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_2.png
+
+----------------------------------------
+Commit: 33ce7d4
+Autor: Hector del Caño
+Fecha: 2026-05-14
+Mensaje: sprites eliminados para posterior resizeo
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_0.png
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_1.png
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_2.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_0.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_1.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_2.png
+
+----------------------------------------
+Commit: 1a9c7f1
+Autor: Hector del Caño
+Fecha: 2026-05-14
+Mensaje: imagen recortada para resizear luego
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_0.png
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_1.png
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_2.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_0.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_1.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_2.png
+
+----------------------------------------
+Commit: d139d31
+Autor: Hector del Caño
+Fecha: 2026-05-14
+Mensaje: resize texturas enemigo
+-	-	assets/Enemigo/enemigo hacia abajo.png
+-	-	assets/Enemigo/enemigo hacia arriba.png
+-	-	assets/Enemigo/enemigo hacia derecha.png
+-	-	assets/Enemigo/enemigo hacia izquierda.png
+
+----------------------------------------
+Commit: ab64616
+Autor: Hector del Caño
+Fecha: 2026-05-14
+Mensaje: enemigo hacia arriba textura
+-	-	assets/Enemigo/enemigo hacia arriba.png
+
+----------------------------------------
+Commit: 81ec818
+Autor: cristianbalasoiu
+Fecha: 2026-05-14
+Mensaje: sprites hacia arriba con escala
+-	-	assets/Jugador/andandoHaciaArriba/sprite_0.png
+-	-	assets/Jugador/andandoHaciaArriba/sprite_1.png
+-	-	assets/Jugador/andandoHaciaArriba/sprite_2.png
+-	-	assets/Jugador/andandoHaciaArriba/sprite_3.png
+
+----------------------------------------
+Commit: b9bea54
+Autor: cristianbalasoiu
+Fecha: 2026-05-14
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 25e0a21
+Autor: cristianbalasoiu
+Fecha: 2026-05-14
+Mensaje: sprites hacia arriba sin escala
+-	-	assets/Jugador/andandoHaciaArriba/sprite_0.png
+-	-	assets/Jugador/andandoHaciaArriba/sprite_1.png
+-	-	assets/Jugador/andandoHaciaArriba/sprite_2.png
+-	-	assets/Jugador/andandoHaciaArriba/sprite_3.png
+
+----------------------------------------
+Commit: c2cb2d1
+Autor: ID4N1
+Fecha: 2026-05-14
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 9ce1c1a
+Autor: cristianbalasoiu
+Fecha: 2026-05-14
+Mensaje: sprites hacia abajo con escala
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_0.png
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_1.png
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_2.png
+
+----------------------------------------
+Commit: e8ce5a1
+Autor: ID4N1
+Fecha: 2026-05-14
+Mensaje: Cambiado el daño de las trampas al init
+2	2	src/items/colections.py
+
+----------------------------------------
+Commit: fbfe565
+Autor: ID4N1
+Fecha: 2026-05-14
+Mensaje: Arreglo de texturas intercambiadas de las trampas
+156	157	assets/maps/mapa.tmx
+3	2	src/items/colections.py
+
+----------------------------------------
+Commit: 65a7ff9
+Autor: cristianbalasoiu
+Fecha: 2026-05-14
+Mensaje: imagenes hacia abajo sin escala
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_0.png
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_1.png
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_2.png
+
+----------------------------------------
+Commit: 38db9c2
+Autor: cristianbalasoiu
+Fecha: 2026-05-14
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 74da834
+Autor: cristianbalasoiu
+Fecha: 2026-05-14
+Mensaje: movimiento hacia la derecha pero sin escala
+31	2	src/entities/player.py
+
+----------------------------------------
+Commit: 66e2f40
+Autor: ID4N1
+Fecha: 2026-05-14
+Mensaje: Quitado fondo trampas, cambiado a /assets/items y cambiado el path relativo en codigo
+-	-	assets/items/trampa.png
+-	-	assets/items/trampaVenenosa.png
+-	-	assets/tilesets/trampa.png
+-	-	assets/tilesets/trampaVenenosa.png
+2	2	src/items/colections.py
+
+----------------------------------------
+Commit: 020b53a
+Autor: ID4N1
+Fecha: 2026-05-14
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 0b5b388
+Autor: ID4N1
+Fecha: 2026-05-14
+Mensaje: Fondo eliminado:botiquin, pistola, cuchillo
+-	-	assets/items/Cuchillo.png
+-	-	assets/items/Pistola.png
+-	-	assets/items/botiquin.png
+1	1	src/items/items.py
+2	2	src/items/weapons.py
+
+----------------------------------------
+Commit: cc92598
+Autor: ID4N1
+Fecha: 2026-05-14
+Mensaje: Mapa en cruz
+135	131	assets/maps/mapa.tmx
+-	-	assets/tilesets/caminoTierra.png
+4	0	assets/tilesets/caminotierra.tsx
+-	-	assets/tilesets/muroCruz.png
+4	0	assets/tilesets/muroCruz.tsx
+-	-	assets/tilesets/muroEsquinas.png
+4	0	assets/tilesets/muroEsquinas.tsx
+-	-	assets/tilesets/muros.png
+-	-	assets/tilesets/sueloMetal.png
+4	0	assets/tilesets/suelometal.tsx
+14	9	mapaProyecto.tiled-session
+
+----------------------------------------
+Commit: 9252ff6
+Autor: diego935
+Fecha: 2026-05-14
+Mensaje: trampa completa
+3	3	assets/dialogs/npc_mercader.json
+-	-	assets/tilesets/trampa.png
+-	-	assets/tilesets/trampaVenenosa.png
+31	9	src/entities/player.py
+13	4	src/items/colections.py
+1	0	src/vista/vista_partidas.py
+
+----------------------------------------
+Commit: b0439b1
+Autor: diego935
+Fecha: 2026-05-14
+Mensaje: Sistema de coleccionables y trampas
+1	0	src/entities/player.py
+143	0	src/items/colections.py
+22	41	src/vista/game.py
+
+----------------------------------------
+Commit: 107249d
+Autor: diego935
+Fecha: 2026-05-13
+Mensaje: Merge remote-tracking branch 'refs/remotes/origin/main'
+----------------------------------------
+Commit: ac7de9e
+Autor: diego935
+Fecha: 2026-05-13
+Mensaje: El botiquin ahora funciona tanto como con LMB como con doble click en el inventario
+2	2	src/dialog/acciones.py
+16	8	src/entities/enemy.py
+2	3	src/entities/player.py
+4	21	src/items/items.py
+
+----------------------------------------
+Commit: 9f25fdf
+Autor: cristianbalasoiu
+Fecha: 2026-05-12
+Mensaje: sonido al correr implentado
+16	1	src/entities/player.py
+
+----------------------------------------
+Commit: af5c3a5
+Autor: cristianbalasoiu
+Fecha: 2026-05-11
+Mensaje: sonido de andar implementado
+21	0	src/entities/player.py
+
+----------------------------------------
+Commit: 077b527
+Autor: cristianbalasoiu
+Fecha: 2026-05-11
+Mensaje: cambio de formato a wav
+-	-	assets/sonidos/caminar.wav
+
+----------------------------------------
+Commit: cfeabaf
+Autor: cristianbalasoiu
+Fecha: 2026-05-11
+Mensaje: cambio de formato
+-	-	assets/sonidos/caminar.mp3
+
+----------------------------------------
+Commit: adfd50a
+Autor: cristianbalasoiu
+Fecha: 2026-05-11
+Mensaje: sonido de caminar
+-	-	assets/sonidos/caminar.mp3
+
+----------------------------------------
+Commit: ea53809
+Autor: cristianbalasoiu
+Fecha: 2026-05-09
+Mensaje: implementacion de que la banda sonora pare cuando entras al juego
+6	0	src/vista/vista_partidas.py
+
+----------------------------------------
+Commit: 6851ad3
+Autor: cristianbalasoiu
+Fecha: 2026-05-09
+Mensaje: banda sonora en menu implementada
+26	1	src/vista/menu_principal.py
+
+----------------------------------------
+Commit: e1682da
+Autor: cristianbalasoiu
+Fecha: 2026-05-09
+Mensaje: banada sonora
+-	-	assets/musica/banda_sonora.mp3
+
+----------------------------------------
+Commit: aeff956
+Autor: diego935
+Fecha: 2026-05-08
+Mensaje: Reparar lo roto
+4	1	src/entities/player.py
+24	2	src/items/items.py
+5	5	src/vista/game.py
+
+----------------------------------------
+Commit: 350b9fd
+Autor: diego935
+Fecha: 2026-05-08
+Mensaje: menores
+18	2	src/dialog/acciones.py
+4	4	src/vista/game.py
+
+----------------------------------------
+Commit: bc292a3
+Autor: diego935
+Fecha: 2026-05-08
+Mensaje: Merge remote-tracking branch 'refs/remotes/origin/main'
+----------------------------------------
+Commit: 0a9e4f1
+Autor: diego935
+Fecha: 2026-05-08
+Mensaje: Dialogos completos
+1	1	src/dialog/acciones.py
+23	4	src/vista/game.py
+
+----------------------------------------
+Commit: 40dc611
+Autor: diego935
+Fecha: 2026-05-08
+Mensaje: Dialogos
+-	-	assets/items/mercader.png
+9	1	assets/maps/mapa.tmx
+-	-	assets/npcs/mercader.png
+28	14	src/dialog/acciones.py
+34	4	src/dialog/dialog_system.py
+18	1	src/entities/player.py
+1	5	src/vista/consola.py
+47	4	src/vista/game.py
+
+----------------------------------------
+Commit: 87cb235
+Autor: diego935
+Fecha: 2026-05-08
+Mensaje: Delete tmp
+0	1	siguiente
+
+----------------------------------------
+Commit: cd724a2
+Autor: diego935
+Fecha: 2026-05-08
+Mensaje: Botiquin recuperado
+32	0	assets/dialogs/npc_mercader.json
+-	-	assets/items/mercader.png
+3	0	src/dialog/__init__.py
+79	0	src/dialog/acciones.py
+121	0	src/dialog/dialog_system.py
+98	0	src/vista/dialog_ui.py
+
+----------------------------------------
+Commit: ffd0961
+Autor: diego935
+Fecha: 2026-05-08
+Mensaje: Antes del sistema de dialogos
+2	1	src/vista/game.py
+
+----------------------------------------
+Commit: 0532043
+Autor: cristianbalasoiu
+Fecha: 2026-05-08
+Mensaje: sonido de disparo y recarga implementado
+6	0	src/items/weapons.py
+
+----------------------------------------
+Commit: add9377
+Autor: cristianbalasoiu
+Fecha: 2026-05-08
+Mensaje: cambio nombre sonido recarga
+-	-	assets/sonidos/recarga.wav
+
+----------------------------------------
+Commit: 8df3e06
+Autor: cristianbalasoiu
+Fecha: 2026-05-08
+Mensaje: cambio recarga
+-	-	assets/sonidos/Recarga Definitiva.wav
+
+----------------------------------------
+Commit: b71fd77
+Autor: cristianbalasoiu
+Fecha: 2026-05-08
+Mensaje: cambio disparo
+-	-	assets/sonidos/Disparo Definitivo.wav
+
+----------------------------------------
+Commit: a51510f
+Autor: cristianbalasoiu
+Fecha: 2026-05-08
+Mensaje: cambio nombre archivo sonido disparo
+-	-	assets/sonidos/disparo.wav
+
+----------------------------------------
+Commit: 43772cd
+Autor: cristianbalasoiu
+Fecha: 2026-05-08
+Mensaje: sonido recarga
+-	-	assets/sonidos/Recarga Definitiva.wav
+
+----------------------------------------
+Commit: 98025c5
+Autor: cristianbalasoiu
+Fecha: 2026-05-08
+Mensaje: sonido disparo
+-	-	assets/sonidos/Disparo Definitivo.wav
+
+----------------------------------------
+Commit: 5011e7b
+Autor: cristianbalasoiu
+Fecha: 2026-05-08
+Mensaje: cambio de la fuente del titulo
+3	2	src/vista/menu_principal.py
+
+----------------------------------------
+Commit: c9f6521
+Autor: ID4N1
+Fecha: 2026-05-08
+Mensaje: Fix del botiquin
+14	4	src/items/items.py
+
+----------------------------------------
+Commit: 1ab6eeb
+Autor: ID4N1
+Fecha: 2026-05-08
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 47686dc
+Autor: ID4N1
+Fecha: 2026-05-08
+Mensaje: Carga del mapa arreglada y reubicacion de assets
+2	2	assets/maps/mapa.tmx
+0	4	assets/maps/quitamiedos.tsx
+0	0	assets/{maps => tilesets}/campoPlantas.tsx
+0	0	assets/{maps => tilesets}/quitaMiedos.tsx
+9	1	mapaProyecto.tiled-session
+1	1	src/entities/player.py
+1	1	src/main.py
+
+----------------------------------------
+Commit: 5c00e82
+Autor: diego935
+Fecha: 2026-05-08
+Mensaje: Cambios menores
+3	0	src/config.py
+11	106	src/entities/enemy.py
+2	3	src/entities/pathfinding.py
+1	1	src/entities/player.py
+3	3	src/items/weapons.py
+
+----------------------------------------
+Commit: bc9c083
+Autor: diego935
+Fecha: 2026-05-07
+Mensaje: Altura de la pistola correcta
+1	0	siguiente
+43	3	src/entities/enemy.py
+21	3	src/entities/pathfinding.py
+1	1	src/entities/player.py
+3	3	src/items/weapons.py
+
+----------------------------------------
+Commit: c8552af
+Autor: diego935
+Fecha: 2026-05-07
+Mensaje: Nota introductoria a los la busqueda de los 8 bichos
+-	-	assets/items/Nota.png
+6	5	src/items/items.py
+6	6	src/vista/game.py
+1	1	src/vista/inventory.py
+
+----------------------------------------
+Commit: 97b89a6
+Autor: ID4N1
+Fecha: 2026-05-07
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 266c952
+Autor: ID4N1
+Fecha: 2026-05-07
+Mensaje: Cambio de titulo del menu
+1	1	src/vista/menu_principal.py
+
+----------------------------------------
+Commit: adac740
+Autor: diego935
+Fecha: 2026-05-07
+Mensaje: Merge remote-tracking branch 'refs/remotes/origin/main'
+----------------------------------------
+Commit: 995cca9
+Autor: diego935
+Fecha: 2026-05-07
+Mensaje: A falta de sprite hay una nota en 0,0
+2	1	src/entities/player.py
+7	2	src/items/item_manager.py
+16	17	src/items/items.py
+22	3	src/vista/game.py
+56	1	src/vista/inventory.py
+
+----------------------------------------
+Commit: 66ed47b
+Autor: ID4N1
+Fecha: 2026-05-07
+Mensaje: Nuevo sprite y barreras
+4	0	assets/maps/campoPlantas.tsx
+31	30	assets/maps/mapa.tmx
+-	-	assets/tilesets/campoPlantas.png
+37	9	mapaProyecto.tiled-session
+
+----------------------------------------
+Commit: 5baa093
+Autor: ID4N1
+Fecha: 2026-05-07
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 5f37cc0
+Autor: ID4N1
+Fecha: 2026-05-07
+Mensaje: Mapa nuevo y nuevos sprites
+125	139	assets/maps/mapa.tmx
+0	9	assets/maps/pared_ejemplo.tsx
+4	0	assets/maps/quitaMiedos.tsx
+4	0	assets/maps/quitamiedos.tsx
+0	4	assets/tilesets/Ejemplo.tsx
+9	0	assets/tilesets/bloqueHitbox.tsx
+-	-	assets/tilesets/carretera.png
+4	0	assets/tilesets/carretera.tsx
+-	-	assets/{maps/ChatGPT Image 7 may 2026, 15_23_21.png => tilesets/conjuntoTiles.png}
+-	-	assets/tilesets/ejemplo.png
+-	-	assets/tilesets/quitamiedos-removebg-preview.png
+-	-	assets/tilesets/quitamiedos.png
+-	-	assets/tilesets/sueloCampo.png
+4	0	assets/tilesets/sueloCampo.tsx
+13	3	mapaProyecto.tiled-session
+
+----------------------------------------
+Commit: 00f592e
+Autor: cristianbalasoiu
+Fecha: 2026-05-07
+Mensaje: eliminación de comentarios innecesarios
+4	5	src/vista/vista_partidas.py
+
+----------------------------------------
+Commit: 6ce4077
+Autor: cristianbalasoiu
+Fecha: 2026-05-07
+Mensaje: cambio minimo en botones
+10	8	src/vista/vista_partidas.py
+
+----------------------------------------
+Commit: ee61403
+Autor: cristianbalasoiu
+Fecha: 2026-05-07
+Mensaje: cambio minimo en titulo
+2	2	src/vista/menu_principal.py
+
+----------------------------------------
+Commit: 80b94fc
+Autor: Hector del Caño
+Fecha: 2026-05-07
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: ecaace3
+Autor: Hector del Caño
+Fecha: 2026-05-07
+Mensaje: Enemigo png estático
+-	-	assets/Enemigo/enemigo hacia abajo.png
+-	-	assets/Enemigo/enemigo hacia derecha.png
+-	-	assets/Enemigo/enemigo hacia izquierda.png
+
+----------------------------------------
+Commit: 33725d3
+Autor: diego935
+Fecha: 2026-05-07
+Mensaje: Menú arreglado
+1	2	src/vista/menu_principal.py
+1	1	src/vista/vista_partidas.py
+
+----------------------------------------
+Commit: e58b80e
+Autor: Hector del Caño
+Fecha: 2026-05-07
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 18eb832
+Autor: Hector del Caño
+Fecha: 2026-05-07
+Mensaje: mapa
+-	-	assets/maps/ChatGPT Image 7 may 2026, 15_23_21.png
+
+----------------------------------------
+Commit: 9e3f3a6
+Autor: cristianbalasoiu
+Fecha: 2026-05-07
+Mensaje: menu innecesario
+0	32	src/vista/menu.py
+
+----------------------------------------
+Commit: 1e59fc2
+Autor: ID4N1
+Fecha: 2026-05-07
+Mensaje: Arreglos del mapa y fix del menu
+5	5	mapaProyecto.tiled-session
+33	160	src/vista/game.py
+
+----------------------------------------
+Commit: 67aed89
+Autor: ID4N1
+Fecha: 2026-05-07
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 4baba2d
+Autor: cristianbalasoiu
+Fecha: 2026-05-06
+Mensaje: pantalla completa implementada
+15	1	src/main.py
+
+----------------------------------------
+Commit: bd8992b
+Autor: ID4N1
+Fecha: 2026-05-06
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 9154d00
+Autor: ID4N1
+Fecha: 2026-05-06
+Mensaje: Mapa
+1	1	assets/maps/mapa.tmx
+12	6	mapaProyecto.tiled-session
+
+----------------------------------------
+Commit: 181af70
+Autor: Hector del Caño
+Fecha: 2026-05-05
+Mensaje: testing de texturas 9
+1	1	src/entities/player.py
+
+----------------------------------------
+Commit: 8921449
+Autor: Hector del Caño
+Fecha: 2026-05-05
+Mensaje: testing de texturas 8
+1	1	src/entities/player.py
+
+----------------------------------------
+Commit: 57bbe3b
+Autor: Hector del Caño
+Fecha: 2026-05-05
+Mensaje: testing de texturas 7
+-	-	assets/Jugador/Soldado hacia abajo.png
+-	-	assets/Jugador/Soldado hacia arriba.png
+-	-	assets/Jugador/Soldado hacia derecha.png
+-	-	assets/Jugador/Soldado hacia izquierda.png
+1	1	src/entities/player.py
+
+----------------------------------------
+Commit: 9e78933
+Autor: Hector del Caño
+Fecha: 2026-05-05
+Mensaje: testing texturas 6
+1	1	src/entities/player.py
+
+----------------------------------------
+Commit: 938194f
+Autor: Hector del Caño
+Fecha: 2026-05-05
+Mensaje: testing texturas5
+-	-	assets/Jugador/Soldado hacia abajo.png
+-	-	assets/Jugador/Soldado hacia arriba.png
+-	-	assets/Jugador/Soldado hacia derecha.png
+-	-	assets/Jugador/Soldado hacia izquierda.png
+1	1	src/entities/player.py
+
+----------------------------------------
+Commit: 1a9522c
+Autor: Hector del Caño
+Fecha: 2026-05-05
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: e10f6dc
+Autor: Hector del Caño
+Fecha: 2026-05-05
+Mensaje: sprites animacion andar jugador
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_0.png
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_1.png
+-	-	assets/Jugador/andandoHaciaAbajo/sprite_2.png
+-	-	assets/Jugador/andandoHaciaArriba/sprite_0.png
+-	-	assets/Jugador/andandoHaciaArriba/sprite_1.png
+-	-	assets/Jugador/andandoHaciaArriba/sprite_2.png
+-	-	assets/Jugador/andandoHaciaArriba/sprite_3.png
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_0.png
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_1.png
+-	-	assets/Jugador/andandoHaciaDerecha/sprite_2.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_0.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_1.png
+-	-	assets/Jugador/andandoHaciaIzquierda/sprite_2.png
+
+----------------------------------------
+Commit: 265e5e7
+Autor: cristianbalasoiu
+Fecha: 2026-05-05
+Mensaje: fondo del menu principal implementado
+11	1	src/vista/menu_principal.py
+
+----------------------------------------
+Commit: 0f422a4
+Autor: diego935
+Fecha: 2026-05-05
+Mensaje: Cambios menores
+6	4	src/entities/enemy.py
+8	7	src/vista/textos.py
+
+----------------------------------------
+Commit: d803616
+Autor: diego935
+Fecha: 2026-05-05
+Mensaje: Enemigos simples, uso del inventario
+462	2	src/entities/enemy.py
+7	2	src/items/items.py
+45	0	src/vista/consola.py
+69	2	src/vista/game.py
+
+----------------------------------------
+Commit: 4c2c9d8
+Autor: diego935
+Fecha: 2026-05-05
+Mensaje: Implementación del menú principal
+3	2	src/entities/enemy.py
+0	1	src/entities/pathfinding.py
+6	7	src/entities/player.py
+2	4	src/main.py
+58	0	src/vista/menu_navegacion.py
+23	25	src/vista/menu_principal.py
+19	36	src/vista/vista_ajustes.py
+19	41	src/vista/vista_historia.py
+40	42	src/vista/vista_partidas.py
+
+----------------------------------------
+Commit: 8ed34b8
+Autor: diego935
+Fecha: 2026-05-04
+Mensaje: Merge correcto y solucionado problema con el nombre de texturas.
+13	685	src/entities/enemy.py
+8	574	src/items/items.py
+2	2	src/items/weapons.py
+10	0	src/vista/camera_manager.py
+25	28	src/vista/game.py
+
+----------------------------------------
+Commit: 96cf91d
+Autor: ID4N1
+Fecha: 2026-05-04
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 821c7e5
+Autor: diego935
+Fecha: 2026-05-04
+Mensaje: Merge remote-tracking branch 'refs/remotes/origin/main'
+----------------------------------------
+Commit: d26c72f
+Autor: ID4N1
+Fecha: 2026-05-04
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 45ab81b
+Autor: ID4N1
+Fecha: 2026-05-04
+Mensaje: Generacion de mapa correcta. colisiones de pared y textura de ejemplo de pared
+219	14	assets/maps/mapa.tmx
+9	0	assets/maps/pared_ejemplo.tsx
+-	-	assets/tilesets/spriteEjemplo_pared.png
+3	1	mapaProyecto.tiled-session
+50	71	src/vista/game.py
+
+----------------------------------------
+Commit: 13f46aa
+Autor: Hector del Caño
+Fecha: 2026-05-04
+Mensaje: testing texturas4
+1	1	src/entities/player.py
+
+----------------------------------------
+Commit: 0feb059
+Autor: Hector del Caño
+Fecha: 2026-05-04
+Mensaje: testing texturas3
+1	1	src/entities/player.py
+
+----------------------------------------
+Commit: a827747
+Autor: Hector del Caño
+Fecha: 2026-05-04
+Mensaje: testing texturas2
+4	2	src/entities/player.py
+
+----------------------------------------
+Commit: 295d492
+Autor: Hector del Caño
+Fecha: 2026-05-04
+Mensaje: testing de texturas1
+4	4	src/entities/player.py
+
+----------------------------------------
+Commit: d1bc34d
+Autor: Hector del Caño
+Fecha: 2026-05-04
+Mensaje: texturas de personaje
+16	0	src/entities/player.py
+
+----------------------------------------
+Commit: d827107
+Autor: Hector del Caño
+Fecha: 2026-05-04
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 898d83d
+Autor: ID4N1
+Fecha: 2026-05-04
+Mensaje: Pequeña limpieza de codigo
+13	12	src/items/items.py
+0	3	src/vista/game.py
+
+----------------------------------------
+Commit: 1a23a78
+Autor: ID4N1
+Fecha: 2026-05-04
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 6f74571
+Autor: cristianbalasoiu
+Fecha: 2026-05-04
+Mensaje: cambio sencillo en menu
+1	0	src/vista/menu_principal.py
+
+----------------------------------------
+Commit: dd7aff6
+Autor: ID4N1
+Fecha: 2026-05-04
+Mensaje: Fix: Botiquin ya cura correctamente. Añadido comando damage a la consola
+12	0	src/entities/player.py
+15	2	src/vista/consola.py
+4	2	src/vista/game.py
+
+----------------------------------------
+Commit: 2f2f582
+Autor: cristianbalasoiu
+Fecha: 2026-05-04
+Mensaje: Vista eleccion de partidas
+82	0	src/vista/vista_partidas.py
+
+----------------------------------------
+Commit: 181bb67
+Autor: cristianbalasoiu
+Fecha: 2026-05-04
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 2473aac
+Autor: ID4N1
+Fecha: 2026-05-04
+Mensaje: Implementacion del uso del botiquin
+6	7	src/items/items.py
+
+----------------------------------------
+Commit: 114fec0
+Autor: Hector del Caño
+Fecha: 2026-05-04
+Mensaje: Sprites del jugador
+-	-	assets/Jugador/Soldado hacia abajo.png
+-	-	assets/Jugador/soldado hacia arriba.png
+-	-	assets/Jugador/soldado hacia derecha.png
+-	-	assets/Jugador/soldado hacia izquierda.png
+
+----------------------------------------
+Commit: 4f2de7b
+Autor: ID4N1
+Fecha: 2026-05-04
+Mensaje: Arreglos de cmd_spawn y primera implementacion del objeto botiquin
+18	2	src/entities/player.py
+50	0	src/items/items.py
+14	5	src/vista/consola.py
+
+----------------------------------------
+Commit: 7c1263e
+Autor: ID4N1
+Fecha: 2026-05-04
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: e8e3c03
+Autor: ID4N1
+Fecha: 2026-05-04
+Mensaje: Implementacion del mapa y arreglos de posicion inicial
+215	87	assets/maps/mapa.tmx
+32	0	mapaProyecto.tiled-session
+3	2	src/entities/player.py
+1	1	src/vista/consola.py
+54	22	src/vista/game.py
+
+----------------------------------------
+Commit: 04dbd0f
+Autor: cristianbalasoiu
+Fecha: 2026-05-04
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: 56d5cf6
+Autor: diego935
+Fecha: 2026-05-04
+Mensaje: Sistema de armas completo: Pistola, Cuchillo, HUD y knockback
+37	8	src/entities/enemy.py
+13	3	src/entities/player.py
+384	0	src/items/weapons.py
+76	42	src/vista/consola.py
+76	14	src/vista/game.py
+140	23	src/vista/hud.py
+87	60	src/vista/inventory.py
+
+----------------------------------------
+Commit: 1b55ae0
+Autor: diego935
+Fecha: 2026-05-04
+Mensaje: Armas sin knockback
+35	0	src/entities/enemy.py
+20	28	src/items/weapons.py
+10	0	src/vista/consola.py
+9	1	src/vista/game.py
+
+----------------------------------------
+Commit: a203b45
+Autor: diego935
+Fecha: 2026-05-04
+Mensaje: Pistola
+11	1	src/entities/player.py
+384	0	src/items/weapons.py
+30	5	src/vista/game.py
+27	38	src/vista/hud.py
+15	13	src/vista/inventory.py
+3	1	src/vista/menu_principal.py
+
+----------------------------------------
+Commit: 3af6dbf
+Autor: diego935
+Fecha: 2026-05-04
+Mensaje: Cambios en el inventario y pathfinding
+-	-	assets/items/Cuchillo.jpg
+-	-	assets/items/Pistola.jpg
+1	7	src/entities/enemy.py
+388	0	src/entities/pathfinding.py
+2	2	src/entities/player.py
+553	0	src/items/items.py
+54	0	src/vista/camera_manager.py
+66	42	src/vista/consola.py
+49	12	src/vista/game.py
+129	1	src/vista/hud.py
+75	50	src/vista/inventory.py
+
+----------------------------------------
+Commit: d5e3dd6
+Autor: cristianbalasoiu
+Fecha: 2026-04-30
+Mensaje: boton inecesario
+0	25	src/vista/boton_inicio.py
+
+----------------------------------------
+Commit: 9ffb6eb
+Autor: cristianbalasoiu
+Fecha: 2026-04-30
+Mensaje: imports
+2	1	src/vista/menu_principal.py
+
+----------------------------------------
+Commit: ca358e4
+Autor: cristianbalasoiu
+Fecha: 2026-04-30
+Mensaje: vista de los ajustes del menu principal
+44	0	src/vista/vista_ajustes.py
+
+----------------------------------------
+Commit: 61c9ea5
+Autor: cristianbalasoiu
+Fecha: 2026-04-30
+Mensaje: pantalla de explicacion de historia
+50	0	src/vista/vista_historia.py
+
+----------------------------------------
+Commit: 897d25a
+Autor: cristianbalasoiu
+Fecha: 2026-04-30
+Mensaje: logica de pulsado de botones del menu implementada
+34	9	src/vista/menu_principal.py
+
+----------------------------------------
+Commit: b84d13c
+Autor: cristianbalasoiu
+Fecha: 2026-04-30
+Mensaje: falta introducir la logoca de pulsado y el fonfo
+116	0	src/vista/menu_principal.py
+
+----------------------------------------
+Commit: 71caf9f
+Autor: ID4N1
+Fecha: 2026-04-23
+Mensaje: Merge branch 'main' of https://github.com/ID4N1/tdv-platform
+----------------------------------------
+Commit: 010ce3a
+Autor: ID4N1
+Fecha: 2026-04-23
+Mensaje: Avances en el mapa
+76	2	assets/maps/mapa.tmx
+4	0	assets/tilesets/Ejemplo.tsx
+-	-	assets/tilesets/ejemplo.png
+20	7	sin nombre.tiled-session
+
+----------------------------------------
+Commit: 8e62a9c
+Autor: cristianbalasoiu
+Fecha: 2026-04-23
+Mensaje: fuente menu principal
+-	-	assets/fuentes/fuente_menu_principal.ttf
+
+----------------------------------------
+Commit: a0e28a4
+Autor: cristianbalasoiu
+Fecha: 2026-04-23
+Mensaje: Merge branch 'main' of https://github.com/diego935/tdv-platform
+----------------------------------------
+Commit: b2afff3
+Autor: cristianbalasoiu
+Fecha: 2026-04-23
+Mensaje: imagen de fondo menu principal
+-	-	assets/fondos/fondo_principal.png
+
+----------------------------------------
+Commit: ce96ea9
+Autor: diego935
+Fecha: 2026-04-23
+Mensaje: Merge remote-tracking branch 'refs/remotes/origin/main'
+----------------------------------------
+Commit: 2f19741
+Autor: diego935
+Fecha: 2026-04-23
+Mensaje: cambios menores
+10	0	requirements.txt
+528	4	src/entities/enemy.py
+3	1	src/items/items.py
+6	3	src/vista/asset_manager.py
+30	12	src/vista/consola.py
+1	1	src/vista/game.py
+
+----------------------------------------
+Commit: ef9c4e9
+Autor: cristianbalasoiu
+Fecha: 2026-04-23
+Mensaje: clase para los botones del incio
+25	0	src/vista/boton_inicio.py
+
+----------------------------------------
+Commit: 721d477
+Autor: ID4N1
+Fecha: 2026-04-22
+Mensaje: Avances en el mapa
+21	12	assets/maps/mapa.tmx
+3	2	sin nombre.tiled-session
+
+----------------------------------------
+Commit: f261e6a
+Autor: ID4N1
+Fecha: 2026-04-22
+Mensaje: Ejemplo de mapa
+0	0	assets/maps/Mapas.txt
+21	0	assets/maps/mapa.tmx
+0	0	assets/tilesets/tiles.txt
+14	0	mapaProyecto.tiled-project
+26	0	sin nombre.tiled-session
+
+----------------------------------------
+Commit: 817d220
+Autor: diego935
+Fecha: 2026-04-20
+Mensaje: cambios menores
+3	2	src/entities/blocks.py
+202	0	src/entities/enemy.py
+1	1	src/items/item_manager.py
+4	1	src/vista/asset_manager.py
+244	0	src/vista/consola.py
+116	29	src/vista/game.py
+
+----------------------------------------
+Commit: 69f0968
+Autor: diego935
+Fecha: 2026-04-18
+Mensaje: Propuesta de HUD y stamina
+10	1	README.md
+-	-	assets/items/{Flint-85743170.png => Flint.png}
+103	94	src/entities/blocks.py
+56	2	src/entities/player.py
+20	0	src/vista/asset_manager.py
+93	63	src/vista/game.py
+76	0	src/vista/hud.py
+
+----------------------------------------
+Commit: 9db4679
+Autor: diego935
+Fecha: 2026-04-17
+Mensaje: primer manejo de inventario
+-	-	assets/items/Flint-85743170.png
+-	-	assets/items/OIP-3801779537.jpg
+-	-	assets/items/botiquin.jpg
+44	0	src/entities/player.py
+34	0	src/items/item_manager.py
+23	0	src/items/items.py
+73	2	src/vista/game.py
+89	0	src/vista/inventory.py
+63	0	src/vista/textos.py
+
+----------------------------------------
+Commit: e41dd8a
+Autor: diego935
+Fecha: 2026-04-16
+Mensaje: Refactorización del código y creación de una pequeña casa con puertas.
+8	1	README.md
+6	0	src/config.py
+140	0	src/entities/blocks.py
+6	0	src/entities/enemy.py
+9	0	src/entities/player.py
+5	163	src/main.py
+125	0	src/vista/game.py
+32	0	src/vista/menu.py
+
+----------------------------------------
+Commit: 5384767
+Autor: ID4N1
+Fecha: 2026-04-10
+Mensaje: Código base para empezar a trabajar
+8	0	docs/memoria.md
+172	0	src/main.py
+
+----------------------------------------
+Commit: d12ed74
+Autor: ID4N1
+Fecha: 2026-04-09
+Mensaje: GDD-Nombre
+2	2	docs/gdd.md
+0	591	src/main.py
+
+----------------------------------------
+Commit: 6d38ff0
+Autor: ID4N1
+Fecha: 2026-04-09
+Mensaje: GDD
+4	4	docs/gdd.md
+
+----------------------------------------
+Commit: 928f7ed
+Autor: ID4N1
+Fecha: 2026-04-09
+Mensaje: GDD
+13	1	docs/gdd.md
+
+----------------------------------------
+Commit: f4bc9e8
+Autor: David
+Fecha: 2026-04-09
+Mensaje: Create memoria.md
+1	0	docs/memoria.md
+
+----------------------------------------
+Commit: a62dd1e
+Autor: David
+Fecha: 2026-04-09
+Mensaje: Add design document outline
+3	0	docs/gdd.md
+
+----------------------------------------
+Commit: 8566fd4
+Autor: David F. Barrero
+Fecha: 2026-04-07
+Mensaje: README updated
+12	0	README.md
+
+----------------------------------------
+Commit: 58a95f1
+Autor: David F. Barrero
+Fecha: 2026-04-07
+Mensaje: Plantilla para el proyecto inicializada
+3	0	assets/dialogs.txt
+591	0	src/main.py
+
+----------------------------------------
+Commit: 5a59f5a
+Autor: David
+Fecha: 2026-04-07
+Mensaje: Initial commit
+207	0	.gitignore
+674	0	LICENSE
+2	0	README.md
