@@ -118,7 +118,7 @@ class MissionCoin(arcade.Sprite):
             )
 
 class SpikeTrap(arcade.Sprite):
-    def __init__(self, x, y, damage_veneno = 20, tiempo_veneno= 3, tiempo_slow = 5):
+    def __init__(self, x, y, damage_veneno = 20, tiempo_veneno= 3, tiempo_slow = 5, dano_base = 20):
         
         if (damage_veneno >0 and tiempo_veneno > 0): 
             texture = AssetManager().get_texture("assets/items/trampaVenenosa.png")
@@ -130,7 +130,7 @@ class SpikeTrap(arcade.Sprite):
         
         self.center_x = x
         self.center_y = y
-        self.damage = 20
+        self.damage = dano_base
         self.damage_veneno = damage_veneno
         self.tiempo_veneno= tiempo_veneno
         self.tiempo_slow = tiempo_slow
