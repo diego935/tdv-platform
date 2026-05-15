@@ -37,31 +37,31 @@ class Jugador(arcade.Sprite):
         self.direccion = "down"
         assets = AssetManager()
         self.texturas = {
-            "up": assets.get_texture("assets/Jugador/Soldado hacia arriba.png"),
-            "down": assets.get_texture("assets/Jugador/Soldado hacia abajo.png"),
-            "left": assets.get_texture("assets/Jugador/Soldado hacia izquierda.png"),
-            "right": assets.get_texture("assets/Jugador/Soldado hacia derecha.png"),
+            "up": assets.get_texture("assets/Jugador/Soldado hacia arriba_reescalado.png"),
+            "down": assets.get_texture("assets/Jugador/Soldado hacia abajo_reescalado.png"),
+            "left": assets.get_texture("assets/Jugador/Soldado hacia izquierda_reescalado.png"),
+            "right": assets.get_texture("assets/Jugador/Soldado hacia derecha_reescalado.png"),
         }
 
         self.texturas_right_walk = [
-        arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_0.png"),
-        arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_1.png"),
-        arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_2.png")]
+        arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_0_reescalado.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_1_reescalado.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_2_reescalado.png")]
         self.texturas_up_walk = [
-        arcade.load_texture("assets/Jugador/andandoHaciaArriba/sprite_0.png"),
-        arcade.load_texture("assets/Jugador/andandoHaciaArriba/sprite_1.png"),
-        arcade.load_texture("assets/Jugador/andandoHaciaArriba/sprite_2.png")
+        arcade.load_texture("assets/Jugador/andandoHaciaArriba/sprite_0_reescalado.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaArriba/sprite_1_reescalado.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaArriba/sprite_2_reescalado.png")
         ]
         self.texturas_left_walk = [
-        arcade.load_texture("assets/Jugador/andandoHaciaIzquierda/sprite_0.png"),
-        arcade.load_texture("assets/Jugador/andandoHaciaIzquierda/sprite_1.png"),
-        arcade.load_texture("assets/Jugador/andandoHaciaIzquierda/sprite_2.png")
+        arcade.load_texture("assets/Jugador/andandoHaciaIzquierda/sprite_0_reescalado.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaIzquierda/sprite_1_reescalado.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaIzquierda/sprite_2_reescalado.png")
         ]
 
         self.texturas_down_walk = [
-        arcade.load_texture("assets/Jugador/andandoHaciaAbajo/sprite_0.png"),
-        arcade.load_texture("assets/Jugador/andandoHaciaAbajo/sprite_1.png"),
-        arcade.load_texture("assets/Jugador/andandoHaciaAbajo/sprite_2.png")
+        arcade.load_texture("assets/Jugador/andandoHaciaAbajo/sprite_0_reescalado.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaAbajo/sprite_1_reescalado.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaAbajo/sprite_2_reescalado.png")
         ]
 
         self.frame_animacion = 0
@@ -70,7 +70,7 @@ class Jugador(arcade.Sprite):
 
         self.texture = self.texturas[self.direccion]
         
-        self.scale = 0.035
+        self.scale = 0.25
         self.original_scale = self.scale
 
         self.sonido_pasos = arcade.load_sound("assets/sonidos/caminar.wav")
