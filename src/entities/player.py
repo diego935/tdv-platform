@@ -275,3 +275,18 @@ class Jugador(arcade.Sprite):
         if (daño_veneno >0 and tiempo_veneno >0): self.estados.append(Veneno(daño_veneno, tiempo_veneno))
         self.slowed *= porcentajeSlow
         self.estados.append(Slow(porcentajeSlow, tiempo_slow))
+
+    def to_dict(self):
+        return {
+            "x": self.center_x,
+            "y": self.center_y,
+            "vida": self.vida,
+            "max_vida": self.max_vida,
+            "stamina": self.stamina,
+            "indice_activo": self.indice_activo,
+            "direccion": self.direccion,
+            "inventario": [
+                item.__class__.__name__ if item else None
+                for item in self.inventory
+            ]
+        }

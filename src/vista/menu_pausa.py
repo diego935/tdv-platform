@@ -119,19 +119,7 @@ class MenuPausa(arcade.View):
 
         jugador = self.vista_juego.sprite_jugador
 
-        data = {
-            "player": {
-                "x": jugador.center_x,
-                "y": jugador.center_y,
-                "vida": jugador.vida,
-                "inventario": [
-                    item.__class__.__name__ if item else None
-                    for item in jugador.inventory
-                ]
-            }
-        }
-
         with open("savegame.json", "w") as f:
-            json.dump(data, f, indent=4)
+            json.dump(jugador.to_dict(), f, indent=4)
 
         print("✔ Partida guardada correctamente")
