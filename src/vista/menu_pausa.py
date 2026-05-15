@@ -123,6 +123,7 @@ class MenuPausa(arcade.View):
             "player": {
                 "x": jugador.center_x,
                 "y": jugador.center_y,
+                "vida": jugador.vida,
                 "inventario": [
                     item.__class__.__name__ if item else None
                     for item in jugador.inventory
