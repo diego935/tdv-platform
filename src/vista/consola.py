@@ -346,12 +346,45 @@ def cmd_dmg(vista, args):
     except ValueError:
         return "Error: La cantidad de daño debe ser un número.", "ERROR"
 
+def cmd_enemigo_r(vista, args):
+    """Crea EnemigoRanged. Uso: enemigo_r [R] [r] [intervalo] [dano] [inteligencia] [area_radio]"""
+    try:
+        radio_R = int(args[0]) if len(args) > 0 else 200
+        radio_r = int(args[1]) if len(args) > 1 else 100
+        intervalo = float(args[2]) if len(args) > 2 else 2.0
+        dano = float(args[3]) if len(args) > 3 else 10.0
+        inteligencia = args[4].lower() == "true" if len(args) > 4 else False
+        area_radio = int(args[5]) if len(args) > 5 else 150
+        
+        x = vista.mouse_world_x
+        y = vista.mouse_world_y
+        
+        from entities.enemy import EnemigoRanged
+        enemigo = EnemigoRanged(
+            x=x, y=y,
+            radio_R=radio_R,
+            radio_r=radio_r,
+            intervalo_ataque=intervalo,
+            dano_ataque=dano,
+            inteligencia=inteligencia,
+            tipo_patrulla="area",
+            area_center=(x, y),
+            area_radio=area_radio,
+            waypoints=None
+        )
+        
+        vista.lista_enemigos.append(enemigo)
+        return f"EnemigoRanged creado - R={radio_R}, r={radio_r}, intervalo={intervalo}s, intel={inteligencia}, area={area_radio}", "SUCCESS"
+    except Exception as e:
+        return f"Error: {e}", "ERROR"
+
 COMANDOS = {
     "spawn": cmd_spawn,
     "tp": cmd_tp,
     "heal": cmd_heal,
     "dummy": cmd_dummy,
-    "enemigo": cmd_enemigo,
+    "enemigom": cmd_enemigo,
+    "enemigor": cmd_enemigo_r,
     "bloque": cmd_bloque,
     "nav": cmd_nav,
     "debug": cmd_debug, 

@@ -6,6 +6,15 @@ import math
 import arcade
 from abc import abstractmethod
 from items.items import BaseItem
+from enum import StrEnum
+
+
+# ==================== OBJETIVO PROYECTIL ====================
+
+class ObjetivoProyectil(StrEnum):
+    PLAYER = "player"
+    ENEMIGOS = "enemigos"
+    AMBOS = "ambos"
 
 
 # ==================== PROYECTIL ====================
@@ -21,7 +30,8 @@ class Proyectil(arcade.Sprite):
         damage: int,
         velocidad: float = 600.0,
         lifetime: float = 2.0,
-        radio: float = 6.0
+        radio: float = 6.0,
+        objetivo: ObjetivoProyectil = ObjetivoProyectil.ENEMIGOS
     ):
         super().__init__("assets/items/bala.png", scale=0.01)
 
@@ -32,13 +42,14 @@ class Proyectil(arcade.Sprite):
         self.velocidad = velocidad
         self.lifetime = lifetime
         self.radio = radio
+        self.objetivo = objetivo
         self._timer = 0.0
         self.alive = True
 
         self._vx = math.cos(math.radians(angle)) * velocidad
         self._vy = math.sin(math.radians(angle)) * velocidad
 
-    def update(self, delta_time, blocks_list=None, enemies_list=None):
+    def update(self, delta_time, blocks_list=None, enemies_list=None, player=None):
         self.center_x += self._vx * delta_time
         self.center_y += self._vy * delta_time
         self._timer += delta_time
@@ -49,7 +60,18 @@ class Proyectil(arcade.Sprite):
                     self.alive = False
                     break
 
-        if enemies_list:
+        # Colisión con player
+        if player and self.objetivo in (ObjetivoProyectil.PLAYER, ObjetivoProyectil.AMBOS):
+            if self._check_collision(player):
+                if hasattr(player, 'recibir_dano'):
+                    player.recibir_dano(self.damage, self.center_x, self.center_y)
+                elif hasattr(player, 'vida'):
+                    player.vida -= self.damage
+                self.alive = False
+                return
+
+        # Colisión con enemigos
+        if enemies_list and self.objetivo in (ObjetivoProyectil.ENEMIGOS, ObjetivoProyectil.AMBOS):
             for enemy in enemies_list:
                 if self._check_collision(enemy):
                     if hasattr(enemy, 'recibir_dano'):

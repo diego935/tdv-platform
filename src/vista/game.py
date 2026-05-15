@@ -227,13 +227,18 @@ class VistaJuego(arcade.View):
         for enemigo in self.lista_enemigos:
             if hasattr(enemigo, 'update'):
                 if hasattr(enemigo, 'puede_ver_player'):
-                    enemigo.update(delta_time, self.sprite_jugador, self.lista_bloques, self.nav_manager)
+                    import inspect
+                    sig = inspect.signature(enemigo.update)
+                    if len(sig.parameters) >= 5:
+                        enemigo.update(delta_time, self.sprite_jugador, self.lista_bloques, self.nav_manager, self.lista_proyectiles)
+                    else:
+                        enemigo.update(delta_time, self.sprite_jugador, self.lista_bloques, self.nav_manager)
                 else:
                     enemigo.update(delta_time)
 
         for p in self.lista_proyectiles:
             if hasattr(p, 'update'):
-                p.update(delta_time, self.lista_bloques, self.lista_enemigos)
+                p.update(delta_time, self.lista_bloques, self.lista_enemigos, self.sprite_jugador)
             elif hasattr(p, 'on_update'):
                 p.on_update(delta_time)
             if hasattr(p, 'update_enemies'):

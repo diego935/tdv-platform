@@ -3,7 +3,8 @@ import random
 import math
 from utils.log import Log
 from entities.pathfinding import SistemaNavegacion
-from utils.log import Log
+from items.weapons import Proyectil, ObjetivoProyectil
+from vista.asset_manager import AssetManager
 
 
 class DummyEnemy(arcade.SpriteSolidColor):
@@ -83,14 +84,15 @@ class EnemigoIA(arcade.Sprite):
         super().__init__()
 
 
-        self.texture_up = arcade.load_texture("assets/Enemigo/enemigo hacia arriba.png")
-        self.texture_down = arcade.load_texture("assets/Enemigo/enemigo hacia abajo.png")
-        self.texture_left = arcade.load_texture("assets/Enemigo/enemigo hacia izquierda.png")
-        self.texture_right = arcade.load_texture("assets/Enemigo/enemigo hacia derecha.png")
+        assets = AssetManager()
+        self.texture_up = assets.get_texture("assets/Enemigo/enemigo hacia arribaEscalado.png")
+        self.texture_down = assets.get_texture("assets/Enemigo/enemigo hacia abajoEscalado.png")
+        self.texture_left = assets.get_texture("assets/Enemigo/enemigo hacia izquierdaEscalado.png")
+        self.texture_right = assets.get_texture("assets/Enemigo/enemigo hacia derechaEscalado.png")
 
         self.texture = self.texture_down
 
-        self.scale = 0.020
+        self.scale = 0.3
         self.center_x = x
         self.center_y = y
         self.vida = 100
@@ -530,3 +532,253 @@ class EnemigoIA(arcade.Sprite):
                 self._base_y = self.center_y
         if self.vida <= 0:
             self.kill()
+
+
+# ==================== ENEMIGO RANGED ====================
+
+class EnemigoRanged(EnemigoIA):
+    """Enemigo que mantiene distancia y ataca a distancia con proyectiles."""
+    
+    ESTADO_MANTENER_DISTANCIA = "mantener_distancia"
+    
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        radio_R: float = 200,
+        radio_r: float = 100,
+        intervalo_ataque: float = 2.0,
+        velocidad_proyectil: float = 400,
+        inteligencia: bool = False,
+        offset_prediccion: float = 50,
+        tipo_patrulla: str = EnemigoIA.TIPO_WAYPOINT,
+        waypoints: list = None,
+        area_center: tuple = None,
+        area_radio: float = 100,
+        velocidad: float = 200,
+        velocidad_patrulla: float = 50,
+        vista_rango: float = 32 * 25,
+        tiempo_buscar: float = 3.0,
+        tiempo_esperar: float = 1.0,
+        dano_ataque: float = 10.0,
+        rango_ataque: float = 300,
+        tiempo_cortesia: float = 4.0
+    ):
+        super().__init__(
+            x=x, y=y,
+            tipo_patrulla=tipo_patrulla,
+            waypoints=waypoints,
+            area_center=area_center,
+            area_radio=area_radio,
+            velocidad=velocidad,
+            velocidad_patrulla=velocidad_patrulla,
+            vista_rango=vista_rango,
+            tiempo_buscar=tiempo_buscar,
+            tiempo_esperar=tiempo_esperar,
+            tipo_ataque="ranged",
+            dano_ataque=dano_ataque,
+            rango_ataque=rango_ataque,
+            tiempo_cortesia=tiempo_cortesia
+        )
+        
+        self.radio_R = radio_R
+        self.radio_r = radio_r
+        self.radio_R_sq = radio_R * radio_R
+        self.radio_r_sq = radio_r * radio_r
+        self.intervalo_ataque = intervalo_ataque
+        self.velocidad_proyectil = velocidad_proyectil
+        self.inteligencia = inteligencia
+        self.offset_prediccion = offset_prediccion
+        
+        self._timer_ataque_ranged = 0.0
+        self._player_velocidad_buffer = [0, 0]
+        self._direccion_lateral = 1  # 1 o -1 para cambiar de lado
+    
+    def _get_comando_distancia(self, player) -> str:
+        dx = player.center_x - self.center_x
+        dy = player.center_y - self.center_y
+        dist_sq = dx * dx + dy * dy
+        
+        if dist_sq > self.radio_R_sq:
+            return "avanzar"
+        elif dist_sq < self.radio_r_sq:
+            return "retroceder"
+        return "mantener"
+    
+    def _actualizar_buffer_player(self, player, delta_time):
+        self._player_velocidad_buffer[0] = player.change_x
+        self._player_velocidad_buffer[1] = player.change_y
+    
+    def _calcular_posicion_ataque(self, player) -> tuple:
+        if self.inteligencia:
+            pred_x = player.center_x + player.change_x * self.offset_prediccion
+            pred_y = player.center_y + player.change_y * self.offset_prediccion
+            return pred_x, pred_y
+        return player.center_x, player.center_y
+    
+    def _mover_hacia_posicion(self, target_x, target_y, nav_manager, delta_time):
+        dx = target_x - self.center_x
+        dy = target_y - self.center_y
+        dist = math.sqrt(dx * dx + dy * dy)
+        
+        if dist > 5:
+            self.change_x = (dx / dist) * self.velocidad
+            self.change_y = (dy / dist) * self.velocidad
+        else:
+            self.change_x = 0
+            self.change_y = 0
+    
+    def _alejar_de_player(self, player, delta_time):
+        dx = self.center_x - player.center_x
+        dy = self.center_y - player.center_y
+        dist = math.sqrt(dx * dx + dy * dy)
+        
+        if dist > 0:
+            self.change_x = (dx / dist) * self.velocidad
+            self.change_y = (dy / dist) * self.velocidad
+    
+    def _atacar_ranged(self, player, proyectiles_list):
+        target_x, target_y = self._calcular_posicion_ataque(player)
+        
+        angle = math.degrees(math.atan2(
+            target_y - self.center_y,
+            target_x - self.center_x
+        ))
+        
+        proyectil = Proyectil(
+            x=self.center_x,
+            y=self.center_y,
+            angle=angle,
+            damage=self.dano_ataque,
+            velocidad=self.velocidad_proyectil,
+            objetivo=ObjetivoProyectil.PLAYER
+        )
+        
+        proyectiles_list.append(proyectil)
+        self._timer_ataque_ranged = self.intervalo_ataque
+        
+        Log.debug("EnemigoRanged", "Proyectil lanzado",
+                  dano=self.dano_ataque,
+                  objetivo="PLAYER",
+                  velocidad=self.velocidad_proyectil)
+    
+    def _puede_atacar_ranged(self, player) -> bool:
+        if self._timer_ataque_ranged > 0:
+            return False
+        dx = player.center_x - self.center_x
+        dy = player.center_y - self.center_y
+        rango_sq = self.rango_ataque * self.rango_ataque
+        return (dx * dx + dy * dy) <= rango_sq
+    
+    def _update_mantener_distancia(self, player, blocks_list, nav_manager, delta_time):
+        comando = self._get_comando_distancia(player)
+        
+        if comando == "avanzar":
+            self._mover_hacia_posicion(player.center_x, player.center_y, nav_manager, delta_time)
+        elif comando == "retroceder":
+            self._alejar_de_player(player, delta_time)
+        else:
+            # En rango correcto: moverse lateralmente alrededor del player
+            dx = player.center_x - self.center_x
+            dy = player.center_y - self.center_y
+            
+            # Vector perpendicular para movimiento lateral
+            perp_x = -dy
+            perp_y = dx
+            dist = math.sqrt(perp_x * perp_x + perp_y * perp_y)
+            
+            if dist > 0:
+                # Moverse en dirección perpendicular (más lento que el normal)
+                velocidad_lateral = self.velocidad * 0.5
+                self.change_x = (perp_x / dist) * velocidad_lateral * self._direccion_lateral
+                self.change_y = (perp_y / dist) * velocidad_lateral * self._direccion_lateral
+                
+                # Cambiar dirección ocasionalmente para no ser predecible
+                if random.random() < 0.01:  # 1% de probabilidad por frame
+                    self._direccion_lateral *= -1
+    
+    def _check_transiciones_ranged(self, player, blocks_list, nav_manager, deltatime):
+        puede_ver = self.puede_ver_player(player)
+        
+        if puede_ver:
+            self._timer_cortesia = self.tiempo_cortesia
+            self._tiene_vista = True
+        elif self._timer_cortesia > 0:
+            self._timer_cortesia -= deltatime
+            puede_ver = True
+        
+        if player and self._puede_atacar_ranged(player):
+            self._atacar_ranged(player, getattr(self, '_proyectiles_list', []))
+        
+        if self.estado == self.ESTADO_PATRULLAR:
+            if puede_ver:
+                self.ultima_pos_player = (player.center_x, player.center_y)
+                self.cambiar_estado(self.ESTADO_MANTENER_DISTANCIA)
+        
+        elif self.estado == self.ESTADO_MANTENER_DISTANCIA:
+            if not puede_ver and self._timer_cortesia <= 0:
+                if self.ultima_pos_player is None:
+                    self.ultima_pos_player = (player.center_x, player.center_y)
+                self.cambiar_estado(self.ESTADO_BUSCAR)
+        
+        elif self.estado == self.ESTADO_BUSCAR:
+            if puede_ver:
+                self.cambiar_estado(self.ESTADO_MANTENER_DISTANCIA)
+            else:
+                self.tiempo_busqueda += deltatime
+                if self.tiempo_busqueda >= self.tiempo_buscar:
+                    self.cambiar_estado(self.ESTADO_RETURN)
+        
+        elif self.estado == self.ESTADO_RETURN:
+            if self._llegado_a_waypoint():
+                self.cambiar_estado(self.ESTADO_ESPERAR)
+                self.tiempo_espera = 0.0
+            if puede_ver:
+                self.cambiar_estado(self.ESTADO_MANTENER_DISTANCIA)
+        
+        elif self.estado == self.ESTADO_ESPERAR:
+            self.tiempo_espera += deltatime
+            if self.tiempo_espera >= self.tiempo_esperar:
+                self.cambiar_estado(self.ESTADO_PATRULLAR)
+            if puede_ver:
+                self.cambiar_estado(self.ESTADO_MANTENER_DISTANCIA)
+        
+        if self._timer_ataque_ranged > 0:
+            self._timer_ataque_ranged -= deltatime
+    
+    def update(self, delta_time, player, blocks_list=None, nav_manager=None, proyectiles_list=None):
+        if proyectiles_list is None:
+            proyectiles_list = []
+        self._proyectiles_list = proyectiles_list
+        
+        if nav_manager is None:
+            nav_manager = self.nav
+        if blocks_list is None:
+            blocks_list = []
+        
+        if self._knockback_timer > 0:
+            self._knockback_timer -= delta_time
+            self.center_x += self._knockback_vel[0] * delta_time
+            self.center_y += self._knockback_vel[1] * delta_time
+            return
+        
+        self._actualizar_buffer_player(player, delta_time)
+        
+        if self.estado == self.ESTADO_PATRULLAR:
+            self._update_patrullar(delta_time, blocks_list, nav_manager)
+        elif self.estado == self.ESTADO_MANTENER_DISTANCIA:
+            self._update_mantener_distancia(player, blocks_list, nav_manager, delta_time)
+        elif self.estado == self.ESTADO_BUSCAR:
+            self._update_buscar(delta_time, blocks_list, nav_manager)
+        elif self.estado == self.ESTADO_RETURN:
+            self._update_return(delta_time, blocks_list, nav_manager)
+        
+        self._check_transiciones_ranged(player, blocks_list, nav_manager, delta_time)
+        
+        self.center_x += self.change_x * delta_time
+        self.center_y += self.change_y * delta_time
+        
+        if abs(self.change_x) > abs(self.change_y):
+            self.texture = self.texture_right if self.change_x > 0 else self.texture_left
+        else:
+            self.texture = self.texture_up if self.change_y > 0 else self.texture_down
