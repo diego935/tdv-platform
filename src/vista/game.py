@@ -1,5 +1,6 @@
 import arcade
 import time
+from vista.menu_pausa import MenuPausa
 from config import ANCHO_VENTANA, ALTO_VENTANA, COLOR_FONDO_JUEGO
 from entities.player import Jugador
 from entities.enemy import *
@@ -259,6 +260,9 @@ class VistaJuego(arcade.View):
             self.console.input_text += text
 
     def on_key_press(self, key, modifiers):
+        if key == arcade.key.ESCAPE:
+            self.window.show_view(MenuPausa(self))
+            return
         if key == arcade.key.F1:
             if self.estado_actual == "CONSOLE":
                 self.estado_actual = "JUGANDO"

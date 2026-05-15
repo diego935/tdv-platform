@@ -8,7 +8,7 @@ class PantallaCompleta(arcade.Window):
 
     def on_key_press(self, key, modifiers):
         # PRESIONAR ESCAPE PARA SALIR DE PANTALLA COMPLETA y F11 PARA VOVERLA A PONER
-        if key == arcade.key.ESCAPE or key == arcade.key.F11:
+        if key == arcade.key.F11:
             self.set_fullscreen(not self.fullscreen)
             
             if not self.fullscreen:
