@@ -10,7 +10,7 @@ from items.items import BaseItem
 
 # ==================== PROYECTIL ====================
 
-class Proyectil:
+class Proyectil(arcade.Sprite):
     """Proyectil para armas de fuego."""
 
     def __init__(
@@ -23,6 +23,8 @@ class Proyectil:
         lifetime: float = 2.0,
         radio: float = 6.0
     ):
+        super().__init__("assets/items/bala.png", scale=0.01)
+
         self.center_x = x
         self.center_y = y
         self.angle = angle
@@ -35,11 +37,6 @@ class Proyectil:
 
         self._vx = math.cos(math.radians(angle)) * velocidad
         self._vy = math.sin(math.radians(angle)) * velocidad
-
-    def draw(self):
-        arcade.draw_circle_filled(
-            self.center_x, self.center_y, self.radio, arcade.color.RED
-        )
 
     def update(self, delta_time, blocks_list=None, enemies_list=None):
         self.center_x += self._vx * delta_time

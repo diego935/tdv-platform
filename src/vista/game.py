@@ -88,7 +88,7 @@ class VistaJuego(arcade.View):
         self.lista_enemigos = arcade.SpriteList()
         self.lista_puertas = arcade.SpriteList()
         self.lista_bloques = arcade.SpriteList()
-        self.lista_proyectiles = []
+        self.lista_proyectiles = arcade.SpriteList()
         self.item_manager = ItemManager() 
         self.text_manager = TextManager()
 
@@ -177,8 +177,7 @@ class VistaJuego(arcade.View):
             self.lista_bloques.draw()
             self.lista_puertas.draw()
             self.item_manager.draw()
-            for p in self.lista_proyectiles:
-                p.draw()
+            self.lista_proyectiles.draw()
             self.im.draw()
             self.lista_enemigos.draw()
             self.lista_jugadores.draw()
@@ -241,7 +240,9 @@ class VistaJuego(arcade.View):
             if hasattr(p, '_actualizar_posicion'):
                 p._actualizar_posicion()
 
-        self.lista_proyectiles = [p for p in self.lista_proyectiles if not p.killed]
+        for p in self.lista_proyectiles[:]:
+          if p.killed:
+            self.lista_proyectiles.remove(p)
         
         arma = self.sprite_jugador.obtener_arma_activa()
         if arma and hasattr(arma, 'actualizar'):
