@@ -349,8 +349,8 @@ def cmd_dmg(vista, args):
 def cmd_enemigo_r(vista, args):
     """Crea EnemigoRanged. Uso: enemigo_r [R] [r] [intervalo] [dano] [inteligencia] [area_radio]"""
     try:
-        radio_R = int(args[0]) if len(args) > 0 else 200
-        radio_r = int(args[1]) if len(args) > 1 else 100
+        radio_R = int(args[0]) if len(args) > 0 else 450
+        radio_r = int(args[1]) if len(args) > 1 else 200
         intervalo = float(args[2]) if len(args) > 2 else 2.0
         dano = float(args[3]) if len(args) > 3 else 10.0
         inteligencia = args[4].lower() == "true" if len(args) > 4 else False
