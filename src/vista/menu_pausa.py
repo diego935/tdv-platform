@@ -13,55 +13,49 @@ class MenuPausa(arcade.View):
 
         cx = self.window.width / 2
 
-        # Fondo oscuro
         arcade.draw_lrbt_rectangle_filled(
             0,
             self.window.width,
             0,
             self.window.height,
-            (0, 0, 0, 180)
+            arcade.color.SMOKY_BLACK
         )
 
-        # Título
         arcade.draw_text(
             "PAUSA",
             cx,
             self.window.height - 150,
-            arcade.color.WHITE,
+            arcade.color.GOLDENROD,
             60,
             anchor_x="center"
         )
 
-        # BOTÓN CONTINUAR
         self._draw_button(
             cx,
             self.window.height / 2 + 80,
             "CONTINUAR",
-            arcade.color.DARK_SLATE_GRAY
+            arcade.color.SMOKY_BLACK
         )
 
-        # BOTÓN GUARDAR
         self._draw_button(
             cx,
             self.window.height / 2,
             "GUARDAR PARTIDA",
-            arcade.color.DARK_GRAY
+            arcade.color.SMOKY_BLACK
         )
 
-        # BOTÓN SALIR AL MENÚ
         self._draw_button(
             cx,
             self.window.height / 2 - 80,
             "SALIR AL MENÚ",
-            arcade.color.DARK_RED
+            arcade.color.SMOKY_BLACK
         )
 
-        # 🆕 BOTÓN SALIR DEL JUEGO
         self._draw_button(
             cx,
             self.window.height / 2 - 160,
             "SALIR DEL JUEGO",
-            arcade.color.RED_PURPLE
+            arcade.color.SMOKY_BLACK
         )
 
     def _draw_button(self, cx, cy, text, color):
@@ -76,11 +70,20 @@ class MenuPausa(arcade.View):
             color
         )
 
+        arcade.draw_lbwh_rectangle_outline(
+            left,
+            bottom,
+            300,
+            60,
+            arcade.color.VENETIAN_RED,
+            3
+        )
+
         arcade.draw_text(
             text,
             cx,
             cy,
-            arcade.color.WHITE,
+            arcade.color.GOLDENROD,
             20,
             anchor_x="center",
             anchor_y="center"
@@ -91,28 +94,23 @@ class MenuPausa(arcade.View):
             self.window.show_view(self.vista_juego)
             return
 
-
     def on_mouse_press(self, x, y, button, modifiers):
 
         cx = self.window.width / 2
 
-        # CONTINUAR
         if (cx - 150 < x < cx + 150) and (self.window.height / 2 + 50 < y < self.window.height / 2 + 110):
             self.window.show_view(self.vista_juego)
             return
 
-        # GUARDAR
         if (cx - 150 < x < cx + 150) and (self.window.height / 2 - 30 < y < self.window.height / 2 + 30):
             self.guardar_partida()
             return
 
-        # SALIR AL MENÚ
         if (cx - 150 < x < cx + 150) and (self.window.height / 2 - 110 < y < self.window.height / 2 - 50):
             from vista.menu_principal import MenuPrincipal
             self.window.show_view(MenuPrincipal())
             return
 
-        # 🆕 SALIR DEL JUEGO
         if (cx - 150 < x < cx + 150) and (self.window.height / 2 - 190 < y < self.window.height / 2 - 130):
             arcade.exit()
             return
