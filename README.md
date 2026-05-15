@@ -25,6 +25,6 @@ Las puertas se abren con la e, y las puertas tienen un tiempo de apertura y cerr
 
 
 
-
-
+Se había llegado al límite de memoria
+Al cargar texturas mucho más pequeñas el juego carga super rápido 
 
