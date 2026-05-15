@@ -47,6 +47,22 @@ class Jugador(arcade.Sprite):
         arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_0.png"),
         arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_1.png"),
         arcade.load_texture("assets/Jugador/andandoHaciaDerecha/sprite_2.png")]
+        self.texturas_up_walk = [
+        arcade.load_texture("assets/Jugador/andandoHaciaArriba/sprite_0.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaArriba/sprite_1.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaArriba/sprite_2.png")
+        ]
+        self.texturas_left_walk = [
+        arcade.load_texture("assets/Jugador/andandoHaciaIzquierda/sprite_0.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaIzquierda/sprite_1.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaIzquierda/sprite_2.png")
+        ]
+
+        self.texturas_down_walk = [
+        arcade.load_texture("assets/Jugador/andandoHaciaAbajo/sprite_0.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaAbajo/sprite_1.png"),
+        arcade.load_texture("assets/Jugador/andandoHaciaAbajo/sprite_2.png")
+        ]
 
         self.frame_animacion = 0
         self.timer_animacion = 0
@@ -154,17 +170,33 @@ class Jugador(arcade.Sprite):
         self.change_y *= self.slowed
         
         moviendose = self.change_x != 0 or self.change_y != 0
-        if self.direccion == "right" and moviendose:
+        if moviendose:
+
             self.timer_animacion += delta_time
+
             if self.timer_animacion >= self.velocidad_animacion:
                 self.timer_animacion = 0
                 self.frame_animacion += 1
-                if self.frame_animacion >= len(self.texturas_right_walk):
-                    self.frame_animacion = 0
 
-            self.texture = self.texturas_right_walk[self.frame_animacion]
-        
+            if self.direccion == "right":
+                frames = self.texturas_right_walk
+
+            elif self.direccion == "left":
+                frames = self.texturas_left_walk
+
+            elif self.direccion == "up":
+                frames = self.texturas_up_walk
+
+            else:
+                frames = self.texturas_down_walk
+
+            if self.frame_animacion >= len(frames):
+                self.frame_animacion = 0
+
+            self.texture = frames[self.frame_animacion]
+
         else:
+            self.frame_animacion = 0
             self.texture = self.texturas[self.direccion]
 
 
@@ -243,3 +275,18 @@ class Jugador(arcade.Sprite):
         if (daño_veneno >0 and tiempo_veneno >0): self.estados.append(Veneno(daño_veneno, tiempo_veneno))
         self.slowed *= porcentajeSlow
         self.estados.append(Slow(porcentajeSlow, tiempo_slow))
+
+    def to_dict(self):
+        return {
+            "x": self.center_x,
+            "y": self.center_y,
+            "vida": self.vida,
+            "max_vida": self.max_vida,
+            "stamina": self.stamina,
+            "indice_activo": self.indice_activo,
+            "direccion": self.direccion,
+            "inventario": [
+                item.__class__.__name__ if item else None
+                for item in self.inventory
+            ]
+        }
