@@ -86,6 +86,12 @@ class MenuPausa(arcade.View):
             anchor_y="center"
         )
 
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ESCAPE:
+            self.window.show_view(self.vista_juego)
+            return
+
+
     def on_mouse_press(self, x, y, button, modifiers):
 
         cx = self.window.width / 2

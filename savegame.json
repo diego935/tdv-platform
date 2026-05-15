@@ -1,0 +1,16 @@
+{
+    "player": {
+        "x": 3015.0,
+        "y": 3410.0,
+        "inventario": [
+            "Pistola",
+            "Cuchillo",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ]
+    }
+}

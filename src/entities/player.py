@@ -3,6 +3,7 @@ from vista.inventory import *
 from vista.textos import *
 from vista.asset_manager import AssetManager
 import math
+from entities.estados import *
 
 
 class Jugador(arcade.Sprite):
@@ -29,10 +30,8 @@ class Jugador(arcade.Sprite):
         self.stamina_exhausted_delay = 3.0
         self.tasa_consumo_stamina = 25
         self.tasa_regen_stamina = 25
-        self.slow_timer = 0.0
-        self.slowed = 1
-        self.poison_timer = 0.0
-        self.poison_damage = 0.0
+        self.slowed = 1.0
+        self.estados = []
         #Curacion
         self.tasa_regen_hp = 25
         self.direccion = "down"
@@ -66,6 +65,14 @@ class Jugador(arcade.Sprite):
 
     def draw_inventory(self, mouse_pos=None): 
         self.vistaInventario.draw(self.inventory, self.vistaInventario._drag_source if hasattr(self.vistaInventario, '_drag_source') else None, mouse_pos)
+
+    def actualizar_estados(self, delta_time: float):
+        estados_restantes = []
+        for estado in self.estados:
+            if not estado.actualizar(self, delta_time):
+                self.estados.remove(estado)
+
+
 
 
     def recoger_objeto(self, objeto):
@@ -106,17 +113,7 @@ class Jugador(arcade.Sprite):
     def move(self, arriba, abajo, izq, der, shift, delta_time):
         
 
-        if self.curacion_pendiente > 0:
-            cura_frame = self.velocidad_curacion * delta_time
-            cura_frame = min(cura_frame, self.curacion_pendiente) # Evita pasarse
-            
-            self.vida += cura_frame
-            self.curacion_pendiente -= cura_frame
-            
-            # Tope máximo
-            if self.vida >= self.max_vida:
-                self.vida = self.max_vida
-                self.curacion_pendiente = 0.0
+        self.actualizar_estados(delta_time)
 
         intencion_movimiento = arriba or abajo or izq or der
         
@@ -174,21 +171,6 @@ class Jugador(arcade.Sprite):
         #sonido movimiento
         corriendo = (shift and moviendose and self.stamina > 0 and self.velocidad_actual == self.vel_correr)
 
-# restaurar velocidad
-    
-        # Manejar veneno
-        if self.poison_timer > 0:
-            self.poison_timer -= delta_time
-            # Daño por segundo (ajusta el divisor según prefieras)
-            self.recibir_dano(self.poison_damage * delta_time)
-            if self.poison_timer<=0: 
-                self.color = arcade.color.WHITE
-
-        if self.slow_timer > 0:
-            self.slow_timer -= delta_time
-            if self.slow_timer <= 0:
-                self.slowed = 1
-
         if moviendose:
             velocidad_sonido = 1.5 if corriendo else 1.0
             if not self.sonando_pasos:
@@ -225,11 +207,9 @@ class Jugador(arcade.Sprite):
         return False     
 
     def iniciar_curacion(self, cantidad, tiempo):
-        """ Inicia un proceso de curación gradual """
         if self.vida >= self.max_vida:
             return False
-        self.curacion_pendiente += float(cantidad)
-        self.velocidad_curacion = float(cantidad) / float(tiempo)
+        self.estados.append(Sanacion(cantidad, tiempo))
         return True
 
     def destruir_item_activo(self, slot= None):
@@ -259,14 +239,7 @@ class Jugador(arcade.Sprite):
 
 
     def pisa_trampa(self, daño_base: int, daño_veneno: float, tiempo_veneno: float, tiempo_slow: float, porcentajeSlow:float): 
-        # Daño instantáneo
         self.recibir_dano(daño_base)
-        
-        # Slow - reducir velocidad temporalmente
-        self.slow_timer = tiempo_slow
-        self.slowed=  porcentajeSlow 
-        
-        # Veneno - daño progresivo
-        self.poison_timer += tiempo_veneno
-        self.poison_damage = max(daño_veneno, self.poison_damage)
-        self.color = arcade.color.GREEN
+        if (daño_veneno >0 and tiempo_veneno >0): self.estados.append(Veneno(daño_veneno, tiempo_veneno))
+        self.slowed *= porcentajeSlow
+        self.estados.append(Slow(porcentajeSlow, tiempo_slow))
