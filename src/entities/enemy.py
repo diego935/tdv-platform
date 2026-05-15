@@ -1,7 +1,9 @@
 import arcade
 import random
 import math
+from utils.log import Log
 from entities.pathfinding import SistemaNavegacion
+from utils.log import Log
 
 
 class DummyEnemy(arcade.SpriteSolidColor):
@@ -275,7 +277,7 @@ class EnemigoIA(arcade.Sprite):
             self._timer_ataque = self.tiempo_entre_ataques
             
             # Feedback visual
-            print(f"Enemigo ataca! Daño: {self.dano_ataque}, Vida player: {player.vida}")
+            Log.debug("Enemigo", "Atacando jugador", dano=self.dano_ataque, vida_player=player.vida, tipo=self.tipo_ataque if hasattr(self, 'tipo_ataque') else 'unknown')
 
     def _llegado_a_destino(self, destino, blocks_list, tolerancia: float = 10) -> bool:
         """Check si llegó a posición destino."""

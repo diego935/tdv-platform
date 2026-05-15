@@ -1,5 +1,6 @@
 import arcade
 import json
+from utils.log import Log
 
 
 class MenuPausa(arcade.View):
@@ -135,4 +136,4 @@ class MenuPausa(arcade.View):
         with open("savegame.json", "w") as f:
             json.dump(data, f, indent=4)
 
-        print("✔ Partida guardada correctamente")
+        Log.info("MenuPausa", "Partida guardada", archivo="savegame.json", pos_x=jugador.center_x, pos_y=jugador.center_y)

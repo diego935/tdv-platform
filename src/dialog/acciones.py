@@ -2,6 +2,7 @@ import json
 import os
 from items.items import Botiquin
 from items.items import BaseItem
+from utils.log import Log
 
 
 _acciones_cache = {}
@@ -86,22 +87,23 @@ def ejecutar_accion(accion: str, vista) -> None:
         npc_shape = npc.shape
         nx = (npc_shape[0][0] + npc_shape[2][0]) / 2
         ny = (npc_shape[0][1] + npc_shape[2][1]) / 2        
-        offset = 120
+        offset = 80
         if px > nx:
-            item.center_x = px - offset
-        else:
             item.center_x = px + offset
+        else:
+            item.center_x = px - offset
             
         if py > ny:
-            item.center_y = py - offset
-        else:
             item.center_y = py + offset
+        else:
+            item.center_y = py - offset
         
         _safe_call('item_manager_add_item', item)
     elif tipo == "cerrar":
         _safe_call('cerrar_dialogo')
     elif tipo == "debug":
-        print(f"[Dialog] {param}")
+        from utils.log import Log
+        Log.debug("DialogAcciones", "Debug action", param=param)
 
 
 def obtener_accion(nombre_dialogo: str, clave_accion: str) -> str:

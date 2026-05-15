@@ -1,4 +1,6 @@
 import arcade
+from utils.log import Log
+from utils.log import Log
 
 class AssetManager:
     """
@@ -19,7 +21,7 @@ class AssetManager:
                 # Cargamos y guardamos en el diccionario
                 self._textures[path] = arcade.load_texture(path)
             except Exception as e:
-                print(f"Error cargando {path}: {e}")
+                Log.error("AssetManager", "Error cargando textura", path=path, exception=str(e))
                 # Textura de error (el clásico rosa/negro de motor de juegos)
                 self._textures[path] = arcade.make_soft_square_texture(32, arcade.color.MAGENTA)
         return self._textures[path]

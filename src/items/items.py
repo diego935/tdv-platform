@@ -1,5 +1,6 @@
 import arcade
 from vista.asset_manager import AssetManager
+from utils.log import Log
 
 
 class BaseItem(arcade.Sprite):
@@ -47,12 +48,12 @@ class Botiquin(BaseItem):
             self._timer_cooldown -= delta_time
 
     def usar(self, owner,slot=None, target_x=None, target_y=None, proyectiles_list=None) -> bool:
-        print(self.puede_usar)
+        Log.debug("Botiquin", "Verificando uso", puede_usar=self.puede_usar)
         if not self.puede_usar:
             return False
 
         se_pudo_curar = owner.iniciar_curacion(self.cantidad_curacion, self.tiempo_curacion)
-        print("Se pudo curar:" ,se_pudo_curar)
+        Log.info("Botiquin", "Curación aplicada", exito=se_pudo_curar, cantidad=self.cantidad_curacion, tiempo=self.tiempo_curacion)
 
         if se_pudo_curar:
             self.cantidad_usos -= 1

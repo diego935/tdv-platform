@@ -2,6 +2,8 @@ import arcade
 import time 
 from items.items import *
 from entities.blocks import * 
+from entities.enemy import EnemigoIA
+
 from entities.enemy import *
 
 
@@ -208,7 +210,6 @@ def cmd_dummy(vista, args):
 def cmd_enemigo(vista, args):
     """Crea EnemigoIA. Uso: enemigo [waypoint|area|paredes] [radio] [dano]"""
     try:
-        from entities.enemy import EnemigoIA
         
         tipo = args[0].lower() if args else "waypoint"
         radio = int(args[1]) if len(args) > 1 else 150

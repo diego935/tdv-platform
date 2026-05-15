@@ -2,6 +2,7 @@ import arcade
 from typing import Optional
 from vista.textos import TextManager
 from vista.asset_manager import AssetManager
+from utils.log import Log
 
 # ==========================================
 # 1. EL MANAGER (Singleton)
@@ -35,7 +36,7 @@ class InteractionManager:
         self.stats.clear()
 
     def add_collectible(self, sprite, category, on_pickup, on_all_collected=None):
-        print(f"[DEBUG] add_collectible llamado: {sprite}, category: {category}")
+        Log.debug("InteractionManager", "Añadiendo collectible", sprite=str(sprite), category=category)
         sprite.is_trap = False
         sprite.category = category
         sprite.on_pickup = on_pickup
@@ -43,14 +44,14 @@ class InteractionManager:
             self.stats[category] = {"actual": 0, "total": 0, "callback": on_all_collected}
         self.stats[category]["total"] += 1
         self.all_interactables.append(sprite)
-        print(f"[DEBUG] total interactables ahora: {len(self.all_interactables)}")
+        Log.debug("InteractionManager", "Collectible añadido", objetos=[str(s) for s in self.all_interactables])
 
     def add_trap(self, sprite, on_trigger):
-        print(f"[DEBUG] add_trap llamado: {sprite}")
+        Log.debug("InteractionManager", "Añadiendo trampa", sprite=str(sprite))
         sprite.is_trap = True
         sprite.on_trigger = on_trigger
         self.all_interactables.append(sprite)
-        print(f"[DEBUG] total interactables ahora: {len(self.all_interactables)}")
+        Log.debug("InteractionManager", "Trampa añadida", total=len(self.all_interactables))
 
     def update(self):
         if not self.player: return

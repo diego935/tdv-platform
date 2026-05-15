@@ -1,6 +1,10 @@
 import arcade
 from config import ANCHO_VENTANA, ALTO_VENTANA, TITULO_VENTANA
 from vista.menu_principal import MenuPrincipal
+from utils.log import Log
+
+Log.init("game.log")
+Log.info("Main", "Iniciando juego")
 
 class PantallaCompleta(arcade.Window):
     def __init__(self, width, height, title):

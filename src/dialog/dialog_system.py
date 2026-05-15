@@ -2,6 +2,8 @@ import json
 import os
 import arcade
 from typing import Callable, Optional
+from utils.log import Log
+from utils.log import Log
 
 
 class DialogSystem:
@@ -36,7 +38,7 @@ class DialogSystem:
         self._nombre_dialogo = nombre
         ruta = f"assets/dialogs/{nombre}.json"
         if not os.path.exists(ruta):
-            print(f"[DialogSystem] Archivo no encontrado: {ruta}")
+            Log.warning("DialogSystem", "Archivo de diálogo no encontrado", ruta=ruta)
             return False
         with open(ruta, "r", encoding="utf-8") as f:
             self.dialogo_actual = json.load(f)
@@ -46,7 +48,7 @@ class DialogSystem:
         if self.dialogo_actual is None:
             return False
         if nodo_inicial not in self.dialogo_actual:
-            print(f"[DialogSystem] Nodo no encontrado: {nodo_inicial}")
+            Log.warning("DialogSystem", "Nodo de diálogo no encontrado", nodo=nodo_inicial)
             return False
         self.dialogo_activo = True
         self.mostrar_nodo(nodo_inicial)

@@ -3,7 +3,8 @@ import threading
 import time
 from typing import List, Tuple, Optional, Set, Callable, Dict
 import arcade
-from config import CELL_SIZE 
+from config import CELL_SIZE
+from utils.log import Log 
 
 
 class Nodo:
@@ -95,14 +96,14 @@ class GridPathfinder:
             self._actualizar_grid_sync(self._bloques_pendientes, padding)
             duracion = time.time() - inicio
         except Exception as e:
-            print(f"[GridPathfinder] Error en actualización: {e}")
+            Log.error("Pathfinding", "Error en actualización del grid", exception=str(e))
         finally:
             self._actualizando = False
             if self._callback_completado:
                 try:
                     self._callback_completado()
                 except Exception as e:
-                    print(f"[GridPathfinder] Error en callback: {e}")
+                    Log.error("Pathfinding", "Error en callback de pathfinding", exception=str(e))
 
     def _actualizar_grid_sync(self, bloques, padding: int = 2):
         self.grid.clear()
@@ -269,7 +270,7 @@ class GridPathfinder:
                     heapq.heappush(abierta, vecino)
 
         if iteraciones >= self.MAX_ITERACIONES:
-            print(f"[GridPathfinder] A* alcanzó límite de iteraciones ({self.MAX_ITERACIONES})")
+            Log.warning("Pathfinding", "A* alcanzó límite de iteraciones", limite=self.MAX_ITERACIONES)
         return None
 
     def _encontrar_celda_cercana(self, grid_pos: Tuple[int, int]) -> Optional[Nodo]:
