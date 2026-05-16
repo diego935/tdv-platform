@@ -74,6 +74,8 @@ class Jugador(arcade.Sprite):
         self.original_scale = self.scale
 
         self.sonido_pasos = arcade.load_sound("assets/sonidos/caminar.wav")
+        self.sonido_trampa = arcade.load_sound("assets/sonidos/trampa.wav")
+        self.sonido_queja = arcade.load_sound("assets/sonidos/queja_jugador.wav")
         self.player_pasos = None
         self.sonando_pasos = False
         self.speed_sonido = 1.0
@@ -271,6 +273,8 @@ class Jugador(arcade.Sprite):
 
 
     def pisa_trampa(self, daño_base: int, daño_veneno: float, tiempo_veneno: float, tiempo_slow: float, porcentajeSlow:float): 
+        arcade.play_sound(self.sonido_trampa, volume=0.3)
+        arcade.play_sound(self.sonido_queja, volume=0.4)
         self.recibir_dano(daño_base)
         if (daño_veneno >0 and tiempo_veneno >0): self.estados.append(Veneno(daño_veneno, tiempo_veneno))
         self.slowed *= porcentajeSlow
