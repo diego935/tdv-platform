@@ -142,78 +142,6 @@ class VistaJuego(arcade.View):
             for muro in muros_mapa:
                 self.lista_bloques.append(muro)
 
-        # Cargar enemigos desde Tiled
-        Log.info("Game", f"Buscando capa de enemigos: {self.CAPAS.get('enemigos')}")
-        enemigos_layer = self.tile_map.object_lists.get(self.CAPAS["enemigos"], [])
-        Log.info("Game", f"Enemigos encontrados: {len(enemigos_layer)}")
-
-        for enemy_obj in enemigos_layer:
-            try:
-                props = getattr(enemy_obj, 'properties', {})
-                Log.info("Game", f"Enemigo: {getattr(enemy_obj, 'name', 'unnamed')}, props: {props}")
-
-                enemy_id = props.get('tipo', 'bandido')
-                subtipo = props.get('subtipo', 'melee')
-                tipo_patrulla_str = props.get('tipo_patrulla', 'area')
-                area_radio = props.get('area_radio', 500)
-                vida = props.get('vida', 100)
-                dano = props.get('dano', 15.0)
-                vista_rango = props.get('vista_rango', 800)
-
-                if tipo_patrulla_str == 'waypoint':
-                    tipo_patrulla = EnemigoIA.TIPO_WAYPOINT
-                elif tipo_patrulla_str == 'area':
-                    tipo_patrulla = EnemigoIA.TIPO_AREA
-                elif tipo_patrulla_str == 'paredes':
-                    tipo_patrulla = EnemigoIA.TIPO_PAREDES
-                else:
-                    tipo_patrulla = EnemigoIA.TIPO_AREA
-
-                x = (enemy_obj.shape[0][0] + enemy_obj.shape[2][0]) / 2
-                y = (enemy_obj.shape[0][1] + enemy_obj.shape[2][1]) / 2
-
-                if subtipo == "ranged":
-                    enemigo = EnemigoRanged(
-                        x=x, y=y,
-                        tipo_patrulla=tipo_patrulla,
-                        area_center=(x, y),
-                        area_radio=area_radio,
-                        dano_ataque=dano,
-                        vista_rango=vista_rango
-                    )
-                else:
-                    if tipo_patrulla_str == "waypoint":
-                        waypoints = [(x, y), (x+100, y), (x+100, y+100), (x, y+100)]
-                        enemigo = EnemigoIA(
-                            x=x, y=y,
-                            tipo_patrulla=tipo_patrulla,
-                            waypoints=waypoints,
-                            dano_ataque=dano,
-                            vista_rango=vista_rango
-                        )
-                    elif tipo_patrulla_str == "area":
-                        enemigo = EnemigoIA(
-                            x=x, y=y,
-                            tipo_patrulla=tipo_patrulla,
-                            area_center=(x, y),
-                            area_radio=area_radio,
-                            dano_ataque=dano,
-                            vista_rango=vista_rango
-                        )
-                    else:
-                        enemigo = EnemigoIA(
-                            x=x, y=y,
-                            tipo_patrulla=tipo_patrulla,
-                            dano_ataque=dano,
-                            vista_rango=vista_rango
-                        )
-
-                enemigo.enemy_id = enemy_id
-                self.lista_enemigos.append(enemigo)
-                Log.info("Game", f"Enemigo creado: {enemy_id} en ({x}, {y})")
-            except Exception as e:
-                Log.error("Game", f"Error creando enemigo: {e}")
-
         self.camera = CameraManager()
         self.hud = HUD()
         self.console = ConsoleUI()
@@ -230,6 +158,100 @@ class VistaJuego(arcade.View):
 
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
         self.nav_manager = SistemaNavegacion(self.lista_bloques)
+
+        # Cargar enemigos desde Tiled
+        Log.info("Game", f"Buscando capa de enemigos: {self.CAPAS.get('enemigos')}")
+        enemigos_layer = self.tile_map.object_lists.get(self.CAPAS["enemigos"], [])
+        Log.info("Game", f"Enemigos encontrados: {len(enemigos_layer)}")
+
+        for enemy_obj in enemigos_layer:
+            try:
+                props = getattr(enemy_obj, 'properties', {})
+                Log.info("Game", f"Enemigo: {getattr(enemy_obj, 'name', 'unnamed')}, props: {props}")
+
+                enemy_id = props.get('tipo', 'bandido')
+                subtipo = props.get('subtipo', 'melee')
+                tipo_patrulla_str = props.get('tipo_patrulla', 'area')
+                area_radio = props.get('area_radio', 500)
+                dano = props.get('dano', 15.0)
+                vista_rango = props.get('vista_rango', 800)
+
+                if tipo_patrulla_str == 'waypoint':
+                    tipo_patrulla = EnemigoIA.TIPO_WAYPOINT
+                elif tipo_patrulla_str == 'area':
+                    tipo_patrulla = EnemigoIA.TIPO_AREA
+                elif tipo_patrulla_str == 'paredes':
+                    tipo_patrulla = EnemigoIA.TIPO_PAREDES
+                else:
+                    tipo_patrulla = EnemigoIA.TIPO_AREA
+
+                x = (enemy_obj.shape[0][0] + enemy_obj.shape[2][0]) / 2
+                y = (enemy_obj.shape[0][1] + enemy_obj.shape[2][1]) / 2
+
+                if subtipo == "ranged":
+                    radio_R = props.get('radio_R', 450)
+                    radio_r = props.get('radio_r', 200)
+                    intervalo = props.get('intervalo', 2.0)
+                    inteligencia = props.get('inteligencia', False)
+                    rango_ataque = props.get('rango_ataque', 300)
+
+                    enemigo = EnemigoRanged(
+                        x=x, y=y,
+                        tipo_patrulla=tipo_patrulla,
+                        area_center=(x, y),
+                        area_radio=area_radio,
+                        dano_ataque=dano,
+                        vista_rango=vista_rango,
+                        radio_R=radio_R,
+                        radio_r=radio_r,
+                        intervalo_ataque=intervalo,
+                        inteligencia=inteligencia,
+                        rango_ataque=rango_ataque,
+                        waypoints=None
+                    )
+                else:
+                    velocidad = props.get('velocidad', 200)
+                    velocidad_patrulla = props.get('velocidad_patrulla', 50)
+
+                    if tipo_patrulla_str == "waypoint":
+                        waypoints = [(x, y), (x+100, y), (x+100, y+100), (x, y+100)]
+                        enemigo = EnemigoIA(
+                            x=x, y=y,
+                            tipo_patrulla=tipo_patrulla,
+                            waypoints=waypoints,
+                            dano_ataque=dano,
+                            vista_rango=vista_rango,
+                            velocidad=velocidad,
+                            velocidad_patrulla=velocidad_patrulla
+                        )
+                    elif tipo_patrulla_str == "area":
+                        enemigo = EnemigoIA(
+                            x=x, y=y,
+                            tipo_patrulla=tipo_patrulla,
+                            area_center=(x, y),
+                            area_radio=area_radio,
+                            dano_ataque=dano,
+                            vista_rango=vista_rango,
+                            velocidad=velocidad,
+                            velocidad_patrulla=velocidad_patrulla
+                        )
+                    else:
+                        enemigo = EnemigoIA(
+                            x=x, y=y,
+                            tipo_patrulla=tipo_patrulla,
+                            dano_ataque=dano,
+                            vista_rango=vista_rango,
+                            velocidad=velocidad,
+                            velocidad_patrulla=velocidad_patrulla
+                        )
+
+                enemigo.enemy_id = enemy_id
+                Log.info("Game", f"Enemigo creado: {enemy_id} en ({x}, {y})")
+
+                self.lista_enemigos.append(enemigo)
+            except Exception as e:
+                Log.error("Game", f"Error creando enemigo: {e}")
+
         self.dm = DialogManager()
         self.dm.set_vista(self)
         # En tu setup del juego

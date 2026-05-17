@@ -627,25 +627,63 @@ class EnemigoRanged(EnemigoIA):
         return player.center_x, player.center_y
     
     def _mover_hacia_posicion(self, target_x, target_y, nav_manager, delta_time):
-        dx = target_x - self.center_x
-        dy = target_y - self.center_y
-        dist = math.sqrt(dx * dx + dy * dy)
-        
-        if dist > 5:
-            self.change_x = (dx / dist) * self.velocidad
-            self.change_y = (dy / dist) * self.velocidad
+        if not self.ruta_actual or self._llegado_a_destino((target_x, target_y), [], tolerancia=50):
+            self.ruta_actual = nav_manager.encontrar_ruta(
+                self.position,
+                (target_x, target_y)
+            ) or []
+
+        if self.ruta_actual:
+            try:
+                dest_x, dest_y = self.ruta_actual[0]
+                dx = dest_x - self.center_x
+                dy = dest_y - self.center_y
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist > 5:
+                    self.change_x = (dx / dist) * self.velocidad
+                    self.change_y = (dy / dist) * self.velocidad
+                else:
+                    self.ruta_actual.pop(0)
+                    self.change_x = 0
+                    self.change_y = 0
+            except (IndexError, TypeError):
+                self.change_x = 0
+                self.change_y = 0
         else:
             self.change_x = 0
             self.change_y = 0
-    
-    def _alejar_de_player(self, player, delta_time):
-        dx = self.center_x - player.center_x
-        dy = self.center_y - player.center_y
-        dist = math.sqrt(dx * dx + dy * dy)
-        
-        if dist > 0:
-            self.change_x = (dx / dist) * self.velocidad
-            self.change_y = (dy / dist) * self.velocidad
+
+    def _alejar_de_player(self, player, blocks_list, nav_manager, delta_time):
+        target_x = self.center_x * 2 - player.center_x
+        target_y = self.center_y * 2 - player.center_y
+
+        if not self.ruta_actual:
+            self.ruta_actual = nav_manager.encontrar_ruta(
+                self.position,
+                (target_x, target_y)
+            ) or []
+
+        if self.ruta_actual:
+            try:
+                dest_x, dest_y = self.ruta_actual[0]
+                dx = dest_x - self.center_x
+                dy = dest_y - self.center_y
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist > 5:
+                    self.change_x = (dx / dist) * self.velocidad
+                    self.change_y = (dy / dist) * self.velocidad
+                else:
+                    self.ruta_actual.pop(0)
+            except (IndexError, TypeError):
+                self.change_x = 0
+                self.change_y = 0
+        else:
+            dx = self.center_x - player.center_x
+            dy = self.center_y - player.center_y
+            dist = math.sqrt(dx * dx + dy * dy)
+            if dist > 0:
+                self.change_x = (dx / dist) * self.velocidad
+                self.change_y = (dy / dist) * self.velocidad
     
     def _atacar_ranged(self, player, proyectiles_list):
         target_x, target_y = self._calcular_posicion_ataque(player)
@@ -686,7 +724,7 @@ class EnemigoRanged(EnemigoIA):
         if comando == "avanzar":
             self._mover_hacia_posicion(player.center_x, player.center_y, nav_manager, delta_time)
         elif comando == "retroceder":
-            self._alejar_de_player(player, delta_time)
+            self._alejar_de_player(player, blocks_list, nav_manager, delta_time)
         else:
             # En rango correcto: moverse lateralmente alrededor del player
             dx = player.center_x - self.center_x
