@@ -1,4 +1,5 @@
 import arcade
+from utils.log import Log
 
 class ItemManager:
     _instance = None
@@ -37,3 +38,9 @@ class ItemManager:
             if arcade.get_distance_between_sprites(jugador, item) < distancia:
                 items_cercanos.append(item)
         return items_cercanos
+    
+    def clear(self) -> None:
+        """Elimina todos los ítems que estén tirados en el suelo del mundo."""
+        if hasattr(self, 'items_on_ground') and self.items_on_ground:
+            self.items_on_ground.clear()
+        Log.info("ItemManager", "Todos los ítems del suelo han sido eliminados.")

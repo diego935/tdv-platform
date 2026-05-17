@@ -200,6 +200,14 @@ class QuestEventBus:
                 except Exception as e:
                     Log.error("QuestEventBus", f"Error en callback: {e}")
 
+    @classmethod
+    def clear_bus(cls) -> None:
+        """Vacía todos los suscriptores y destruye la instancia del EventBus."""
+        if cls._instance:
+            cls._instance._subscribers.clear()
+        cls._instance = None
+        Log.info("QuestEventBus", "EventBus reiniciado a cero.")
+
 
 class QuestManager:
     _instance = None
@@ -442,6 +450,30 @@ class QuestManager:
                 for i, obj_data in enumerate(objetivos_data):
                     if i < len(objetivos_quest):
                         objetivos_quest[i].progreso = obj_data.get("progreso", 0)
+                        
+    def clear_manager(self, default: bool = True) -> None:
+        """Vacía por completo el progreso de las misiones y las restablece a su estado inicial."""
+        Log.info("QuestManager", "Vaciando datos lógicos de misiones...")
+        
+        # 1. Limpiar diccionarios y listas de progreso
+        self.misiones.clear()
+        self.misiones_activas.clear()
+        self.misiones_completadas.clear()
+        
+        # 2. Quitar los callbacks globales de la interfaz
+        self._on_progress_callback = None
+        self._on_complete_callback = None
+        
+        # 3. Limpiar los suscriptores del EventBus propio
+        if self.event_bus:
+            self.event_bus.clear_bus()
+            
+        # 4. ¡CRÍTICO!: Volvemos a cargar las misiones por defecto aquí
+        # Esto asegura que el diccionario misiones no esté vacío y que "verificar_condicion" no falle
+        if default: self.cargar_misiones_defecto()
+            
+        Log.info("QuestManager", "QuestManager restablecido con misiones base limpias.")
+
 
 
 QM = QuestManager.get_instance()

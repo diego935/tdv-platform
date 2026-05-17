@@ -125,6 +125,12 @@ class VistaJuego(arcade.View):
                 self.lista_npc_sprites.append(npc_sprite)
         
         self.sprite_jugador = Jugador()
+
+        print("\n\n\n\n\n\n")
+        print(self.sprite_jugador.__dict__)
+        print("\n\n\n\n\n\n")
+
+        
         if spawn:
             self.sprite_jugador.center_x = spawn.shape[0]
             self.sprite_jugador.center_y = map_height - spawn.shape[1]
@@ -576,3 +582,57 @@ class VistaJuego(arcade.View):
                 QM.from_dict(data["misiones"])
         except Exception as e:
             pass
+
+
+    def limpiar_estado(self):
+        """Limpia a cero absoluto el estado visual, frena inputs y vacía los managers globales 
+        sin destruir sus instancias, preparándolos para recibir datos nuevos."""
+        Log.info("Game", "=== INICIANDO LIMPIEZA DEL ESTADO GLOBAL ===")
+
+        # 1. Vaciar los managers por dentro llamando a sus nuevos métodos clear
+        from dialog.dialog_system import DialogSystem
+
+        QM.clear_manager()                             # Vacía progreso de misiones y el EventBus
+        DialogSystem.get_instance().clear_manager()    # Resetea textos de diálogos, acciones y listeners UI
+        ItemManager().clear()                          # Elimina los ítems esparcidos por el suelo
+        InteractionManager().clear()                   # Limpia monedas, trampas y desvincula al jugador viejo
+
+        # 2. Resetear estados lógicos internos de la interfaz de la vista
+        self.estado_actual = "JUGANDO"
+        self.show_inventory = False
+        self._ultimo_click_slot = None
+        self._ultimo_click_tiempo = 0.0
+
+        # 3. Forzar el frenado de los inputs (soluciona el bug de caminar solos tras recargar)
+        self.izquierda_presionado = False
+        self.derecha_presionado = False
+        self.arriba_presionado = False
+        self.abajo_presionado = False
+        self.shift_presionado = False
+
+        # 4. Vaciar por completo las SpriteLists antiguas de Arcade para liberar memoria de video
+        listas_a_limpiar = [
+            'lista_jugadores', 'lista_enemigos', 'lista_puertas', 
+            'lista_bloques', 'lista_npc_sprites', 'lista_proyectiles'
+        ]
+        for lista_attr in listas_a_limpiar:
+            if hasattr(self, lista_attr) and getattr(self, lista_attr):
+                getattr(self, lista_attr).clear()
+
+        # 5. Re-inicializar las SpriteLists vacías listas para la nueva inyección de datos
+        self.lista_jugadores = arcade.SpriteList()
+        self.lista_enemigos = arcade.SpriteList()
+        self.lista_puertas = arcade.SpriteList()
+        self.lista_bloques = arcade.SpriteList()
+        self.lista_proyectiles = arcade.SpriteList()
+        self.lista_npc_sprites = arcade.SpriteList()
+        self.lista_npcs = []
+
+        # 6. Reiniciar utilidades del motor de renderizado y UI básica de la pantalla
+       
+        self.text_manager = TextManager()
+        self.camera = CameraManager()
+        self.hud = HUD()
+        self.console = ConsoleUI()
+        
+        Log.info("Game", "=== MUNDO LIMPIO: Todo listo para inyectar datos del JSON o Setup ===")

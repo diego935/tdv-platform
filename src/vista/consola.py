@@ -354,7 +354,7 @@ def cmd_enemigo_r(vista, args):
         intervalo = float(args[2]) if len(args) > 2 else 2.0
         dano = float(args[3]) if len(args) > 3 else 10.0
         inteligencia = args[4].lower() == "true" if len(args) > 4 else False
-        area_radio = int(args[5]) if len(args) > 5 else 150
+        area_radio = int(args[5]) if len(args) > 5 else 500
         
         x = vista.mouse_world_x
         y = vista.mouse_world_y

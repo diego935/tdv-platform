@@ -158,13 +158,16 @@ class DialogSystem:
     def obtener_opciones(self) -> list[tuple[str, str, str]]:
         resultado = []
         opciones_filtradas = {}
+        
+        # Este contador llevará el número visible real de la opción (1, 2, 3...)
+        contador_opcion_visible = 1
 
         for i in range(1, 10):
-            clave = str(i)
-            if clave not in self.opciones:
+            clave_json = str(i)
+            if clave_json not in self.opciones:
                 continue
 
-            opcion_raw = self.opciones[clave]
+            opcion_raw = self.opciones[clave_json]
 
             if isinstance(opcion_raw, str):
                 condicion = None
@@ -180,8 +183,17 @@ class DialogSystem:
             if not verificar_condicion(condicion):
                 continue
 
-            opciones_filtradas[clave] = opcion_raw
-            resultado.append((clave, siguiente_nodo, texto_mostrar))
+            # Convertimos el contador actual a string ('1', '2', '3'...)
+            clave_visible = str(contador_opcion_visible)
+
+            # Guardamos la opción mapeada a su NUEVO número dinámico de teclado
+            opciones_filtradas[clave_visible] = opcion_raw
+            
+            # Añadimos a la lista que renderiza la UI con el número correcto
+            resultado.append((clave_visible, siguiente_nodo, texto_mostrar))
+            
+            # Incrementamos solo porque esta opción SÍ es válida y se va a mostrar
+            contador_opcion_visible += 1
 
         self._opciones_filtradas = opciones_filtradas
         return resultado
@@ -204,5 +216,28 @@ class DialogSystem:
     def get(cls):
         return cls._instance
 
+
+    def clear_manager(self) -> None:
+        """Fuerza el cierre del diálogo y limpia todas las variables y listeners de la UI."""
+        Log.info("DialogSystem", "Limpiando el sistema de diálogos...")
+        
+        # 1. Forzar el estado lúdico a cerrado
+        self.dialogo_activo = False
+        self.dialogo_actual = None
+        self.nodo_actual = None
+        self.nodo_texto = ""
+        self.nodo_accion = ""
+        self._nombre_dialogo = ""
+        
+        # 2. Limpiar diccionarios de opciones
+        self.opciones.clear()
+        self._opciones_filtradas.clear()
+        self.acciones.clear()
+        
+        # 3. Desvincular la vista gráfica anterior y limpiar observadores de interfaz
+        self._vista = None
+        self._listeners.clear()
+        
+        Log.info("DialogSystem", "Sistema de diálogos reseteado por completo.")
 
 DialogManager = DialogSystem.get_instance

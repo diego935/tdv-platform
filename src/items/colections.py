@@ -32,8 +32,11 @@ class InteractionManager:
         self.player = player
 
     def clear(self):
+        """Vacía las listas de trampas, monedas, estadísticas y desvincula al jugador viejo."""
         self.all_interactables.clear()
         self.stats.clear()
+        self.player = None  
+        Log.info("InteractionManager", "Estructuras de interacciones y trampas limpiadas.")
 
     def add_collectible(self, sprite, category, on_pickup, on_all_collected=None):
         Log.debug("InteractionManager", "Añadiendo collectible", sprite=str(sprite), category=category)

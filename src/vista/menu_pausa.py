@@ -109,6 +109,7 @@ class MenuPausa(arcade.View):
 
         if (cx - 150 < x < cx + 150) and (self.window.height / 2 - 110 < y < self.window.height / 2 - 50):
             from vista.menu_principal import MenuPrincipal
+            self.vista_juego.limpiar_estado()
             self.window.show_view(MenuPrincipal())
             return
 
