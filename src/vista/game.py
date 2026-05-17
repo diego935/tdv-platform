@@ -5,6 +5,8 @@ from config import ANCHO_VENTANA, ALTO_VENTANA, COLOR_FONDO_JUEGO
 from entities.player import Jugador
 from entities.enemy import *
 from entities.pathfinding import SistemaNavegacion
+from utils.log import Log
+
 from entities.blocks import *
 from vista.inventory import * 
 from vista.inventory import NotaUI 
@@ -18,12 +20,17 @@ from vista.camera_manager import CameraManager
 from vista.asset_manager import AssetManager
 import random
 from entities.enemy import EnemigoIA
+from entities.enemy import EnemigoRanged
 from items.colections import InteractionManager, SpikeTrap,MissionCoin
 from items.weapons import Pistola, Cuchillo
+import inspect
 
 from dialog import DialogManager
 from vista.dialog_ui import DialogUI
+import json
 
+import os
+from dialog.quest_manager import QM
 
 
 class VistaJuego(arcade.View):
@@ -63,7 +70,9 @@ class VistaJuego(arcade.View):
             "muros": "Pared",
             "eventos": "Eventos",
             "zonas": "Zonas",
-            "npcs" : "NPCs"
+            "npcs" : "NPCs",
+            "overlay": "overlay",
+            "enemigos": "Enemigos"
         }
         self.lista_enemigos = arcade.SpriteList()
         self.lista_puertas = arcade.SpriteList()
@@ -76,6 +85,10 @@ class VistaJuego(arcade.View):
         self._DOUBLE_CLICK_DELAY = 0.3
         
     def setup(self):
+        #Cargar misiones guardadas
+        self._cargar_misiones()
+        QM.suscripcion_automatica()
+
         #Mapa--------------------------------------
         map_name = "assets/maps/mapa.tmx"
         layer_options = {self.CAPAS["muros"]: {"use_spatial_hash": True}}
@@ -103,9 +116,10 @@ class VistaJuego(arcade.View):
         for npc_obj in self.lista_npcs:
             props = getattr(npc_obj, 'properties', {})
             sprite_path = props.get('sprite', '')
+            scale = props.get('scale', 0.11)
             if sprite_path:
                 tex = AssetManager().get_texture(sprite_path)
-                npc_sprite = arcade.Sprite(tex, scale=0.11)
+                npc_sprite = arcade.Sprite(tex, scale=scale)
                 npc_sprite.center_x = (npc_obj.shape[0][0] + npc_obj.shape[2][0]) / 2
                 npc_sprite.center_y = (npc_obj.shape[0][1] + npc_obj.shape[2][1]) / 2
                 self.lista_npc_sprites.append(npc_sprite)
@@ -127,6 +141,78 @@ class VistaJuego(arcade.View):
         if muros_mapa:
             for muro in muros_mapa:
                 self.lista_bloques.append(muro)
+
+        # Cargar enemigos desde Tiled
+        Log.info("Game", f"Buscando capa de enemigos: {self.CAPAS.get('enemigos')}")
+        enemigos_layer = self.tile_map.object_lists.get(self.CAPAS["enemigos"], [])
+        Log.info("Game", f"Enemigos encontrados: {len(enemigos_layer)}")
+
+        for enemy_obj in enemigos_layer:
+            try:
+                props = getattr(enemy_obj, 'properties', {})
+                Log.info("Game", f"Enemigo: {getattr(enemy_obj, 'name', 'unnamed')}, props: {props}")
+
+                enemy_id = props.get('tipo', 'bandido')
+                subtipo = props.get('subtipo', 'melee')
+                tipo_patrulla_str = props.get('tipo_patrulla', 'area')
+                area_radio = props.get('area_radio', 500)
+                vida = props.get('vida', 100)
+                dano = props.get('dano', 15.0)
+                vista_rango = props.get('vista_rango', 800)
+
+                if tipo_patrulla_str == 'waypoint':
+                    tipo_patrulla = EnemigoIA.TIPO_WAYPOINT
+                elif tipo_patrulla_str == 'area':
+                    tipo_patrulla = EnemigoIA.TIPO_AREA
+                elif tipo_patrulla_str == 'paredes':
+                    tipo_patrulla = EnemigoIA.TIPO_PAREDES
+                else:
+                    tipo_patrulla = EnemigoIA.TIPO_AREA
+
+                x = (enemy_obj.shape[0][0] + enemy_obj.shape[2][0]) / 2
+                y = (enemy_obj.shape[0][1] + enemy_obj.shape[2][1]) / 2
+
+                if subtipo == "ranged":
+                    enemigo = EnemigoRanged(
+                        x=x, y=y,
+                        tipo_patrulla=tipo_patrulla,
+                        area_center=(x, y),
+                        area_radio=area_radio,
+                        dano_ataque=dano,
+                        vista_rango=vista_rango
+                    )
+                else:
+                    if tipo_patrulla_str == "waypoint":
+                        waypoints = [(x, y), (x+100, y), (x+100, y+100), (x, y+100)]
+                        enemigo = EnemigoIA(
+                            x=x, y=y,
+                            tipo_patrulla=tipo_patrulla,
+                            waypoints=waypoints,
+                            dano_ataque=dano,
+                            vista_rango=vista_rango
+                        )
+                    elif tipo_patrulla_str == "area":
+                        enemigo = EnemigoIA(
+                            x=x, y=y,
+                            tipo_patrulla=tipo_patrulla,
+                            area_center=(x, y),
+                            area_radio=area_radio,
+                            dano_ataque=dano,
+                            vista_rango=vista_rango
+                        )
+                    else:
+                        enemigo = EnemigoIA(
+                            x=x, y=y,
+                            tipo_patrulla=tipo_patrulla,
+                            dano_ataque=dano,
+                            vista_rango=vista_rango
+                        )
+
+                enemigo.enemy_id = enemy_id
+                self.lista_enemigos.append(enemigo)
+                Log.info("Game", f"Enemigo creado: {enemy_id} en ({x}, {y})")
+            except Exception as e:
+                Log.error("Game", f"Error creando enemigo: {e}")
 
         self.camera = CameraManager()
         self.hud = HUD()
@@ -183,6 +269,11 @@ class VistaJuego(arcade.View):
             self.lista_enemigos.draw()
             self.lista_jugadores.draw()
             self.lista_npc_sprites.draw()
+
+            overlay = self.scene.get_sprite_list(self.CAPAS.get("overlay"))
+            if overlay:
+                overlay.draw()
+
             self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager, self.sprite_jugador)
             self.text_manager.draw()
 
@@ -227,7 +318,6 @@ class VistaJuego(arcade.View):
         for enemigo in self.lista_enemigos:
             if hasattr(enemigo, 'update'):
                 if hasattr(enemigo, 'puede_ver_player'):
-                    import inspect
                     sig = inspect.signature(enemigo.update)
                     if len(sig.parameters) >= 5:
                         enemigo.update(delta_time, self.sprite_jugador, self.lista_bloques, self.nav_manager, self.lista_proyectiles)
@@ -348,7 +438,8 @@ class VistaJuego(arcade.View):
                 npc_y = (npc.shape[0][1] + npc.shape[2][1]) / 2
                 dx = abs(self.sprite_jugador.center_x - npc_x)
                 dy = abs(self.sprite_jugador.center_y - npc_y)
-                if dx < 80 and dy < 120:
+                rango = props.get('rango', 80)
+                if dx < rango and dy < rango * 1.5:
                     self.dm.cargar_dialogo(dialog_file)
                     self.dm.iniciar(nodo_inicial)
                     self.estado_actual = "DIALOGO"
@@ -449,3 +540,17 @@ class VistaJuego(arcade.View):
     
     def item_manager_add_item(self, item):
         self.item_manager.add_to_world(item)
+
+    def _cargar_misiones(self):
+
+        if not os.path.exists("savegame.json"):
+            return
+
+        try:
+            with open("savegame.json", "r") as f:
+                data = json.load(f)
+
+            if "misiones" in data:
+                QM.from_dict(data["misiones"])
+        except Exception as e:
+            pass

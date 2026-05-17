@@ -68,7 +68,7 @@ class DialogUI:
                 font_size=14,
                 anchor_x="center"
             )
-            for clave, destino in opciones:
+            for clave, destino, texto_mostrar in opciones:
                 numero = clave
                 arcade.draw_text(
                     f"{numero}.",
@@ -78,9 +78,8 @@ class DialogUI:
                     font_size=16,
                     font_name="calibri"
                 )
-                texto_opcion = f"{destino}"
                 arcade.draw_text(
-                    texto_opcion,
+                    texto_mostrar,
                     cx - 180,
                     y_opciones,
                     arcade.color.WHITE,

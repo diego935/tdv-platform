@@ -76,27 +76,30 @@ class MissionCoin(arcade.Sprite):
     def __init__(self, x, y):
         texture = AssetManager().get_texture(":resources:images/items/gold_1.png")
         super().__init__(texture, scale=0.4)
-        
+
         self.center_x = x
         self.center_y = y
-        self.categoria = "monedas_ancestrales" # Definimos la categoría dentro del objeto
+        self.categoria = "monedas_ancestrales"
+        self.item_id = "moneda_ancestral"
 
     def al_recoger(self):
         """Se ejecuta cuando el jugador toca ESTA moneda."""
+        from dialog.quest_manager import EB
+        EB.publish("item_collected", {"item_id": self.item_id})
+
         im = InteractionManager()
         datos = im.stats.get(self.categoria)
-        
-        # Calculamos progreso
-        actual = datos["actual"] + 1 
+
+        actual = datos["actual"] + 1
         total = datos["total"]
-        
+
         player = im.player
         if player:
             TextManager().show_message(
-                f"{actual}/{total}", 
-                player.center_x, 
-                player.center_y + 30, 
-                (255, 215, 0) # Dorado
+                f"{actual}/{total}",
+                player.center_x,
+                player.center_y + 30,
+                (255, 215, 0)
             )
 
     @staticmethod

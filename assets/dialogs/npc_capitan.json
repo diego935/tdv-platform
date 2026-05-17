@@ -1,0 +1,52 @@
+{
+    "saludo": {
+        "texto": "¡Soldado! Los bandidos están atacando las caravanas. ¡Necesitamos tu ayuda!",
+        "accion": "",
+        "opciones": {
+            "1": {"nodo": "mision_guerrera", "texto": "¿Cuál es la misión?"},
+            "2": {"nodo": "despedida", "texto": "Más tarde"}
+        }
+    },
+    "mision_guerrera": {
+        "texto": "Derrota a 5 bandidos que andan rondando por el norte. ¿Aceptas?",
+        "accion": "",
+        "opciones": {
+            "1": {"nodo": "aceptar_mision_guerrera", "texto": "Acepto la misión", "condicion": {"mision_no_activa": "mision_guerrera"}},
+            "2": {"nodo": "mision_en_progreso_guerrera", "texto": "Ya estoy en ello...", "condicion": {"mision_activa": "mision_guerrera"}},
+            "3": {"nodo": "mision_completada_guerrera", "texto": "¡Misión completada!", "condicion": {"mision_completada": "mision_guerrera"}},
+            "4": {"nodo": "saludo", "texto": "Aún no"}
+        }
+    },
+    "aceptar_mision_guerrera": {
+        "texto": "¡Bien! Los encontrarás al norte. ¡Derrota a los 5!",
+        "accion": "iniciar_mision:mision_guerrera",
+        "opciones": {"1": {"nodo": "saludo", "texto": "Entendido"}}
+    },
+    "mision_en_progreso_guerrera": {
+        "texto": "¡Sigue luchando! Derrota a los bandidos que faltan.",
+        "accion": "",
+        "opciones": {"1": {"nodo": "saludo", "texto": "Volver"}}
+    },
+    "mision_completada_guerrera": {
+        "texto": "¡Excelente trabajo! Las caravanas están a salvo.",
+        "accion": "",
+        "opciones": {
+            "1": {"nodo": "recibir_recompensa", "texto": "Reclamar recompensa", "condicion": {"mision_completada": "mision_guerrera", "recompensa_no_recibida": "mision_guerrera"}},
+            "2": {"nodo": "saludo", "texto": "Gracias, Capitán"}
+        }
+    },
+    "recibir_recompensa": {
+        "texto": "Aquí tienes tu recompensa. ¡Bien hecho, soldado!",
+        "accion": "recompensa:mision_guerrera:dar-dinero:200",
+        "opciones": {"1": {"nodo": "saludo", "texto": "Gracias"}}
+    },
+    "despedida": {
+        "texto": "¡A las órdenes!",
+        "accion": "cerrar",
+        "opciones": {}
+    },
+    "_acciones": {
+        "iniciar_mision": "iniciar_mision:mision_guerrera",
+        "cerrar": "cerrar"
+    }
+}

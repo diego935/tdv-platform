@@ -1,0 +1,52 @@
+{
+    "saludo": {
+        "texto": "¡Ah, viajante! Me llamo Mentor. Veo que tienes potencial...",
+        "accion": "",
+        "opciones": {
+            "1": {"nodo": "mision_monedero", "texto": "¿Tienes alguna misión para mí?"},
+            "2": {"nodo": "despedida", "texto": "Solo pasaba a saludar"}
+        }
+    },
+    "mision_monedero": {
+        "texto": "Sí, necesito que recojas 3 monedas ancestrales que están desperdigadas por el mapa. ¿Aceptas?",
+        "accion": "",
+        "opciones": {
+            "1": {"nodo": "aceptar_mision_monedero", "texto": "Acepto la misión", "condicion": {"mision_no_activa": "mision_monedero"}},
+            "2": {"nodo": "mision_en_progreso_monedero", "texto": "Ya estoy en ello...", "condicion": {"mision_activa": "mision_monedero"}},
+            "3": {"nodo": "mision_completada_monedero", "texto": "¡Ya la completé!", "condicion": {"mision_completada": "mision_monedero"}},
+            "4": {"nodo": "saludo", "texto": "Aún no"}
+        }
+    },
+    "aceptar_mision_monedero": {
+        "texto": "¡Excelente! Las monedas están cerca de la zona sur. ¡Buena suerte!",
+        "accion": "iniciar_mision:mision_monedero",
+        "opciones": {"1": {"nodo": "saludo", "texto": "Gracias"}}
+    },
+    "mision_en_progreso_monedero": {
+        "texto": "¡Animo! Busca bien, las monedas están cerca.",
+        "accion": "",
+        "opciones": {"1": {"nodo": "saludo", "texto": "Volver"}}
+    },
+    "mision_completada_monedero": {
+        "texto": "¡Increíble! Has demostrado ser un verdadero aventurero.",
+        "accion": "",
+        "opciones": {
+            "1": {"nodo": "recibir_recompensa", "texto": "Reclamar recompensa", "condicion": {"mision_completada": "mision_monedero", "recompensa_no_recibida": "mision_monedero"}},
+            "2": {"nodo": "saludo", "texto": "Gracias"}
+        }
+    },
+    "recibir_recompensa": {
+        "texto": "Toma, esto es para ti. ¡Has demostrado ser un verdadero aventurero!",
+        "accion": "recompensa:mision_monedero:dar-item:EspadaLegendaria",
+        "opciones": {"1": {"nodo": "saludo", "texto": "Gracias"}}
+    },
+    "despedida": {
+        "texto": "¡Que tengas un buen viaje, aventurero!",
+        "accion": "cerrar",
+        "opciones": {}
+    },
+    "_acciones": {
+        "iniciar_mision": "iniciar_mision:mision_monedero",
+        "cerrar": "cerrar"
+    }
+}

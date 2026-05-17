@@ -1,0 +1,52 @@
+{
+    "saludo": {
+        "texto": "Soy Silvane, jefe de la Orden de los Ents. Mi jardín ha sido invadido por criaturas repulsivas...",
+        "accion": "",
+        "opciones": {
+            "1": {"nodo": "mision", "texto": "¿En qué puedo ayudarte?"},
+            "2": {"nodo": "despedida", "texto": "Solo pasaba por aquí"}
+        }
+    },
+    "mision": {
+        "texto": "Se han colado unos no-muertos en mi jardín. ¿Podrías deshacerte de ellos?",
+        "accion": "",
+        "opciones": {
+            "1": {"nodo": "aceptar", "texto": "Acepto el encargo", "condicion": {"mision_no_activa": "mision_silvane"}},
+            "2": {"nodo": "progreso", "texto": "Estoy en ello...", "condicion": {"mision_activa": "mision_silvane"}},
+            "3": {"nodo": "completada", "texto": "¡Ya está hecho!", "condicion": {"mision_completada": "mision_silvane"}},
+            "4": {"nodo": "saludo", "texto": "Ahora no puedo"}
+        }
+    },
+    "aceptar": {
+        "texto": "¡Te lo agradeceré eternamente! Date prisa, mi jardín está plagado.",
+        "accion": "iniciar_mision:mision_silvane",
+        "opciones": {"1": {"nodo": "saludo", "texto": "Cuenta conmigo"}}
+    },
+    "progreso": {
+        "texto": "¡Date prisa! Los no-muertos siguen causando caos.",
+        "accion": "",
+        "opciones": {"1": {"nodo": "saludo", "texto": "Voy"}}
+    },
+    "completada": {
+        "texto": "¡Mi jardín está limpio! Eres un verdadero héroe de los Ents.",
+        "accion": "",
+        "opciones": {
+            "1": {"nodo": "recompensa", "texto": "Reclamar recompensa", "condicion": {"mision_completada": "mision_silvane", "recompensa_no_recibida": "mision_silvane"}},
+            "2": {"nodo": "saludo", "texto": "De nada"}
+        }
+    },
+    "recompensa": {
+        "texto": "Toma, esto es para ti. ¡Has salvado mi hogar!",
+        "accion": "recompensa:mision_silvane:dar-item:Botiquin",
+        "opciones": {"1": {"nodo": "saludo", "texto": "Gracias"}}
+    },
+    "despedida": {
+        "texto": "Que los árboles te protejan, viajero.",
+        "accion": "cerrar",
+        "opciones": {}
+    },
+    "_acciones": {
+        "iniciar_mision": "iniciar_mision:mision_silvane",
+        "cerrar": "cerrar"
+    }
+}

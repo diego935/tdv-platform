@@ -1,0 +1,52 @@
+{
+    "misiones": [
+        {
+            "id": "mision_monedero",
+            "nombre": "Recolectar Monedas Ancestrales",
+            "descripcion": "El Mentor necesita que recojas 3 monedas ancestrales.",
+            "objetivos": [
+                {"id": "obj_monedero", "tipo": "collect", "target": "moneda_ancestral", "cantidad": 3, "descripcion": "Recolectar 3 monedas ancestrales"}
+            ],
+            "recompensas": {"items": ["EspadaLegendaria"]},
+            "estado": "disponible",
+            "dialogo_inicio": "npc_mentor:saludo",
+            "dialogo_completado": "npc_mentor:mision_completada_monedero"
+        },
+        {
+            "id": "mision_guerrera",
+            "nombre": "Eliminar Bandidos",
+            "descripcion": "El Capitán necesita que derrote a 5 bandidos que atacan las caravanas.",
+            "objetivos": [
+                {"id": "obj_bandidos", "tipo": "kill", "target": "bandido", "cantidad": 5, "descripcion": "Derrotar 5 bandidos"}
+            ],
+            "recompensas": {"dinero": 200, "items": ["PocionSalud"]},
+            "estado": "disponible",
+            "dialogo_inicio": "npc_capitan:saludo",
+            "dialogo_completado": "npc_capitan:mision_completada_guerrera"
+        },
+        {
+            "id": "mision_silvane",
+            "nombre": "Limpiar el Jardín de Silvane",
+            "descripcion": "Silvane necesita que deshazte de los no-muertos en su jardín.",
+            "objetivos": [
+                {"id": "obj_zombies", "tipo": "kill", "target": "silvane", "cantidad": 6, "descripcion": "Derrotar a los no-muertos"}
+            ],
+            "recompensas": {"items": ["Botiquin"], "vida": 50},
+            "estado": "disponible",
+            "dialogo_inicio": "npc_silvane:saludo",
+            "dialogo_completado": "npc_silvane:completada"
+        },
+        {
+            "id": "derrotar_jefe",
+            "nombre": "Derrotar al Jefe",
+            "descripcion": "El jefe final espera en lo profundo de la mazmorra.",
+            "objetivos": [
+                {"id": "obj_1", "tipo": "reach", "target": "mazmorra_entrance", "cantidad": 1, "descripcion": "Entrar a la mazmorra"},
+                {"id": "obj_2", "tipo": "kill", "target": "jefe_mazmorra", "cantidad": 1, "descripcion": "Derrotar al jefe de la mazmorra"}
+            ],
+            "recompensas": {"arma": "ArcoLegendario", "dinero": 1000},
+            "estado": "bloqueada",
+            "requisitos": {"mision_anterior": "rescatar_princesa"}
+        }
+    ]
+}

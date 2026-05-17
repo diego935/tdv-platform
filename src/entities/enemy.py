@@ -96,6 +96,7 @@ class EnemigoIA(arcade.Sprite):
         self.center_x = x
         self.center_y = y
         self.vida = 100
+        self.enemy_id = "bandido"
 
         self.tipo_patrulla = tipo_patrulla
 
@@ -531,7 +532,16 @@ class EnemigoIA(arcade.Sprite):
                 self._base_x = self.center_x
                 self._base_y = self.center_y
         if self.vida <= 0:
+            self._publicar_muerte()
             self.kill()
+
+    def _publicar_muerte(self) -> None:
+        """Publica evento de muerte para el sistema de misiones."""
+        try:
+            from dialog.quest_manager import EB
+            EB.publish("enemy_killed", {"enemy_id": self.enemy_id})
+        except Exception:
+            pass
 
 
 # ==================== ENEMIGO RANGED ====================

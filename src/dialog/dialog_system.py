@@ -6,6 +6,31 @@ from utils.log import Log
 from utils.log import Log
 
 
+def verificar_condicion(condicion: dict) -> bool:
+    if not condicion:
+        return True
+
+    for clave, valor in condicion.items():
+        if clave == "mision_completada":
+            from dialog.quest_manager import QM
+            return QM.esta_completada(valor)
+        elif clave == "mision_activa":
+            from dialog.quest_manager import QM
+            return QM.esta_activa(valor)
+        elif clave == "mision_no_activa":
+            from dialog.quest_manager import QM
+            quest = QM.get_mision(valor)
+            return quest is not None and quest.estado not in ["en_progreso", "completada"]
+        elif clave == "flag":
+            from dialog.quest_manager import QM
+            return QM.esta_completada(valor) or QM.esta_activa(valor)
+        elif clave == "recompensa_no_recibida":
+            from dialog.quest_manager import QM
+            return QM.esta_completada(valor) and not QM.recompensa_entregada(valor)
+
+    return True
+
+
 class DialogSystem:
     _instance = None
 
@@ -14,6 +39,7 @@ class DialogSystem:
         self.dialogo_actual: Optional[dict] = None
         self.nodo_actual: Optional[str] = None
         self.opciones: dict[str, str] = {}
+        self._opciones_filtradas: dict = {}
         self.dialogo_activo: bool = False
         self.nodo_texto: str = ""
         self.nodo_accion: str = ""
@@ -65,6 +91,7 @@ class DialogSystem:
         self.nodo_texto = nodo.get("texto", "")
         self.nodo_accion = nodo.get("accion") or ""
         self.opciones = nodo.get("opciones", {})
+        self.obtener_opciones()
         self._notificar_cambio()
 
     def ejecutar_accion_actual(self) -> None:
@@ -83,16 +110,20 @@ class DialogSystem:
                 ejecutar_accion(accion_real, self._vista)
 
     def seleccionar_opcion(self, numero: str) -> bool:
-        if numero not in self.opciones:
+        if numero not in self._opciones_filtradas:
             return False
-        
-        siguiente_nodo = self.opciones[numero]
-        
+
+        opcion = self._opciones_filtradas[numero]
+        siguiente_nodo = opcion.get("nodo") if isinstance(opcion, dict) else opcion
+
+        if not siguiente_nodo:
+            return False
+
         self.mostrar_nodo(siguiente_nodo)
-        
+
         if self.nodo_accion:
             self.ejecutar_accion_actual()
-        
+
         return True
 
     def cerrar(self) -> None:
@@ -100,6 +131,7 @@ class DialogSystem:
         self.dialogo_actual = None
         self.nodo_actual = None
         self.opciones = {}
+        self._opciones_filtradas = {}
         self._notificar_cambio()
 
     def on_key_press(self, key) -> bool:
@@ -123,12 +155,35 @@ class DialogSystem:
     def registrar_accion(self, nombre: str, callback: Callable) -> None:
         self.acciones[nombre] = callback
 
-    def obtener_opciones(self) -> list[tuple[str, str]]:
+    def obtener_opciones(self) -> list[tuple[str, str, str]]:
         resultado = []
-        for i in range(1, len(self.opciones) + 1):
+        opciones_filtradas = {}
+
+        for i in range(1, 10):
             clave = str(i)
-            if clave in self.opciones:
-                resultado.append((clave, self.opciones[clave]))
+            if clave not in self.opciones:
+                continue
+
+            opcion_raw = self.opciones[clave]
+
+            if isinstance(opcion_raw, str):
+                condicion = None
+                siguiente_nodo = opcion_raw
+                texto_mostrar = opcion_raw
+            elif isinstance(opcion_raw, dict):
+                siguiente_nodo = opcion_raw.get("nodo", "")
+                condicion = opcion_raw.get("condicion")
+                texto_mostrar = opcion_raw.get("texto", siguiente_nodo)
+            else:
+                continue
+
+            if not verificar_condicion(condicion):
+                continue
+
+            opciones_filtradas[clave] = opcion_raw
+            resultado.append((clave, siguiente_nodo, texto_mostrar))
+
+        self._opciones_filtradas = opciones_filtradas
         return resultado
 
     def tiene_opciones(self) -> bool:

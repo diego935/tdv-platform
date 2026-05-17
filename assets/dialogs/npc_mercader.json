@@ -2,22 +2,33 @@
     "saludo": {
         "texto": "¡Hola, viajero! ¿Qué necesitas?",
         "accion": "",
-        "opciones": {"1": "dañar", "2": "item", "3": "Por que no te dañan mis balas?", "4": "adios"}
+        "opciones": {
+            "1": {"nodo": "dañar", "texto": "Te quiero dañar"},
+            "2": {"nodo": "item", "texto": "Dame un item"},
+            "3": {"nodo": "misterio", "texto": "¿Por qué no te dañan mis balas?"},
+            "4": {"nodo": "mision_especial", "texto": "Cuéntame sobre la misión especial", "condicion": {"mision_completada": "rescatar_princesa"}},
+            "5": {"nodo": "adios", "texto": "Adiós"}
+        }
     },
     "dañar": {
         "texto": "¡Te quito 10 de vida!",
         "accion": "dano",
-        "opciones": {"1": "saludo"}
+        "opciones": {"1": {"nodo": "saludo", "texto": "Volver"}}
     },
     "item": {
-        "texto": "Toma,agarrate un botiquin.",
+        "texto": "Toma, agarrate un botiquin.",
         "accion": "dar-item:Botiquin",
-        "opciones": {"1": "saludo"}
+        "opciones": {"1": {"nodo": "saludo", "texto": "Gracias, volver"}}
     },
-    "Por que no te dañan mis balas?": {
+    "misterio": {
         "texto": "De puro comer espinacas",
         "accion": "",
-        "opciones": {"1": "saludo"}
+        "opciones": {"1": {"nodo": "saludo", "texto": "Volver"}}
+    },
+    "mision_especial": {
+        "texto": "¡Ya has completado la misión! Eres un verdadero héroe.",
+        "accion": "",
+        "opciones": {"1": {"nodo": "saludo", "texto": "Gracias"}}
     },
     "adios": {
         "texto": "¡Hasta luego!",
