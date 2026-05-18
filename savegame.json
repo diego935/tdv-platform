@@ -1,7 +1,12 @@
 {
     "player": {
-        "x": 3015.0,
-        "y": 3410.0,
+        "x": 3155.0,
+        "y": 2967.25,
+        "vida": 100.0,
+        "max_vida": 100.0,
+        "stamina": 27.41608472497319,
+        "indice_activo": 3,
+        "direccion": "down",
         "inventario": [
             "Pistola",
             "Cuchillo",
@@ -12,5 +17,15 @@
             null,
             null
         ]
+    },
+    "misiones": {
+        "misiones_activas": [],
+        "misiones_completadas": [
+            "mision_silvane"
+        ],
+        "estados": {
+            "mision_silvane": "completada"
+        },
+        "progreso": {}
     }
 }

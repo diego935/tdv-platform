@@ -144,9 +144,6 @@ class EnemigoIA(arcade.Sprite):
         self._base_x = x
         self._base_y = y
 
-        self._ultima_celda_player = None
-        self._ultima_celda_destino = None
-
     def on_draw(self):
         super().on_draw()
         
@@ -404,32 +401,14 @@ class EnemigoIA(arcade.Sprite):
 
         return self.pos_origen
 
-    def _get_celda_player(self, player, nav_manager):
-        """Obtiene la celda del grid donde está el player."""
-        if player is None:
-            return None
-        return nav_manager.grafo._mundo_a_grid(player.center_x, player.center_y)
-
     def _update_perseguir(self, delta_time, player, blocks_list, nav_manager):
         """Update del estado PERSEGUIR."""
         if player is None:
             return
 
         destino = (player.center_x, player.center_y)
-        celda_actual = self._get_celda_player(player, nav_manager)
 
-        necesita_nueva_ruta = False
-
-        if not self.ruta_actual:
-            necesita_nueva_ruta = True
-        elif celda_actual != self._ultima_celda_player:
-            necesita_nueva_ruta = True
-            self._ultima_celda_player = celda_actual
-        elif self._llegado_a_destino(destino, blocks_list):
-            self.ruta_actual = []
-            necesita_nueva_ruta = False
-
-        if necesita_nueva_ruta:
+        if not self.ruta_actual or self._llegado_a_destino(destino, blocks_list):
             self.ruta_actual = nav_manager.encontrar_ruta(
                 self.position,
                 destino
@@ -443,24 +422,7 @@ class EnemigoIA(arcade.Sprite):
             self.cambiar_estado(self.ESTADO_RETURN)
             return
 
-        celda_destino = nav_manager.grafo._mundo_a_grid(
-            self.ultima_pos_player[0], self.ultima_pos_player[1]
-        )
-
-        necesita_nueva_ruta = False
-        if not self.ruta_actual:
-            necesita_nueva_ruta = True
-        elif celda_destino != self._ultima_celda_destino:
-            necesita_nueva_ruta = True
-            self._ultima_celda_destino = celda_destino
-
-        if necesita_nueva_ruta:
-            self.ruta_actual = nav_manager.encontrar_ruta(
-                self.position,
-                self.ultima_pos_player
-            ) or []
-
-        if self._llegado_a_destino(self.ultima_pos_player, blocks_list):
+        if not self.ruta_actual or self._llegado_a_destino(self.ultima_pos_player, blocks_list):
             self.cambiar_estado(self.ESTADO_RETURN)
             return
 
@@ -543,6 +505,7 @@ class EnemigoIA(arcade.Sprite):
 
         self.center_x += self.change_x * delta_time
         self.center_y += self.change_y * delta_time
+
         if abs(self.change_x) > abs(self.change_y):
 
             if self.change_x > 0:
@@ -666,22 +629,11 @@ class EnemigoRanged(EnemigoIA):
         return player.center_x, player.center_y
     
     def _mover_hacia_posicion(self, target_x, target_y, nav_manager, delta_time):
-        celda_target = nav_manager.grafo._mundo_a_grid(target_x, target_y)
-
-        necesita_ruta = False
-        if not self.ruta_actual:
-            necesita_ruta = True
-        elif celda_target != self._ultima_celda_destino:
-            necesita_ruta = True
-            self._ultima_celda_destino = celda_target
-
-        if necesita_ruta:
+        if not self.ruta_actual or self._llegado_a_destino((target_x, target_y), [], tolerancia=50):
             self.ruta_actual = nav_manager.encontrar_ruta(
                 self.position,
                 (target_x, target_y)
             ) or []
-        elif self._llegado_a_destino((target_x, target_y), [], tolerancia=50):
-            self.ruta_actual = []
 
         if self.ruta_actual:
             try:

@@ -262,8 +262,6 @@ class VistaJuego(arcade.View):
             except Exception as e:
                 Log.error("Game", f"Error creando enemigo: {e}")
 
-        
-
         self.dm = DialogManager()
         self.dm.set_vista(self)
         # En tu setup del juego
@@ -392,6 +390,7 @@ class VistaJuego(arcade.View):
             arma.actualizar(delta_time)
 
         self.physics_engine.update()
+        
         self.camera.position = self.sprite_jugador.position
         self.text_manager.update()
         self.item_manager.update()
