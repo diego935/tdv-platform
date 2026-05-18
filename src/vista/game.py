@@ -1,7 +1,7 @@
 import arcade
 import time
 from vista.menu_pausa import MenuPausa
-from config import ANCHO_VENTANA, ALTO_VENTANA, COLOR_FONDO_JUEGO
+from config import ANCHO_VENTANA, ALTO_VENTANA, COLOR_FONDO_JUEGO, DISTANCIA_ACTUALIZACION
 from entities.player import Jugador
 from entities.enemy import *
 from entities.pathfinding import SistemaNavegacion
@@ -63,6 +63,9 @@ class VistaJuego(arcade.View):
         self.ZOOM_SENSITIVITY = 0.1
         self.MIN_ZOOM = 0.2
         self.MAX_ZOOM = 4.0
+        
+        # Optimización de distancia
+        self.DISTANCIA_ACTUALIZACION = DISTANCIA_ACTUALIZACION
         
 
         #Inicializar variables del mapa.
@@ -259,6 +262,8 @@ class VistaJuego(arcade.View):
             except Exception as e:
                 Log.error("Game", f"Error creando enemigo: {e}")
 
+        
+
         self.dm = DialogManager()
         self.dm.set_vista(self)
         # En tu setup del juego
@@ -344,7 +349,15 @@ class VistaJuego(arcade.View):
 
         self.lista_puertas.update(delta_time)
         
+        player_x = self.sprite_jugador.center_x
+        player_y = self.sprite_jugador.center_y
+        
         for enemigo in self.lista_enemigos:
+            dx = enemigo.center_x - player_x
+            dy = enemigo.center_y - player_y
+            if dx * dx + dy * dy > self.DISTANCIA_ACTUALIZACION ** 2:
+                continue
+            
             if hasattr(enemigo, 'update'):
                 if hasattr(enemigo, 'puede_ver_player'):
                     sig = inspect.signature(enemigo.update)
@@ -356,6 +369,11 @@ class VistaJuego(arcade.View):
                     enemigo.update(delta_time)
 
         for p in self.lista_proyectiles:
+            dx = p.center_x - player_x
+            dy = p.center_y - player_y
+            if dx * dx + dy * dy > self.DISTANCIA_ACTUALIZACION ** 2:
+                continue
+            
             if hasattr(p, 'update'):
                 p.update(delta_time, self.lista_bloques, self.lista_enemigos, self.sprite_jugador)
             elif hasattr(p, 'on_update'):
