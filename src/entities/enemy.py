@@ -5,6 +5,8 @@ from utils.log import Log
 from entities.pathfinding import SistemaNavegacion
 from items.weapons import Proyectil, ObjetivoProyectil
 from vista.asset_manager import AssetManager
+from dialog.quest_manager import EB
+
 
 
 class DummyEnemy(arcade.SpriteSolidColor):
@@ -538,7 +540,6 @@ class EnemigoIA(arcade.Sprite):
     def _publicar_muerte(self) -> None:
         """Publica evento de muerte para el sistema de misiones."""
         try:
-            from dialog.quest_manager import EB
             EB.publish("enemy_killed", {"enemy_id": self.enemy_id})
         except Exception:
             pass

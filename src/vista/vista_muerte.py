@@ -1,5 +1,6 @@
 import arcade
 
+
 class VistaGameOver(arcade.View):
 
     def __init__(self):
@@ -87,6 +88,6 @@ class VistaGameOver(arcade.View):
 
         if left_btn <= x <= right_btn and bottom_btn <= y <= top_btn:
 
-            from menu_principal import MenuPrincipal
+            from vista.menu_principal import MenuPrincipal
 
             self.window.show_view(MenuPrincipal())

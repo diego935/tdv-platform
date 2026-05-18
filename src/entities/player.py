@@ -4,6 +4,7 @@ from vista.textos import *
 from vista.asset_manager import AssetManager
 import math
 from entities.estados import *
+from dialog.quest_manager import EB
 
 
 class Jugador(arcade.Sprite):
@@ -255,6 +256,7 @@ class Jugador(arcade.Sprite):
             self.inventory[self.indice_activo] = None
 
     def recibir_dano(self, cantidad: float, fuente_x: float = None, fuente_y: float = None):
+        if not self.max_vida: return
         self.vida -= cantidad
         if fuente_x is not None and fuente_y is not None:
             dx = self.center_x - fuente_x
@@ -266,10 +268,8 @@ class Jugador(arcade.Sprite):
                 self._base_x = self.center_x
                 self._base_y = self.center_y
         if self.vida <= 0:
-            self.vida =0
-            
-            #Aqui se llama a la pantalla de muerte
-            pass 
+            self.max_vida =0
+            EB.publish("player_death", {})           
 
 
     def pisa_trampa(self, daño_base: int, daño_veneno: float, tiempo_veneno: float, tiempo_slow: float, porcentajeSlow:float): 

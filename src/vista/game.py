@@ -28,7 +28,8 @@ import inspect
 from dialog import DialogManager
 from vista.dialog_ui import DialogUI
 import json
-
+from dialog.quest_manager import EB
+from vista.vista_muerte import VistaGameOver
 import os
 from dialog.quest_manager import QM
 
@@ -125,7 +126,7 @@ class VistaJuego(arcade.View):
                 self.lista_npc_sprites.append(npc_sprite)
         
         self.sprite_jugador = Jugador()
-
+        EB.subscribe("player_death", self._on_player_death)
         print("\n\n\n\n\n\n")
         print(self.sprite_jugador.__dict__)
         print("\n\n\n\n\n\n")
@@ -583,6 +584,9 @@ class VistaJuego(arcade.View):
         except Exception as e:
             pass
 
+
+    def _on_player_death(self, data):
+            self.window.show_view(VistaGameOver())
 
     def limpiar_estado(self):
         """Limpia a cero absoluto el estado visual, frena inputs y vacía los managers globales 
