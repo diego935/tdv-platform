@@ -10,7 +10,6 @@ class MenuPrincipal(arcade.View):
     def __init__(self):
         super().__init__()
         self.botones = []
-        #arcade.set_background_color(arcade.color.BLACK_LEATHER_JACKET)
         self.bg_texture = arcade.load_texture("assets/fondos/fondo_principal.png")
         arcade.load_font("assets/fuentes/fuente_menu_principal.ttf")
 
@@ -111,11 +110,24 @@ class MenuPrincipal(arcade.View):
 
         arcade.draw_lrbt_rectangle_outline(center_x - half_width, center_x + half_width, bottom3, top3, arcade.color.VENETIAN_RED, 3)
 
+        # BOTÓN (SALIR DEL JUEGO)
+        salir_width = 160
+        salir_height = 40
+        margen = 25
+
+        salir_left = self.window.width - salir_width - margen
+        salir_right = self.window.width - margen
+        salir_bottom = margen
+        salir_top = margen + salir_height
+
+        arcade.draw_lrbt_rectangle_filled(salir_left, salir_right, salir_bottom, salir_top, arcade.color.SMOKY_BLACK)
+        arcade.draw_lrbt_rectangle_outline(salir_left, salir_right, salir_bottom, salir_top, arcade.color.VENETIAN_RED, 2)
+        
         # TEXTO BOTÓN 1 (JUGAR)
         arcade.draw_text(
         "JUGAR",
         center_x,
-        center_y + self.window.height * 0.06,  # centro del rectángulo 1
+        center_y + self.window.height * 0.06,
         arcade.color.GOLDENROD,
         font_size=50,
         anchor_x="center",
@@ -126,7 +138,7 @@ class MenuPrincipal(arcade.View):
         arcade.draw_text(
         "HISTORIA",
         center_x,
-        center_y - self.window.height * 0.15,  # centro del rectángulo 2
+        center_y - self.window.height * 0.15,
         arcade.color.GOLDENROD,
         font_size=30,
         anchor_x="center",
@@ -137,9 +149,20 @@ class MenuPrincipal(arcade.View):
         arcade.draw_text(
         "CONTROLES",
         center_x,
-        center_y - self.window.height * 0.335,  # centro del rectángulo 3
+        center_y - self.window.height * 0.335,
         arcade.color.GOLDENROD,
         font_size=30,
+        anchor_x="center",
+        anchor_y="center",
+        font_name="Times New Roman")
+
+        # TEXTO BOTÓN SALIR
+        arcade.draw_text(
+        "SALIR DEL JUEGO",
+        (salir_left + salir_right) / 2,
+        (salir_bottom + salir_top) / 2,
+        arcade.color.GOLDENROD,
+        font_size=14,
         anchor_x="center",
         anchor_y="center",
         font_name="Times New Roman")
@@ -175,4 +198,18 @@ class MenuPrincipal(arcade.View):
 
         if left <= x <= right and bottom <= y <= top:
             self.window.show_view(VistaAjustes())
+            return
+        
+        # BOTÓN SALIR
+        salir_width = 160
+        salir_height = 40
+        margen = 25
+
+        salir_left = self.window.width - salir_width - margen
+        salir_right = self.window.width - margen
+        salir_bottom = margen
+        salir_top = margen + salir_height
+
+        if salir_left <= x <= salir_right and salir_bottom <= y <= salir_top:
+            arcade.exit()
             return
