@@ -1,31 +1,27 @@
 {
     "player": {
-        "x": 3155.0,
-        "y": 2967.25,
+        "x": 3196.5599999999986,
+        "y": 2786.44,
         "vida": 100.0,
         "max_vida": 100.0,
-        "stamina": 27.41608472497319,
-        "indice_activo": 3,
-        "direccion": "down",
+        "stamina": 76.0143540250283,
+        "indice_activo": 2,
+        "direccion": "left",
         "inventario": [
             "Pistola",
             "Cuchillo",
             null,
-            null,
-            null,
-            null,
-            null,
-            null
+            "Botiquin",
+            "Botiquin",
+            "Botiquin",
+            "Botiquin",
+            "Botiquin"
         ]
     },
     "misiones": {
         "misiones_activas": [],
-        "misiones_completadas": [
-            "mision_silvane"
-        ],
-        "estados": {
-            "mision_silvane": "completada"
-        },
+        "misiones_completadas": [],
+        "estados": {},
         "progreso": {}
     }
 }

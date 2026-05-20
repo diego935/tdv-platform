@@ -269,6 +269,7 @@ class Jugador(arcade.Sprite):
                 self._base_y = self.center_y
         if self.vida <= 0:
             self.max_vida =0
+            arcade.stop_sound(self.player_pasos)
             EB.publish("player_death", {})           
 
 
