@@ -33,6 +33,8 @@ class Jugador(arcade.Sprite):
         self.tasa_regen_stamina = 25
         self.slowed = 1.0
         self.estados = []
+        self.linterna_encendida = True
+        self.bateria_linterna = 100.0
         #Curacion
         self.tasa_regen_hp = 25
         self.direccion = "down"

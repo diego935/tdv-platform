@@ -1,7 +1,17 @@
 import arcade
 import time
 from vista.menu_pausa import MenuPausa
-from config import ANCHO_VENTANA, ALTO_VENTANA, COLOR_FONDO_JUEGO, DISTANCIA_ACTUALIZACION
+from config import (
+    ANCHO_VENTANA, 
+    ALTO_VENTANA, 
+    COLOR_FONDO_JUEGO, 
+    DISTANCIA_ACTUALIZACION,
+    LINTERNA_APERTURA_GRADOS, 
+    LINTERNA_ALCANCE,         
+    LINTERNA_RADIO_JUGADOR,   
+    LINTERNA_RADIO_MAX_MAPA,   
+    LINTERNA_COLOR_OSCURIDAD,
+    DURACION_DIA_SEGUNDOS, ALPHA_MIN_MEDIODIA, ALPHA_MAX_MEDIANOCHE)
 from entities.player import Jugador
 from entities.enemy import *
 from entities.pathfinding import SistemaNavegacion
@@ -24,6 +34,7 @@ from entities.enemy import EnemigoRanged
 from items.colections import InteractionManager, SpikeTrap,MissionCoin
 from items.weapons import Pistola, Cuchillo
 import inspect
+import math
 
 from dialog import DialogManager
 from vista.dialog_ui import DialogUI
@@ -50,6 +61,8 @@ class VistaJuego(arcade.View):
         self.mouse_world_y = None  
         self.nav_manager = None
         self.dm = None
+        self.timer_dia_noche = 0.0 
+        self.alpha_actual_oscuridad = ALPHA_MIN_MEDIODIA
         self.lista_npcs = []
         
         self.show_inventory = False
@@ -305,6 +318,8 @@ class VistaJuego(arcade.View):
             overlay = self.scene.get_sprite_list(self.CAPAS.get("overlay"))
             if overlay:
                 overlay.draw()
+            
+            self.dibujar_linterna_vectorial()
 
             self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager, self.sprite_jugador)
             self.text_manager.draw()
@@ -395,6 +410,7 @@ class VistaJuego(arcade.View):
         self.text_manager.update()
         self.item_manager.update()
         self.im.update()
+        self.actualizar_ciclo_dia_noche(delta_time)
 
     def on_text_input(self, text):
         if self.estado_actual =="CONSOLE":
@@ -460,6 +476,13 @@ class VistaJuego(arcade.View):
 
         if key == arcade.key.E:
             self.ejecutar_interaccion()
+        elif key == arcade.key.F:
+            if not self.sprite_jugador.linterna_encendida and self.sprite_jugador.linterna_bateria > 0:
+                self.sprite_jugador.linterna_encendida = True
+                Log.info("Linterna", "Linterna ENCENDIDA")
+            else:
+                self.sprite_jugador.linterna_encendida = False
+                Log.info("Linterna", "Linterna APAGADA")
         elif key == arcade.key.R:
             self.ejecutar_recargar()
         elif key in [arcade.key.KEY_1, arcade.key.KEY_2, arcade.key.KEY_3, arcade.key.KEY_4]:
@@ -657,3 +680,65 @@ class VistaJuego(arcade.View):
         self.console = ConsoleUI()
         
         Log.info("Game", "=== MUNDO LIMPIO: Todo listo para inyectar datos del JSON o Setup ===")
+
+
+    def dibujar_linterna_vectorial(self):
+            # 1. Posición central del jugador
+            cx = self.sprite_jugador.center_x
+            cy = self.sprite_jugador.center_y
+
+            # 2. Calcular el ángulo hacia el ratón (en radianes)
+            dx = self.mouse_world_x - cx
+            dy = self.mouse_world_y - cy
+            angulo_centro = math.atan2(dy, dx)
+
+            # 3. Mapeo de parámetros desde el archivo Config
+            apertura = math.radians(LINTERNA_APERTURA_GRADOS)
+            alcance_luz = LINTERNA_ALCANCE
+            radio_interior = LINTERNA_RADIO_JUGADOR
+            radio_oscuridad = LINTERNA_RADIO_MAX_MAPA
+
+            # Asignamos el color usando el alpha calculado dinámicamente
+            color_oscuridad = (0, 0, 0, self.alpha_actual_oscuridad)
+
+            # Si el día está muy claro, saltamos el dibujado para ahorrar procesamiento
+            if self.alpha_actual_oscuridad <= 5:
+                return
+
+            # 4. Definir las zonas de luz y oscuridad
+            angulo_luz_der = angulo_centro - apertura
+            angulo_luz_izq = angulo_centro + apertura
+            arco_negro = 2 * math.pi - (apertura * 2)
+
+            # 5. Dibujar el anillo (donut) de oscuridad a trozos para evitar parpadeos
+            segmentos = 24 
+            for i in range(segmentos):
+                a1 = angulo_luz_izq + (i * arco_negro / segmentos)
+                a2 = angulo_luz_izq + ((i + 1) * arco_negro / segmentos)
+
+                p1_in = (cx + math.cos(a1) * radio_interior, cy + math.sin(a1) * radio_interior)
+                p2_in = (cx + math.cos(a2) * radio_interior, cy + math.sin(a2) * radio_interior)
+                
+                p1_out = (cx + math.cos(a1) * radio_oscuridad, cy + math.sin(a1) * radio_oscuridad)
+                p2_out = (cx + math.cos(a2) * radio_oscuridad, cy + math.sin(a2) * radio_oscuridad)
+
+                arcade.draw_polygon_filled([p1_in, p2_in, p2_out, p1_out], color_oscuridad)
+
+            # 6. Dibujar las barreras frontales que limitan el alcance del cono de luz
+            p_luz_der_out = (cx + math.cos(angulo_luz_der) * radio_oscuridad, cy + math.sin(angulo_luz_der) * radio_oscuridad)
+            p_luz_izq_out = (cx + math.cos(angulo_luz_izq) * radio_oscuridad, cy + math.sin(angulo_luz_izq) * radio_oscuridad)
+
+            p_luz_der_fin = (cx + math.cos(angulo_luz_der) * alcance_luz, cy + math.sin(angulo_luz_der) * alcance_luz)
+            p_luz_izq_fin = (cx + math.cos(angulo_luz_izq) * alcance_luz, cy + math.sin(angulo_luz_izq) * alcance_luz)
+
+            # Bloque frontal que tapa la luz sobrante a lo largo de la pantalla
+            arcade.draw_polygon_filled([p_luz_der_fin, p_luz_der_out, p_luz_izq_out, p_luz_izq_fin], color_oscuridad)
+
+
+    def actualizar_ciclo_dia_noche(self, delta_time): 
+        self.timer_dia_noche = (self.timer_dia_noche + delta_time) % DURACION_DIA_SEGUNDOS
+
+        progreso_ciclo = self.timer_dia_noche / DURACION_DIA_SEGUNDOS
+        factor_oscuridad = (1.0 - math.cos(progreso_ciclo * 2 * math.pi)) / 2.0
+        rango_alpha = ALPHA_MAX_MEDIANOCHE - ALPHA_MIN_MEDIODIA
+        self.alpha_actual_oscuridad = int(ALPHA_MIN_MEDIODIA + (factor_oscuridad * rango_alpha))
