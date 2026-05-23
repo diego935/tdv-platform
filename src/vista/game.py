@@ -185,6 +185,9 @@ class VistaJuego(arcade.View):
         self.timer_entre_oleadas = 0.0
         self.tiempo_espera_oleada = 5.0
 
+        # Cargar textura de fondo fijo
+        self.fondo_pantalla = arcade.load_texture("assets/fondos/fondo_bosque.png")
+
 
         self.camera = CameraManager()
         self.hud = HUD()
@@ -329,6 +332,18 @@ class VistaJuego(arcade.View):
 
     def on_draw(self):
         self.clear()
+
+        if getattr(self, "fondo_pantalla", None):
+            arcade.draw_texture_rect(
+                self.fondo_pantalla,
+                arcade.XYWH(
+                    self.window.width // 2,
+                    self.window.height // 2,
+                    self.window.width,
+                    self.window.height
+                )
+            )
+
         with self.camera.activate():
             self.scene.draw()            
             self.lista_bloques.draw()
@@ -895,13 +910,14 @@ class VistaJuego(arcade.View):
         self.hud = HUD()
         self.console = ConsoleUI()
         
-        # 7. Reiniciar variables de oleadas
+        # 7. Reiniciar variables de oleadas y fondo
         self.zona_spawn = None
         self.oleadas_activas = False
         self.oleadas_completadas = False
         self.oleada_actual = 0
         self.enemigos_oleada_actual = []
         self.timer_entre_oleadas = 0.0
+        self.fondo_pantalla = None
 
         Log.info("Game", "=== MUNDO LIMPIO: Todo listo para inyectar datos del JSON o Setup ===")
 
