@@ -277,12 +277,14 @@ class EnemigoIA(arcade.Sprite):
     
     def _atacar(self, player):
         """Realiza el ataque al player."""
-        if hasattr(player, 'vida'):
+        if hasattr(player, 'recibir_dano'):
+            player.recibir_dano(self.dano_ataque, self.center_x, self.center_y)
+            self._timer_ataque = self.tiempo_entre_ataques
+            Log.debug("Enemigo", "Atacando jugador (recibir_dano)", dano=self.dano_ataque, vida_player=player.vida, tipo=self.tipo_ataque if hasattr(self, 'tipo_ataque') else 'unknown')
+        elif hasattr(player, 'vida'):
             player.vida -= self.dano_ataque
             self._timer_ataque = self.tiempo_entre_ataques
-            
-            # Feedback visual
-            Log.debug("Enemigo", "Atacando jugador", dano=self.dano_ataque, vida_player=player.vida, tipo=self.tipo_ataque if hasattr(self, 'tipo_ataque') else 'unknown')
+            Log.debug("Enemigo", "Atacando jugador (vida directa)", dano=self.dano_ataque, vida_player=player.vida, tipo=self.tipo_ataque if hasattr(self, 'tipo_ataque') else 'unknown')
 
     def _llegado_a_destino(self, destino, blocks_list, tolerancia: float = 10) -> bool:
         """Check si llegó a posición destino."""
@@ -484,11 +486,18 @@ class EnemigoIA(arcade.Sprite):
         if blocks_list is None:
             blocks_list = []
 
-        # Manejar knockback
+        # Manejar knockback con colisiones
         if self._knockback_timer > 0:
             self._knockback_timer -= delta_time
+            old_x = self.center_x
             self.center_x += self._knockback_vel[0] * delta_time
+            if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+                self.center_x = old_x
+            
+            old_y = self.center_y
             self.center_y += self._knockback_vel[1] * delta_time
+            if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+                self.center_y = old_y
             return
 
         # FSM
@@ -503,8 +512,16 @@ class EnemigoIA(arcade.Sprite):
 
         self._check_transiciones(player, blocks_list, nav_manager, delta_time)
 
+        # Mover y resolver colisiones eje por eje
+        old_x = self.center_x
         self.center_x += self.change_x * delta_time
+        if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+            self.center_x = old_x
+
+        old_y = self.center_y
         self.center_y += self.change_y * delta_time
+        if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+            self.center_y = old_y
 
         if abs(self.change_x) > abs(self.change_y):
 
@@ -808,8 +825,15 @@ class EnemigoRanged(EnemigoIA):
         
         if self._knockback_timer > 0:
             self._knockback_timer -= delta_time
+            old_x = self.center_x
             self.center_x += self._knockback_vel[0] * delta_time
+            if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+                self.center_x = old_x
+            
+            old_y = self.center_y
             self.center_y += self._knockback_vel[1] * delta_time
+            if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+                self.center_y = old_y
             return
         
         self._actualizar_buffer_player(player, delta_time)
@@ -825,8 +849,16 @@ class EnemigoRanged(EnemigoIA):
         
         self._check_transiciones_ranged(player, blocks_list, nav_manager, delta_time)
         
+        # Mover y resolver colisiones eje por eje
+        old_x = self.center_x
         self.center_x += self.change_x * delta_time
+        if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+            self.center_x = old_x
+
+        old_y = self.center_y
         self.center_y += self.change_y * delta_time
+        if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+            self.center_y = old_y
         
         if abs(self.change_x) > abs(self.change_y):
             self.texture = self.texture_right if self.change_x > 0 else self.texture_left

@@ -174,6 +174,16 @@ class VistaJuego(arcade.View):
         if self.lista_rejas:
             for reja in self.lista_rejas:
                 reja.visible = False
+        # Variables para el sistema de oleadas
+        spawn_layer = self.tile_map.object_lists.get("Spawn", [])
+        self.zona_spawn = spawn_layer[0] if spawn_layer else None
+        self.oleadas_activas = False
+        self.oleadas_completadas = False
+        self.oleada_actual = 0
+        self.max_oleadas = 3
+        self.enemigos_oleada_actual = []
+        self.timer_entre_oleadas = 0.0
+        self.tiempo_espera_oleada = 5.0
 
 
         self.camera = CameraManager()
@@ -341,6 +351,40 @@ class VistaJuego(arcade.View):
 
         self.hud.draw(self.sprite_jugador)
         
+        # Dibujar información de oleadas
+        if getattr(self, 'oleadas_activas', False):
+            window = self.window
+            arcade.draw_text(
+                f"OLEADA {self.oleada_actual} / {self.max_oleadas}",
+                window.width / 2,
+                window.height - 100,
+                arcade.color.RED,
+                font_size=20,
+                bold=True,
+                anchor_x="center"
+            )
+            num_enemigos = len(self.enemigos_oleada_actual)
+            arcade.draw_text(
+                f"Enemigos restantes: {num_enemigos}",
+                window.width / 2,
+                window.height - 125,
+                arcade.color.WHITE,
+                font_size=12,
+                bold=True,
+                anchor_x="center"
+            )
+        elif getattr(self, 'timer_entre_oleadas', 0.0) > 0:
+            window = self.window
+            arcade.draw_text(
+                f"Siguiente oleada en: {int(self.timer_entre_oleadas) + 1}s",
+                window.width / 2,
+                window.height - 100,
+                arcade.color.GOLD,
+                font_size=18,
+                bold=True,
+                anchor_x="center"
+            )
+        
         if self.show_inventory:
             mouse_pos = (self.mouse_pos_x, self.mouse_pos_y) if hasattr(self, 'mouse_pos_x') else None
             self.sprite_jugador.draw_inventory(mouse_pos)
@@ -365,6 +409,8 @@ class VistaJuego(arcade.View):
             return
         if self.estado_actual == "DIALOGO" or self.show_inventory or self.sprite_jugador.vistaNota:
             return
+
+        self.actualizar_oleadas(delta_time)
 
         self.sprite_jugador.move(
             self.arriba_presionado,
@@ -551,6 +597,10 @@ class VistaJuego(arcade.View):
                         self.lista_bloques.append(reja)
             self.rejas_activas = True
             Log.info("Palanca", "Rejas ACTIVADAS: colisiones añadidas y mostradas (paso bloqueado)")
+
+            # Iniciar oleadas al cerrar las rejas
+            if not getattr(self, "oleadas_activas", False) and not getattr(self, "oleadas_completadas", False):
+                self.iniciar_oleadas()
         else:
             # Desactivar las rejas: ocultar sprites y quitar colisiones (abre el paso)
             if self.lista_rejas:
@@ -564,6 +614,123 @@ class VistaJuego(arcade.View):
         # Actualizar dinámicamente el motor de física y el pathfinding
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
         self.nav_manager.actualizar_desde_bloques(self.lista_bloques)
+
+    def iniciar_oleadas(self):
+        self.oleadas_activas = True
+        self.oleada_actual = 1
+        self.enemigos_oleada_actual = []
+        self.timer_entre_oleadas = 0.0
+        self.spawnear_oleada(self.oleada_actual)
+        Log.info("Waves", "Sistema de oleadas iniciado en la zona Spawn")
+
+    def spawnear_enemigo(self, tipo="melee"):
+        if not self.zona_spawn:
+            return
+        
+        pts = self.zona_spawn.shape
+        x_min = int(min(p[0] for p in pts))
+        x_max = int(max(p[0] for p in pts))
+        y_min = int(min(p[1] for p in pts))
+        y_max = int(max(p[1] for p in pts))
+        
+        spawn_x, spawn_y = (x_min + x_max) / 2, (y_min + y_max) / 2
+        
+        # Intentar buscar un punto transitable
+        for _ in range(50):
+            rx = random.randint(x_min, x_max)
+            ry = random.randint(y_min, y_max)
+            gx = rx // 32
+            gy = ry // 32
+            nodo = self.nav_manager.grid_pathfinder.grid.get((gx, gy))
+            if nodo and nodo.transitable:
+                spawn_x, spawn_y = rx, ry
+                break
+                
+        if tipo == "ranged":
+            enemigo = EnemigoRanged(
+                x=spawn_x, y=spawn_y,
+                tipo_patrulla=EnemigoIA.TIPO_AREA,
+                area_center=(spawn_x, spawn_y),
+                area_radio=250,
+                dano_ataque=10.0,
+                vista_rango=800,
+                radio_R=450,
+                radio_r=200,
+                intervalo_ataque=2.0,
+                inteligencia=False,
+                rango_ataque=300
+            )
+        else:
+            enemigo = EnemigoIA(
+                x=spawn_x, y=spawn_y,
+                tipo_patrulla=EnemigoIA.TIPO_AREA,
+                area_center=(spawn_x, spawn_y),
+                area_radio=250,
+                dano_ataque=15.0,
+                vista_rango=800,
+                velocidad=180,
+                velocidad_patrulla=50
+            )
+        
+        enemigo.enemy_id = "bandido"
+        self.lista_enemigos.append(enemigo)
+        self.enemigos_oleada_actual.append(enemigo)
+
+    def spawnear_oleada(self, num_oleada):
+        config_oleadas = {
+            1: {"melee": 5, "ranged": 1},
+            2: {"melee": 7, "ranged": 2},
+            3: {"melee": 10, "ranged": 4}
+        }
+        
+        config = config_oleadas.get(num_oleada, {"melee": 2, "ranged": 0})
+        self.enemigos_oleada_actual = []
+        
+        for _ in range(config["melee"]):
+            self.spawnear_enemigo("melee")
+        for _ in range(config["ranged"]):
+            self.spawnear_enemigo("ranged")
+            
+        Log.info("Waves", f"Oleada {num_oleada} spawneada: {config['melee']} melee, {config['ranged']} ranged")
+
+    def actualizar_oleadas(self, delta_time):
+        # 1. Si las oleadas están activas
+        if self.oleadas_activas:
+            # Filtrar enemigos vivos de la oleada actual
+            self.enemigos_oleada_actual = [e for e in self.enemigos_oleada_actual if e.vida > 0]
+            
+            # Si todos los enemigos de la oleada han sido derrotados
+            if len(self.enemigos_oleada_actual) == 0:
+                if self.timer_entre_oleadas == 0.0:
+                    # Iniciar tiempo de espera para la siguiente oleada
+                    if self.oleada_actual < self.max_oleadas:
+                        self.timer_entre_oleadas = self.tiempo_espera_oleada
+                        Log.info("Waves", f"Oleada {self.oleada_actual} superada. Preparando siguiente oleada...")
+                    else:
+                        # Completó todas las oleadas
+                        self.oleadas_activas = False
+                        self.oleadas_completadas = True
+                        self.text_manager.show_message("¡ZONA LIMPIA! OLEADAS COMPLETADAS", self.sprite_jugador.center_x, self.sprite_jugador.center_y + 40, arcade.color.GREEN)
+                        Log.info("Waves", "Todas las oleadas de la zona Spawn completadas")
+
+                        # Abrir las rejas automáticamente al completar las oleadas
+                        if getattr(self, "rejas_activas", False) and self.lista_rejas:
+                            for reja in self.lista_rejas:
+                                reja.visible = False
+                                if reja in self.lista_bloques:
+                                    self.lista_bloques.remove(reja)
+                            self.rejas_activas = False
+                            self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
+                            self.nav_manager.actualizar_desde_bloques(self.lista_bloques)
+                            Log.info("Waves", "Rejas abiertas automáticamente al limpiar la zona")
+                
+        # 2. Temporizador de cuenta atrás entre oleadas
+        if self.timer_entre_oleadas > 0:
+            self.timer_entre_oleadas -= delta_time
+            if self.timer_entre_oleadas <= 0:
+                self.timer_entre_oleadas = 0.0
+                self.oleada_actual += 1
+                self.spawnear_oleada(self.oleada_actual)
 
     def ejecutar_recargar(self):
         arma = self.sprite_jugador.obtener_arma_activa()
@@ -728,6 +895,14 @@ class VistaJuego(arcade.View):
         self.hud = HUD()
         self.console = ConsoleUI()
         
+        # 7. Reiniciar variables de oleadas
+        self.zona_spawn = None
+        self.oleadas_activas = False
+        self.oleadas_completadas = False
+        self.oleada_actual = 0
+        self.enemigos_oleada_actual = []
+        self.timer_entre_oleadas = 0.0
+
         Log.info("Game", "=== MUNDO LIMPIO: Todo listo para inyectar datos del JSON o Setup ===")
 
 

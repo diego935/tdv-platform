@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="32" tileheight="32" infinite="0" nextlayerid="12" nextobjectid="91">
+<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="94">
  <tileset firstgid="1" source="../tilesets/sueloCampo.tsx"/>
  <tileset firstgid="111" source="../tilesets/carretera.tsx"/>
  <tileset firstgid="221" source="../tilesets/quitaMiedos.tsx"/>
@@ -433,6 +433,10 @@
   <object id="73" name="Nota" x="3341.33" y="5394.67" width="52" height="57.3333"/>
   <object id="76" name="Rejas" x="2144" y="2560" width="232" height="1280"/>
   <object id="77" x="768" y="2592" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="12" name="Spawn">
+  <object id="92" x="736" y="2240" width="1408" height="1920"/>
+  <object id="93" x="530.303" y="2196.97"/>
  </objectgroup>
  <layer id="6" name="Pared" width="200" height="200">
   <data encoding="csv">
