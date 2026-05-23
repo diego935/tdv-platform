@@ -683,6 +683,8 @@ class VistaJuego(arcade.View):
 
 
     def dibujar_linterna_vectorial(self):
+            if self.mouse_world_x is None or self.mouse_world_y is None:
+                return
             # 1. Posición central del jugador
             cx = self.sprite_jugador.center_x
             cy = self.sprite_jugador.center_y
