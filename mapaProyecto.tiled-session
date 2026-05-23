@@ -17,11 +17,11 @@
             "scaleInEditor": 1
         },
         "assets/maps/mapa.tmx": {
-            "scale": 0.33,
-            "selectedLayer": 0,
+            "scale": 0.5,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 3751.515151515152,
-                "y": 2528.787878787879
+                "x": 3024,
+                "y": 3143
             }
         },
         "assets/maps/pared_ejemplo.tsx": {
@@ -44,13 +44,29 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "assets/tilesets/caminotierra.tsx": {
+            "scaleInDock": 0.5,
+            "scaleInEditor": 1
+        },
         "assets/tilesets/campoPlantas.tsx": {
-            "scaleInDock": 1,
+            "scaleInDock": 0.75,
             "scaleInEditor": 1
         },
         "assets/tilesets/carretera.tsx": {
             "scaleInDock": 0.75,
             "scaleInEditor": 1
+        },
+        "assets/tilesets/muroCruz.tsx": {
+            "scaleInDock": 0.5,
+            "scaleInEditor": 1
+        },
+        "assets/tilesets/muroEsquinas.tsx": {
+            "scaleInDock": 0.33,
+            "scaleInEditor": 1
+        },
+        "assets/tilesets/palanca.tsx": {
+            "scaleInDock": 0.125,
+            "scaleInEditor": 0.5
         },
         "assets/tilesets/quitaMiedos.tsx": {
             "scaleInDock": 1,
@@ -59,32 +75,35 @@
         "assets/tilesets/sueloCampo.tsx": {
             "scaleInDock": 0.5,
             "scaleInEditor": 1
+        },
+        "assets/tilesets/suelometal.tsx": {
+            "scaleInDock": 0.5,
+            "scaleInEditor": 1
         }
     },
     "last.externalTilesetPath": "/home/d4ni/Documentos/tdv-platform/assets/tilesets",
     "last.imagePath": "/home/d4ni/Documentos/tdv-platform/assets/tilesets",
     "openFiles": [
         "assets/maps/mapa.tmx",
-        "assets/tilesets/sueloCampo.tsx",
-        "assets/tilesets/carretera.tsx",
-        "assets/tilesets/bloqueHitbox.tsx",
-        "assets/maps/campoPlantas.tsx",
-        "assets/tilesets/quitaMiedos.tsx"
+        "assets/tilesets/caminotierra.tsx",
+        "assets/tilesets/suelometal.tsx",
+        "assets/tilesets/muroCruz.tsx",
+        "assets/tilesets/muroEsquinas.tsx"
     ],
     "project": "mapaProyecto.tiled-project",
     "recentFiles": [
+        "assets/tilesets/palanca.tsx",
+        "assets/tilesets/muroEsquinas.tsx",
+        "assets/tilesets/muroCruz.tsx",
+        "assets/tilesets/suelometal.tsx",
+        "assets/tilesets/caminotierra.tsx",
+        "assets/maps/mapa.tmx",
         "assets/tilesets/quitaMiedos.tsx",
         "assets/tilesets/bloqueHitbox.tsx",
         "assets/tilesets/carretera.tsx",
         "assets/tilesets/sueloCampo.tsx",
         "assets/maps/campoPlantas.tsx",
-        "assets/maps/mapa.tmx",
-        "assets/tilesets/campoPlantas.tsx",
-        "assets/maps/quitaMiedos.tsx",
-        "assets/maps/quitamiedos.tsx",
-        "assets/maps/Carretera.tsx",
-        "assets/maps/pared_ejemplo.tsx",
-        "assets/tilesets/Ejemplo.tsx"
+        "assets/tilesets/campoPlantas.tsx"
     ],
     "tileset.lastUsedFilter": "Archivos de conjuntos de patrones Tiled (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx"

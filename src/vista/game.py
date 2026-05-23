@@ -165,6 +165,17 @@ class VistaJuego(arcade.View):
             for muro in muros_mapa:
                 self.lista_bloques.append(muro)
 
+        # Cargar las capas de Rejas y Palanca
+        self.lista_rejas = self.scene.get_sprite_list("Rejas")
+        self.lista_palanca = self.scene.get_sprite_list("Palanca")
+        self.rejas_activas = False
+
+        # Las rejas inician inactivas (invisibles y sin colisiones físicas)
+        if self.lista_rejas:
+            for reja in self.lista_rejas:
+                reja.visible = False
+
+
         self.camera = CameraManager()
         self.hud = HUD()
         self.console = ConsoleUI()
@@ -493,6 +504,13 @@ class VistaJuego(arcade.View):
             self.sprite_jugador.indice_activo = key - arcade.key.KEY_1
 
     def ejecutar_interaccion(self):
+        # Comprobar interacción con la palanca
+        if hasattr(self, 'lista_palanca') and self.lista_palanca:
+            for palanca in self.lista_palanca:
+                if self.cerca_con_margen(self.sprite_jugador, palanca, 30):
+                    self.activar_rejas()
+                    return
+
         for puerta in self.lista_puertas:
             if self.cerca_con_margen(self.sprite_jugador, puerta, 15):
                 puerta.interactuar()
@@ -519,6 +537,33 @@ class VistaJuego(arcade.View):
                     return
         
         self.item_manager.intentar_recoger(self.sprite_jugador)
+
+    def activar_rejas(self):
+        # Alternar el estado
+        rejas_activas = getattr(self, "rejas_activas", False)
+
+        if not rejas_activas:
+            # Activar las rejas: mostrar sprites y añadir colisiones (bloquea el paso)
+            if self.lista_rejas:
+                for reja in self.lista_rejas:
+                    reja.visible = True
+                    if reja not in self.lista_bloques:
+                        self.lista_bloques.append(reja)
+            self.rejas_activas = True
+            Log.info("Palanca", "Rejas ACTIVADAS: colisiones añadidas y mostradas (paso bloqueado)")
+        else:
+            # Desactivar las rejas: ocultar sprites y quitar colisiones (abre el paso)
+            if self.lista_rejas:
+                for reja in self.lista_rejas:
+                    reja.visible = False
+                    if reja in self.lista_bloques:
+                        self.lista_bloques.remove(reja)
+            self.rejas_activas = False
+            Log.info("Palanca", "Rejas DESACTIVADAS: colisiones eliminadas y ocultadas (paso libre)")
+
+        # Actualizar dinámicamente el motor de física y el pathfinding
+        self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
+        self.nav_manager.actualizar_desde_bloques(self.lista_bloques)
 
     def ejecutar_recargar(self):
         arma = self.sprite_jugador.obtener_arma_activa()
