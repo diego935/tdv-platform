@@ -196,12 +196,12 @@ class VistaJuego(arcade.View):
         nota_prueba = Nota(500, "Se busca", "SE BUSCAN KORUS",
             "Si alguien lee esto...\nYo de niña tenía unos muñecos... \ny los he perdido \n¿me ayudas a encontrarlos? \n\nquizás recibas algo a cambio :)",
             "assets/items/Nota.png")
-        nota_prueba.center_x = 106*32
-        nota_prueba.center_y = 101*32
+        nota_prueba.center_x = 156*32
+        nota_prueba.center_y = 151*32
         self.item_manager.add_to_world(nota_prueba)
         nota_bosque = Nota(500, "...", "Algo extraño pasa en este bosque", "Igual si pruebo a cruzarlo...", "assets/items/Nota.png")
-        nota_bosque.center_x = 105*32
-        nota_bosque.center_y = 30.5*32
+        nota_bosque.center_x = 155*32
+        nota_bosque.center_y = 80.5*32
 
         self.item_manager.add_to_world(nota_bosque)
         self.sprite_jugador.inventory[0] = Pistola()
@@ -309,18 +309,18 @@ class VistaJuego(arcade.View):
         self.im = InteractionManager(self.sprite_jugador)
 
         # Añadir trampa
-        trampa = SpikeTrap(106*32, 110*32)
+        trampa = SpikeTrap(156*32, 160*32)
         self.im.add_trap(trampa, trampa.activar)
-        trampa = SpikeTrap(108*32, 110*32)
+        trampa = SpikeTrap(158*32, 160*32)
         self.im.add_trap(trampa, trampa.activar)
-        trampa = SpikeTrap(109*32, 110*32)
+        trampa = SpikeTrap(159*32, 160*32)
         self.im.add_trap(trampa, trampa.activar)
-        trampa = SpikeTrap(110*32, 110*32)
+        trampa = SpikeTrap(160*32, 160*32)
         self.im.add_trap(trampa, trampa.activar)
 
         # Añadir monedas
         for i in range(3):
-            coin = MissionCoin((100 + (i*8))*32, 105*32)
+            coin = MissionCoin((150 + (i*8))*32, 155*32)
             
             # Tienes que pasarle la categoría y las dos funciones de la moneda
             self.im.add_collectible(
