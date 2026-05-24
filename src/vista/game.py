@@ -316,15 +316,33 @@ class VistaJuego(arcade.View):
         # En tu setup del juego
         self.im = InteractionManager(self.sprite_jugador)
 
-        # Añadir trampa
-        trampa = SpikeTrap(156*32, 160*32)
-        self.im.add_trap(trampa, trampa.activar)
-        trampa = SpikeTrap(158*32, 160*32)
-        self.im.add_trap(trampa, trampa.activar)
-        trampa = SpikeTrap(159*32, 160*32)
-        self.im.add_trap(trampa, trampa.activar)
-        trampa = SpikeTrap(160*32, 160*32)
-        self.im.add_trap(trampa, trampa.activar)
+        # Añadir trampas desde el mapa Tiled (Eventos)
+        for obj in eventos:
+            obj_name = getattr(obj, "name", "")
+            if not obj_name:
+                continue
+            
+            name_lower = obj_name.lower()
+            if name_lower in ("trampa", "trampa_venenosa"):
+                if isinstance(obj.shape, list) and len(obj.shape) >= 3:
+                    x = (obj.shape[0][0] + obj.shape[2][0]) / 2
+                    y = (obj.shape[0][1] + obj.shape[2][1]) / 2
+                elif isinstance(obj.shape, tuple) or hasattr(obj.shape, "__len__"):
+                    x = obj.shape[0]
+                    y = map_height - obj.shape[1]
+                else:
+                    Log.warning("Game", f"Objeto trampa {obj_name} con shape no soportada: {obj.shape}")
+                    continue
+
+                if name_lower == "trampa":
+                    # Trampa común (sin veneno)
+                    trampa = SpikeTrap(x, y, damage_veneno=0, tiempo_veneno=0)
+                else:
+                    # Trampa venenosa (con valores de veneno por defecto)
+                    trampa = SpikeTrap(x, y)
+                
+                self.im.add_trap(trampa, trampa.activar)
+                Log.info("Game", f"Trampa '{obj_name}' generada en ({x}, {y})")
 
         # Añadir monedas
         for i in range(3):
