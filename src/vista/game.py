@@ -611,28 +611,22 @@ class VistaJuego(arcade.View):
         # Alternar el estado
         rejas_activas = getattr(self, "rejas_activas", False)
 
-        if not rejas_activas:
-            # Activar las rejas: mostrar sprites y añadir colisiones (bloquea el paso)
-            if self.lista_rejas:
-                for reja in self.lista_rejas:
-                    reja.visible = True
-                    if reja not in self.lista_bloques:
-                        self.lista_bloques.append(reja)
-            self.rejas_activas = True
-            Log.info("Palanca", "Rejas ACTIVADAS: colisiones añadidas y mostradas (paso bloqueado)")
+        if rejas_activas:
+            # Si las rejas ya están activadas, no se permite desactivar manualmente
+            return
 
-            # Iniciar oleadas al cerrar las rejas
-            if not getattr(self, "oleadas_activas", False) and not getattr(self, "oleadas_completadas", False):
-                self.iniciar_oleadas()
-        else:
-            # Desactivar las rejas: ocultar sprites y quitar colisiones (abre el paso)
-            if self.lista_rejas:
-                for reja in self.lista_rejas:
-                    reja.visible = False
-                    if reja in self.lista_bloques:
-                        self.lista_bloques.remove(reja)
-            self.rejas_activas = False
-            Log.info("Palanca", "Rejas DESACTIVADAS: colisiones eliminadas y ocultadas (paso libre)")
+        # Activar las rejas: mostrar sprites y añadir colisiones (bloquea el paso)
+        if self.lista_rejas:
+            for reja in self.lista_rejas:
+                reja.visible = True
+                if reja not in self.lista_bloques:
+                    self.lista_bloques.append(reja)
+        self.rejas_activas = True
+        Log.info("Palanca", "Rejas ACTIVADAS: colisiones añadidas y mostradas (paso bloqueado)")
+
+        # Iniciar oleadas al cerrar las rejas
+        if not getattr(self, "oleadas_activas", False) and not getattr(self, "oleadas_completadas", False):
+            self.iniciar_oleadas()
 
         # Actualizar dinámicamente el motor de física y el pathfinding
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)

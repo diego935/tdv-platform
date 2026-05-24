@@ -5,7 +5,7 @@ class FloatingMessage:
         self.text = text
         self.x = x
         self.y = y
-        self.color = color  # RGB tuple
+        self.color = color[:3]  # RGB tuple (slice to discard alpha if present)
         self.alpha = 255  # Opacidad total al inicio
         self.speed = 0.5  # Qué tan rápido sube
         self.fade_rate = 2 # Qué tan rápido desaparece
@@ -50,7 +50,6 @@ class TextManager:
         ## NOTE: Esto es un singleton, es una clase que solo es instanciada una vez, las siguientes veces que se intenta devuelve la clase ya instanciada.
 
     def show_message(self, text, x, y, color=(255, 255, 255)):
-        from vista.inventory import FloatingMessage 
         nuevo = FloatingMessage(text, x, y, color)
         self.floating_messages.append(nuevo)
 
