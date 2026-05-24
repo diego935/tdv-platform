@@ -25,6 +25,5 @@ def main():
     vista_menu = MenuPrincipal()
     window.show_view(vista_menu)
     arcade.run()
-
 if __name__ == "__main__":
     main()

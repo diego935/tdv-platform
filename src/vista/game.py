@@ -199,11 +199,19 @@ class VistaJuego(arcade.View):
         nota_prueba.center_x = 156*32
         nota_prueba.center_y = 151*32
         self.item_manager.add_to_world(nota_prueba)
-        nota_bosque = Nota(500, "...", "Algo extraño pasa en este bosque", "Igual si pruebo a cruzarlo...", "assets/items/Nota.png")
-        nota_bosque.center_x = 155*32
-        nota_bosque.center_y = 80.5*32
 
+
+
+        nota_bosque = Nota(500, "...", "Algo extraño pasa en este bosque", "Igual si pruebo a cruzarlo...", "assets/items/Nota.png")
+        nota_bosque.center_x = 155.23 * 32
+        nota_bosque.center_y = 80.52 * 32
         self.item_manager.add_to_world(nota_bosque)
+
+        nota_palanca = Nota(501, "Nota", "Palanca", "Me pregunto que pasará si pulso la palanca...", "assets/items/Nota.png")
+        nota_palanca.center_x = 85 * 32
+        nota_palanca.center_y = 160 * 32
+        self.item_manager.add_to_world(nota_palanca)
+
         self.sprite_jugador.inventory[0] = Pistola()
         self.sprite_jugador.inventory[1] = Cuchillo()
 
