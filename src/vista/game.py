@@ -193,23 +193,50 @@ class VistaJuego(arcade.View):
         self.hud = HUD()
         self.console = ConsoleUI()
         
+        # Buscar posiciones de Nota_bosque y Nota_palanca en la capa de Eventos
+        pos_nota_bosque = None
+        pos_nota_palanca = None
+        for obj in eventos:
+            obj_name = getattr(obj, "name", "")
+            if not obj_name:
+                continue
+            name_lower = obj_name.lower()
+            if name_lower in ("nota_bosque", "nota_palanca"):
+                if isinstance(obj.shape, list) and len(obj.shape) >= 3:
+                    x = (obj.shape[0][0] + obj.shape[2][0]) / 2
+                    y = (obj.shape[0][1] + obj.shape[2][1]) / 2
+                elif isinstance(obj.shape, tuple) or hasattr(obj.shape, "__len__"):
+                    x = obj.shape[0]
+                    y = map_height - obj.shape[1]
+                else:
+                    continue
+
+                if name_lower == "nota_bosque":
+                    pos_nota_bosque = (x, y)
+                elif name_lower == "nota_palanca":
+                    pos_nota_palanca = (x, y)
+
         nota_prueba = Nota(500, "Se busca", "SE BUSCAN KORUS",
             "Si alguien lee esto...\nYo de niña tenía unos muñecos... \ny los he perdido \n¿me ayudas a encontrarlos? \n\nquizás recibas algo a cambio :)",
             "assets/items/Nota.png")
-        nota_prueba.center_x = 156*32
-        nota_prueba.center_y = 151*32
+        nota_prueba.center_x = (156 + 100) * 32
+        nota_prueba.center_y = (151 + 100) * 32
         self.item_manager.add_to_world(nota_prueba)
 
-
-
         nota_bosque = Nota(500, "...", "Algo extraño pasa en este bosque", "Igual si pruebo a cruzarlo...", "assets/items/Nota.png")
-        nota_bosque.center_x = 155.23 * 32
-        nota_bosque.center_y = 80.52 * 32
+        if pos_nota_bosque:
+            nota_bosque.center_x, nota_bosque.center_y = pos_nota_bosque
+        else:
+            nota_bosque.center_x = (155.23 + 100) * 32
+            nota_bosque.center_y = (80.52 + 100) * 32
         self.item_manager.add_to_world(nota_bosque)
 
         nota_palanca = Nota(501, "Nota", "Palanca", "Me pregunto que pasará si pulso la palanca...", "assets/items/Nota.png")
-        nota_palanca.center_x = 85 * 32
-        nota_palanca.center_y = 160 * 32
+        if pos_nota_palanca:
+            nota_palanca.center_x, nota_palanca.center_y = pos_nota_palanca
+        else:
+            nota_palanca.center_x = (85 + 100) * 32
+            nota_palanca.center_y = (160 + 100) * 32
         self.item_manager.add_to_world(nota_palanca)
 
         self.sprite_jugador.inventory[0] = Pistola()
@@ -346,7 +373,7 @@ class VistaJuego(arcade.View):
 
         # Añadir monedas
         for i in range(3):
-            coin = MissionCoin((150 + (i*8))*32, 155*32)
+            coin = MissionCoin((150 + 100 + (i*8))*32, (155 + 100)*32)
             
             # Tienes que pasarle la categoría y las dos funciones de la moneda
             self.im.add_collectible(
