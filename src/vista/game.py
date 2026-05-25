@@ -862,8 +862,7 @@ class VistaJuego(arcade.View):
         elif key in [arcade.key.LSHIFT, arcade.key.RSHIFT]: self.shift_presionado = False
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        nuevo_zoom = self.camera.zoom + (scroll_y * self.ZOOM_SENSITIVITY)
-        self.camera.zoom = max(self.MIN_ZOOM, min(self.MAX_ZOOM, nuevo_zoom))
+        pass
 
     def procesar_comando(self, comando_raw):
         partes = comando_raw.strip().split()

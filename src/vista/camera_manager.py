@@ -14,6 +14,7 @@ class CameraManager:
 
     def __init__(self):
         self.camera = arcade.camera.Camera2D()
+        self.camera.zoom = 1.0
         self.zoom_target = 1.0
 
     def seguir_sprite(self, sprite):
@@ -21,9 +22,8 @@ class CameraManager:
         self.camera.position = sprite.position
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        """Ajusta el zoom según el scroll del ratón."""
-        nuevo_zoom = self.camera.zoom + (scroll_y * self.ZOOM_SENSITIVITY)
-        self.camera.zoom = max(self.MIN_ZOOM, min(self.MAX_ZOOM, nuevo_zoom))
+        """Mantiene el zoom fijo en 1.0."""
+        pass
 
     def unproject(self, screen_pos):
         """Convierte coordenadas de pantalla a coordenadas del mundo."""
