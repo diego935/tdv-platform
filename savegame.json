@@ -1,27 +1,42 @@
 {
     "player": {
-        "x": 3196.5599999999986,
-        "y": 2786.44,
-        "vida": 100.0,
-        "max_vida": 100.0,
-        "stamina": 76.0143540250283,
-        "indice_activo": 2,
+        "x": 4576.0,
+        "y": 5204.25,
+        "vida": 115.0,
+        "max_vida": 300.0,
+        "stamina": 100.00402000000008,
+        "indice_activo": 0,
         "direccion": "left",
         "inventario": [
             "Pistola",
             "Cuchillo",
             null,
-            "Botiquin",
-            "Botiquin",
-            "Botiquin",
-            "Botiquin",
-            "Botiquin"
+            "Nota",
+            null,
+            "Nota",
+            null,
+            null
         ]
     },
     "misiones": {
-        "misiones_activas": [],
+        "misiones_activas": [
+            "mision_silvane"
+        ],
         "misiones_completadas": [],
-        "estados": {},
-        "progreso": {}
+        "estados": {
+            "mision_silvane": "en_progreso"
+        },
+        "progreso": {
+            "mision_silvane": [
+                {
+                    "id": "obj_zombies",
+                    "tipo": "kill",
+                    "target": "silvane",
+                    "cantidad": 6,
+                    "descripcion": "Derrotar a los no-muertos",
+                    "progreso": 0
+                }
+            ]
+        }
     }
 }
