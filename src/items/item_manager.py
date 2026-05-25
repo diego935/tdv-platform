@@ -15,8 +15,6 @@ class ItemManager:
         self.items_on_ground.append(item)
 
     def update(self):
-        # Aquí podrías checkear si el jugador está cerca de algún item
-        # para mostrar un mensaje de "Presiona E" automáticamente
         pass
 
     def draw(self):

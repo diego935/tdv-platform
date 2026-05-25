@@ -4,8 +4,6 @@ from items.items import *
 from entities.blocks import * 
 from entities.enemy import EnemigoIA
 
-from entities.enemy import *
-
 
 class ConsoleUI:
     def __init__(self):
@@ -138,13 +136,9 @@ class ConsoleUI:
             return
             
         window = arcade.get_window()
-        
-        # --- LÓGICA DEL PARPADEO ---
-        # time.time() devuelve segundos (ej: 16485.45)
-        # Multiplicamos por 2 para que cambie cada 0.5s y usamos % 2 para obtener 0 o 1
+        # Alterna la visibilidad del cursor cada 0.5 segundos
         mostrar_cursor = int(time.time() * 2) % 2 == 0
         cursor = "_" if mostrar_cursor else ""
-        # ----------------------------
 
         # Fondo
         arcade.draw_rect_filled(

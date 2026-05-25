@@ -24,7 +24,6 @@ class InteractionManager:
 
     def _init_manager(self, player: Optional[arcade.Sprite]):
         self.player = player
-        # Volvemos a tu Spatial Hash original ya que me confirmaste que las coordenadas no eran el problema
         self.all_interactables = arcade.SpriteList(use_spatial_hash=True, spatial_hash_cell_size=128)
         self.stats = {}
 

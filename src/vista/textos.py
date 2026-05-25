@@ -47,7 +47,6 @@ class TextManager:
             # Inicializamos la lista solo la primera vez
             cls._instance.floating_messages = []
         return cls._instance 
-        ## NOTE: Esto es un singleton, es una clase que solo es instanciada una vez, las siguientes veces que se intenta devuelve la clase ya instanciada.
 
     def show_message(self, text, x, y, color=(255, 255, 255)):
         nuevo = FloatingMessage(text, x, y, color)
