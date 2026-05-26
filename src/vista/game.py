@@ -128,6 +128,20 @@ class VistaJuego(arcade.View):
         spawn = next((obj for obj in eventos if obj.name == "Spawnpoint"), None)
         self.lista_npcs = self.tile_map.object_lists.get(self.CAPAS["npcs"], [])
         
+        # Buscar zonas de activación de rejas en la zona segura (nombre: "activador")
+        self.activadores_bounds = []
+        for obj in eventos:
+            name_lower = obj.name.lower() if obj.name else ""
+            if name_lower == "activador":
+                pts = obj.shape
+                if isinstance(pts, list) and len(pts) >= 3:
+                    self.activadores_bounds.append({
+                        "x_min": min(p[0] for p in pts),
+                        "x_max": max(p[0] for p in pts),
+                        "y_min": min(p[1] for p in pts),
+                        "y_max": max(p[1] for p in pts)
+                    })
+        
         # Crear sprites para NPCs desde objetos Tiled
         self.lista_npc_sprites = arcade.SpriteList()
         for npc_obj in self.lista_npcs:
@@ -500,6 +514,19 @@ class VistaJuego(arcade.View):
         player_x = self.sprite_jugador.center_x
         player_y = self.sprite_jugador.center_y
         
+        # Comprobar trigger de los activadores de la zona segura
+        if not getattr(self, "rejas_activas", False):
+            en_activador = False
+            if getattr(self, "activadores_bounds", None):
+                for bounds in self.activadores_bounds:
+                    if bounds["x_min"] <= player_x <= bounds["x_max"] and bounds["y_min"] <= player_y <= bounds["y_max"]:
+                        en_activador = True
+                        break
+
+            if en_activador:
+                # Al ser una zona segura no debe activar nada más (como las oleadas) aparte de las rejas
+                self.activar_rejas(iniciar_oleadas=False)
+        
         for enemigo in self.lista_enemigos:
             dx = enemigo.center_x - player_x
             dy = enemigo.center_y - player_y
@@ -658,7 +685,7 @@ class VistaJuego(arcade.View):
         
         self.item_manager.intentar_recoger(self.sprite_jugador)
 
-    def activar_rejas(self):
+    def activar_rejas(self, iniciar_oleadas=True):
         # Alternar el estado
         rejas_activas = getattr(self, "rejas_activas", False)
 
@@ -676,8 +703,9 @@ class VistaJuego(arcade.View):
         Log.info("Palanca", "Rejas ACTIVADAS: colisiones añadidas y mostradas (paso bloqueado)")
 
         # Iniciar oleadas al cerrar las rejas
-        if not getattr(self, "oleadas_activas", False) and not getattr(self, "oleadas_completadas", False):
-            self.iniciar_oleadas()
+        if iniciar_oleadas:
+            if not getattr(self, "oleadas_activas", False) and not getattr(self, "oleadas_completadas", False):
+                self.iniciar_oleadas()
 
         # Actualizar dinámicamente el motor de física y el pathfinding
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
