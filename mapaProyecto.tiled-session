@@ -92,6 +92,10 @@
             "scaleInDock": 0.125,
             "scaleInEditor": 0.5
         },
+        "assets/tilesets/pisadas.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "assets/tilesets/quitaMiedos.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
@@ -110,7 +114,7 @@
         }
     },
     "last.externalTilesetPath": "/home/d4ni/Documentos/tdv-platform/assets/tilesets",
-    "last.imagePath": "/home/d4ni/Documentos/tdv-platform/assets/tilesets",
+    "last.imagePath": "/home/d4ni/Documentos/tdv-platform/assets/Jugador/pisadas",
     "openFiles": [
         "assets/maps/mapa.tmx",
         "assets/tilesets/caminotierra.tsx",
@@ -125,6 +129,7 @@
     ],
     "project": "mapaProyecto.tiled-project",
     "recentFiles": [
+        "assets/tilesets/pisadas.tsx",
         "assets/tilesets/coche.tsx",
         "assets/tilesets/furgo.tsx",
         "assets/tilesets/muroFlores.tsx",
@@ -135,8 +140,7 @@
         "assets/tilesets/suelometal.tsx",
         "assets/tilesets/caminotierra.tsx",
         "assets/maps/mapa.tmx",
-        "assets/tilesets/quitaMiedos.tsx",
-        "assets/tilesets/bloqueHitbox.tsx"
+        "assets/tilesets/quitaMiedos.tsx"
     ],
     "tileset.lastUsedFilter": "Archivos de conjuntos de patrones Tiled (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx"
