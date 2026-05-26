@@ -1,10 +1,10 @@
 {
     "activeFile": "assets/maps/mapa.tmx",
     "expandedProjectPaths": [
-        "assets/tilesets",
         ".",
-        "assets/maps",
-        "assets"
+        "assets/tilesets",
+        "assets",
+        "assets/maps"
     ],
     "file.lastUsedOpenFilter": "Todos los archivos (*)",
     "fileStates": {
@@ -17,11 +17,11 @@
             "scaleInEditor": 1
         },
         "assets/maps/mapa.tmx": {
-            "scale": 0.25,
+            "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 2030,
-                "y": 4486
+                "x": 2465,
+                "y": 1693
             }
         },
         "assets/maps/pared_ejemplo.tsx": {
@@ -115,7 +115,6 @@
         "assets/tilesets/muroCruz.tsx",
         "assets/tilesets/muroEsquinas.tsx",
         "assets/tilesets/rejas.tsx",
-        "assets/tilesets/palanca.tsx",
         "assets/tilesets/palanca.tsx",
         "assets/tilesets/muroFlores.tsx",
         "assets/tilesets/furgo.tsx",

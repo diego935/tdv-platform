@@ -150,7 +150,7 @@ class VistaJuego(arcade.View):
         
         if spawn:
             self.sprite_jugador.center_x = spawn.shape[0]
-            self.sprite_jugador.center_y = map_height - spawn.shape[1]
+            self.sprite_jugador.center_y = spawn.shape[1]
         
         self.scene.add_sprite("Player", self.sprite_jugador)
         self.lista_jugadores.append(self.sprite_jugador)
@@ -193,21 +193,22 @@ class VistaJuego(arcade.View):
         self.hud = HUD()
         self.console = ConsoleUI()
         
-        # Buscar posiciones de Nota_bosque y Nota_palanca en la capa de Eventos
+        # Buscar posiciones de Nota_bosque, Nota_palanca y nota_korus en la capa de Eventos
         pos_nota_bosque = None
         pos_nota_palanca = None
+        pos_nota_korus = None
         for obj in eventos:
             obj_name = getattr(obj, "name", "")
             if not obj_name:
                 continue
             name_lower = obj_name.lower()
-            if name_lower in ("nota_bosque", "nota_palanca"):
+            if name_lower in ("nota_bosque", "nota_palanca", "nota_korus"):
                 if isinstance(obj.shape, list) and len(obj.shape) >= 3:
                     x = (obj.shape[0][0] + obj.shape[2][0]) / 2
                     y = (obj.shape[0][1] + obj.shape[2][1]) / 2
                 elif isinstance(obj.shape, tuple) or hasattr(obj.shape, "__len__"):
                     x = obj.shape[0]
-                    y = map_height - obj.shape[1]
+                    y = obj.shape[1]
                 else:
                     continue
 
@@ -215,12 +216,17 @@ class VistaJuego(arcade.View):
                     pos_nota_bosque = (x, y)
                 elif name_lower == "nota_palanca":
                     pos_nota_palanca = (x, y)
+                elif name_lower == "nota_korus":
+                    pos_nota_korus = (x, y)
 
         nota_prueba = Nota(500, "Se busca", "SE BUSCAN KORUS",
             "Si alguien lee esto...\nYo de niña tenía unos muñecos... \ny los he perdido \n¿me ayudas a encontrarlos? \n\nquizás recibas algo a cambio :)",
             "assets/items/Nota.png")
-        nota_prueba.center_x = (156 + 100) * 32
-        nota_prueba.center_y = (151 + 100) * 32
+        if pos_nota_korus:
+            nota_prueba.center_x, nota_prueba.center_y = pos_nota_korus
+        else:
+            nota_prueba.center_x = (156 + 100) * 32
+            nota_prueba.center_y = (151 + 100) * 32
         self.item_manager.add_to_world(nota_prueba)
 
         nota_bosque = Nota(500, "...", "Algo extraño pasa en este bosque", "Igual si pruebo a cruzarlo...", "assets/items/Nota.png")
