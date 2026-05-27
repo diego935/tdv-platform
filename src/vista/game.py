@@ -89,7 +89,8 @@ class VistaJuego(arcade.View):
             "zonas": "Zonas",
             "npcs" : "NPCs",
             "overlay": "overlay",
-            "enemigos": "Enemigos"
+            "enemigos": "Enemigos",
+            "arbustos": "Arbustos"
         }
         self.lista_enemigos = arcade.SpriteList()
         self.lista_puertas = arcade.SpriteList()
@@ -108,7 +109,10 @@ class VistaJuego(arcade.View):
 
         #Mapa--------------------------------------
         map_name = "assets/maps/mapa.tmx"
-        layer_options = {self.CAPAS["muros"]: {"use_spatial_hash": True}}
+        layer_options = {
+            self.CAPAS["muros"]: {"use_spatial_hash": True},
+            "Arbustos": {"use_spatial_hash": True}
+        }
         self.tile_map = arcade.load_tilemap(map_name, scaling=1, layer_options=layer_options)
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
         
@@ -173,11 +177,16 @@ class VistaJuego(arcade.View):
         for npc_sprite in self.lista_npc_sprites:
             self.lista_bloques.append(npc_sprite)
         
-        # Solo las PAREDES van a la lista de colisión
+        # Solo las PAREDES y ARBUSTOS van a la lista de colisión
         muros_mapa = self.scene.get_sprite_list(self.CAPAS["muros"])
         if muros_mapa:
             for muro in muros_mapa:
                 self.lista_bloques.append(muro)
+
+        arbustos_mapa = self.scene.get_sprite_list(self.CAPAS["arbustos"])
+        if arbustos_mapa:
+            for arbusto in arbustos_mapa:
+                self.lista_bloques.append(arbusto)
 
         # Cargar las capas de Rejas y Palanca
         self.lista_rejas = self.scene.get_sprite_list("Rejas")
