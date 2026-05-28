@@ -101,6 +101,14 @@ class VistaJuego(arcade.View):
         self._ultimo_click_slot = None
         self._ultimo_click_tiempo = 0.0
         self._DOUBLE_CLICK_DELAY = 0.3
+
+       # variables sonido de fondo
+        self.sonido_ambiente = None       
+        self.reproductor_ambiente = None
+        self.sonido_combate = None
+        self.reproductor_combate = None
+        self.en_combate = False
+        self.DISTANCIA_ACTIVACION_COMBATE = 400.0
         
     def setup(self):
         #Cargar misiones guardadas
@@ -411,6 +419,16 @@ class VistaJuego(arcade.View):
                 coin.al_recoger,        # Función al recoger una
                 MissionCoin.mision_completada  # Función al recoger todas
             )
+        
+       #Cargar e iniciar sonido
+        try:
+            self.sonido_ambiente = arcade.load_sound("assets/musica/ambiente_basico.mp3")
+            self.sonido_combate = arcade.load_sound("assets/musica/ambiente_PVP.mp3")
+ 
+            self.reproductor_ambiente = arcade.play_sound(self.sonido_ambiente, volume=0.5, loop=True)
+            Log.info("Audio", "Sonido ambiente continuo iniciado en bucle.")
+        except Exception as e:
+            Log.error("Audio", f"No se pudo cargar el sistema de audio: {e}")
 
     def on_draw(self):
         self.clear()
@@ -582,6 +600,49 @@ class VistaJuego(arcade.View):
         self.item_manager.update()
         self.im.update()
         self.actualizar_ciclo_dia_noche(delta_time)
+
+        # alternancia de música pvp y ambiente
+
+        enemigo_cercano_detectado = False
+        px = self.sprite_jugador.center_x
+        py = self.sprite_jugador.center_y
+
+        for enemigo in self.lista_enemigos:
+            if hasattr(enemigo, 'vida') and enemigo.vida <= 0:
+                continue
+                
+            dx = enemigo.center_x - px
+            dy = enemigo.center_y - py
+            distancia_cuadrada = dx * dx + dy * dy
+
+            if distancia_cuadrada <= self.DISTANCIA_ACTIVACION_COMBATE ** 2:
+                enemigo_cercano_detectado = True
+                break
+
+        # si hay enemigo
+        if enemigo_cercano_detectado and not self.en_combate:
+            self.en_combate = True
+            Log.info("Audio", "¡Enemigo de oleada detectado cerca! Cambiando a música de combate.")
+            
+            if self.reproductor_ambiente:
+                arcade.stop_sound(self.reproductor_ambiente)
+                self.reproductor_ambiente = None
+            
+            if self.sonido_combate:
+                self.reproductor_combate = arcade.play_sound(self.sonido_combate, volume=0.5, loop=True)
+
+        # si ya no hay enemigos
+        elif not enemigo_cercano_detectado and self.en_combate:
+            self.en_combate = False
+            Log.info("Audio", "Zona despejada de amenazas. Volviendo a la música ambiental.")
+            
+            if self.reproductor_combate:
+                arcade.stop_sound(self.reproductor_combate)
+                self.reproductor_combate = None
+                
+            if self.sonido_ambiente:
+                self.reproductor_ambiente = arcade.play_sound(self.sonido_ambiente, volume=0.5, loop=True)
+    
 
     def on_text_input(self, text):
         if self.estado_actual =="CONSOLE":
@@ -952,6 +1013,15 @@ class VistaJuego(arcade.View):
         """Limpia a cero absoluto el estado visual, frena inputs y vacía los managers globales 
         sin destruir sus instancias, preparándolos para recibir datos nuevos."""
         Log.info("Game", "=== INICIANDO LIMPIEZA DEL ESTADO GLOBAL ===")
+        
+        # Detener audio
+        if self.reproductor_ambiente:
+            arcade.stop_sound(self.reproductor_ambiente)
+            self.reproductor_ambiente = None
+        if self.reproductor_combate:
+            arcade.stop_sound(self.reproductor_combate)
+            self.reproductor_combate = None
+        self.en_combate = False
 
         # 1. Vaciar los managers por dentro llamando a sus nuevos métodos clear
         from dialog.dialog_system import DialogSystem
@@ -1009,6 +1079,27 @@ class VistaJuego(arcade.View):
         self.fondo_pantalla = None
 
         Log.info("Game", "=== MUNDO LIMPIO: Todo listo para inyectar datos del JSON o Setup ===")
+
+    def on_hide_view(self):
+        Log.info("Audio", "Juego pausado: Silenciando pistas de audio.")
+        
+        if self.reproductor_ambiente:
+            self.reproductor_ambiente.volume = 0.0
+        if self.reproductor_combate:
+            self.reproductor_combate.volume = 0.0
+
+        if self.sprite_jugador and self.sprite_jugador.player_pasos:
+            arcade.stop_sound(self.sprite_jugador.player_pasos)
+            self.sprite_jugador.player_pasos = None
+            self.sprite_jugador.sonando_pasos = False
+
+    def on_show_view(self):
+        Log.info("Audio", "Juego reanudado: Restaurando volumen de la pista activa.")
+
+        if self.en_combate and self.reproductor_combate:
+            self.reproductor_combate.volume = 0.5
+        elif not self.en_combate and self.reproductor_ambiente:
+            self.reproductor_ambiente.volume = 0.5
 
 
     def dibujar_linterna_vectorial(self):
