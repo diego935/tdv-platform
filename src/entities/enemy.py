@@ -73,8 +73,8 @@ class EnemigoIA(arcade.Sprite):
         waypoints: list = None,
         area_center: tuple = None,
         area_radio: float = 100,
-        velocidad: float = 200,
-        velocidad_patrulla: float = 50,
+        velocidad: float = 320,
+        velocidad_patrulla: float = 120,
         vista_rango: float = 32*25,
         tiempo_buscar: float = 3.0,
         tiempo_esperar: float = 1.0,
@@ -342,7 +342,7 @@ class EnemigoIA(arcade.Sprite):
                     self.position,
                     self.waypoint_actual
                 ) or []
-                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta else random.uniform(1.5, 2.5)
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta else random.uniform(0.3, 0.6)
 
         self._mover_por_ruta(self.velocidad_patrulla)
 
@@ -384,7 +384,7 @@ class EnemigoIA(arcade.Sprite):
                     self.position,
                     self.waypoint_actual
                 ) or []
-                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta else random.uniform(1.5, 2.5)
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta else random.uniform(0.3, 0.6)
 
         self._mover_por_ruta(self.velocidad_patrulla)
 
@@ -421,7 +421,7 @@ class EnemigoIA(arcade.Sprite):
                     self.position,
                     destino
                 ) or []
-                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta_actual else random.uniform(1.5, 2.5)
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta_actual else random.uniform(0.3, 0.6)
 
         self._mover_por_ruta(self.velocidad)
 
@@ -450,7 +450,7 @@ class EnemigoIA(arcade.Sprite):
                     self.position,
                     punto_origen
                 ) or []
-                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta else random.uniform(1.5, 2.5)
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta else random.uniform(0.3, 0.6)
 
         self._mover_por_ruta(self.velocidad_patrulla)
 
@@ -595,8 +595,8 @@ class EnemigoRanged(EnemigoIA):
         waypoints: list = None,
         area_center: tuple = None,
         area_radio: float = 100,
-        velocidad: float = 200,
-        velocidad_patrulla: float = 50,
+        velocidad: float = 300,
+        velocidad_patrulla: float = 100,
         vista_rango: float = 32 * 25,
         tiempo_buscar: float = 3.0,
         tiempo_esperar: float = 1.0,
@@ -663,7 +663,7 @@ class EnemigoRanged(EnemigoIA):
                     self.position,
                     (target_x, target_y)
                 ) or []
-                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta_actual else random.uniform(1.5, 2.5)
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta_actual else random.uniform(0.3, 0.6)
 
         if self.ruta_actual:
             try:
@@ -695,7 +695,7 @@ class EnemigoRanged(EnemigoIA):
                     self.position,
                     (target_x, target_y)
                 ) or []
-                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta_actual else random.uniform(1.5, 2.5)
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta_actual else random.uniform(0.3, 0.6)
 
         if self.ruta_actual:
             try:

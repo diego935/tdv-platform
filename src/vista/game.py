@@ -200,14 +200,21 @@ class VistaJuego(arcade.View):
         self.lista_rejas = self.scene.get_sprite_list("Rejas")
         self.lista_palanca = self.scene.get_sprite_list("Palanca")
         self.rejas_activas = False
+        self.rejas_trial_activas = False
+        self.rejas_segura_activas = False
+        self.rejas_trial_sprites = []
+        self.rejas_segura_sprites = []
+        # Variables para el sistema de oleadas (trial) y spawn dinámico en Nido (ambos en Capa_spawn_enemigos)
+        nido_layer = self.tile_map.object_lists.get("Capa_spawn_enemigos", [])
+        self.zona_spawn = None
+        self.zona_nido = None
+        for obj in nido_layer:
+            obj_name = getattr(obj, "name", "")
+            if obj_name == "trial":
+                self.zona_spawn = obj
+            elif obj_name == "nido":
+                self.zona_nido = obj
 
-        # Las rejas inician inactivas (invisibles y sin colisiones físicas)
-        if self.lista_rejas:
-            for reja in self.lista_rejas:
-                reja.visible = False
-        # Variables para el sistema de oleadas
-        spawn_layer = self.tile_map.object_lists.get("Spawn", [])
-        self.zona_spawn = spawn_layer[0] if spawn_layer else None
         self.oleadas_activas = False
         self.oleadas_completadas = False
         self.oleada_actual = 0
@@ -215,13 +222,9 @@ class VistaJuego(arcade.View):
         self.enemigos_oleada_actual = []
         self.timer_entre_oleadas = 0.0
         self.tiempo_espera_oleada = 5.0
-
-        # Variables para el sistema de spawn dinámico en Nido
-        nido_layer = self.tile_map.object_lists.get("Capa_spawn_enemigos", [])
-        self.zona_nido = nido_layer[0] if nido_layer else None
         self.spawn_rate_nido = 6.0
         self.timer_spawn_nido = 0.0
-        self.max_enemigos_nido = 10
+        self.max_enemigos_nido = 15
 
         # Cargar textura de fondo fijo
         self.fondo_pantalla = arcade.load_texture("assets/fondos/fondo_bosque.png")
@@ -235,6 +238,8 @@ class VistaJuego(arcade.View):
         pos_nota_bosque = None
         pos_nota_palanca = None
         pos_nota_korus = None
+        self.objeto_palanca = None
+        self.bounds_rejas_trial = None
         for obj in eventos:
             obj_name = getattr(obj, "name", "")
             if not obj_name:
@@ -256,6 +261,72 @@ class VistaJuego(arcade.View):
                     pos_nota_palanca = (x, y)
                 elif name_lower == "nota_korus":
                     pos_nota_korus = (x, y)
+            elif name_lower == "palanca":
+                self.objeto_palanca = obj
+            elif name_lower == "rejas_trial":
+                pts = obj.shape
+                if isinstance(pts, list) and len(pts) >= 3:
+                    self.bounds_rejas_trial = {
+                        "x_min": min(p[0] for p in pts),
+                        "x_max": max(p[0] for p in pts),
+                        "y_min": min(p[1] for p in pts),
+                        "y_max": max(p[1] for p in pts)
+                    }
+                elif isinstance(pts, tuple) or hasattr(pts, "__len__"):
+                    x = getattr(obj, "x", pts[0])
+                    y = getattr(obj, "y", pts[1])
+                    w = getattr(obj, "width", 0)
+                    h = getattr(obj, "height", 0)
+                    self.bounds_rejas_trial = {
+                        "x_min": x,
+                        "x_max": x + w,
+                        "y_min": y,
+                        "y_max": y + h
+                    }
+            elif name_lower == "rejas_segura":
+                pts = obj.shape
+                if isinstance(pts, list) and len(pts) >= 3:
+                    self.bounds_rejas_segura = {
+                        "x_min": min(p[0] for p in pts),
+                        "x_max": max(p[0] for p in pts),
+                        "y_min": min(p[1] for p in pts),
+                        "y_max": max(p[1] for p in pts)
+                    }
+                elif isinstance(pts, tuple) or hasattr(pts, "__len__"):
+                    x = getattr(obj, "x", pts[0])
+                    y = getattr(obj, "y", pts[1])
+                    w = getattr(obj, "width", 0)
+                    h = getattr(obj, "height", 0)
+                    self.bounds_rejas_segura = {
+                        "x_min": x,
+                        "x_max": x + w,
+                        "y_min": y,
+                        "y_max": y + h
+                    }
+
+        # Filtrar las rejas que pertenecen al trial
+        self.rejas_trial_sprites = []
+        if self.lista_rejas and self.bounds_rejas_trial:
+            for reja in self.lista_rejas:
+                if (self.bounds_rejas_trial["x_min"] <= reja.center_x <= self.bounds_rejas_trial["x_max"] and
+                    self.bounds_rejas_trial["y_min"] <= reja.center_y <= self.bounds_rejas_trial["y_max"]):
+                    self.rejas_trial_sprites.append(reja)
+        
+        if not self.rejas_trial_sprites and self.lista_rejas:
+            self.rejas_trial_sprites = list(self.lista_rejas)
+
+        # Filtrar las rejas que pertenecen a la zona segura
+        self.rejas_segura_sprites = []
+        if self.lista_rejas and getattr(self, "bounds_rejas_segura", None):
+            for reja in self.lista_rejas:
+                if (self.bounds_rejas_segura["x_min"] <= reja.center_x <= self.bounds_rejas_segura["x_max"] and
+                    self.bounds_rejas_segura["y_min"] <= reja.center_y <= self.bounds_rejas_segura["y_max"]):
+                    self.rejas_segura_sprites.append(reja)
+
+        # Todas las rejas en el mapa inician inactivas (invisibles y sin colisiones físicas)
+        if self.lista_rejas:
+            for reja in self.lista_rejas:
+                reja.visible = False
 
         nota_prueba = Nota(500, "Se busca", "SE BUSCAN KORUS",
             "Si alguien lee esto...\nYo de niña tenía unos muñecos... \ny los he perdido \n¿me ayudas a encontrarlos? \n\nquizás recibas algo a cambio :)",
@@ -335,6 +406,7 @@ class VistaJuego(arcade.View):
                     intervalo = props.get('intervalo', 2.0)
                     inteligencia = props.get('inteligencia', False)
                     rango_ataque = props.get('rango_ataque', 300)
+                    velocidad = props.get('velocidad', 300)
 
                     enemigo = EnemigoRanged(
                         x=x, y=y,
@@ -348,11 +420,12 @@ class VistaJuego(arcade.View):
                         intervalo_ataque=intervalo,
                         inteligencia=inteligencia,
                         rango_ataque=rango_ataque,
+                        velocidad=velocidad,
                         waypoints=None
                     )
                 else:
-                    velocidad = props.get('velocidad', 200)
-                    velocidad_patrulla = props.get('velocidad_patrulla', 50)
+                    velocidad = props.get('velocidad', 320)
+                    velocidad_patrulla = props.get('velocidad_patrulla', 120)
 
                     if tipo_patrulla_str == "waypoint":
                         waypoints = [(x, y), (x+100, y), (x+100, y+100), (x, y+100)]
@@ -579,7 +652,7 @@ class VistaJuego(arcade.View):
         player_y = self.sprite_jugador.center_y
         
         # Comprobar trigger de los activadores de la zona segura
-        if not getattr(self, "rejas_activas", False):
+        if not getattr(self, "rejas_segura_activas", False):
             en_activador = False
             if getattr(self, "activadores_bounds", None):
                 for bounds in self.activadores_bounds:
@@ -758,7 +831,31 @@ class VistaJuego(arcade.View):
             self.sprite_jugador.indice_activo = key - arcade.key.KEY_1
 
     def ejecutar_interaccion(self):
-        # Comprobar interacción con la palanca
+        # Comprobar interacción con la palanca de Eventos (objeto "palanca")
+        if getattr(self, 'objeto_palanca', None):
+            obj = self.objeto_palanca
+            pts = obj.shape
+            esta_cerca = False
+            if isinstance(pts, list) and len(pts) >= 3:
+                x_min = min(p[0] for p in pts)
+                x_max = max(p[0] for p in pts)
+                y_min = min(p[1] for p in pts)
+                y_max = max(p[1] for p in pts)
+                if x_min - 30 <= self.sprite_jugador.center_x <= x_max + 30 and y_min - 30 <= self.sprite_jugador.center_y <= y_max + 30:
+                    esta_cerca = True
+            elif isinstance(pts, tuple) or hasattr(pts, "__len__"):
+                cx = pts[0]
+                cy = pts[1]
+                dx = abs(self.sprite_jugador.center_x - cx)
+                dy = abs(self.sprite_jugador.center_y - cy)
+                if dx < 100 and dy < 100:
+                    esta_cerca = True
+            
+            if esta_cerca:
+                self.activar_rejas()
+                return
+
+        # Comprobar interacción con la palanca de la capa "Palanca" (legacy)
         if hasattr(self, 'lista_palanca') and self.lista_palanca:
             for palanca in self.lista_palanca:
                 if self.cerca_con_margen(self.sprite_jugador, palanca, 30):
@@ -793,26 +890,34 @@ class VistaJuego(arcade.View):
         self.item_manager.intentar_recoger(self.sprite_jugador)
 
     def activar_rejas(self, iniciar_oleadas=True):
-        # Alternar el estado
-        rejas_activas = getattr(self, "rejas_activas", False)
-
-        if rejas_activas:
-            # Si las rejas ya están activadas, no se permite desactivar manualmente
-            return
-
-        # Activar las rejas: mostrar sprites y añadir colisiones (bloquea el paso)
-        if self.lista_rejas:
-            for reja in self.lista_rejas:
-                reja.visible = True
-                if reja not in self.lista_bloques:
-                    self.lista_bloques.append(reja)
-        self.rejas_activas = True
-        Log.info("Palanca", "Rejas ACTIVADAS: colisiones añadidas y mostradas (paso bloqueado)")
-
-        # Iniciar oleadas al cerrar las rejas
         if iniciar_oleadas:
+            if getattr(self, "rejas_trial_activas", False):
+                return
+
+            # Activar las rejas del trial: mostrar sprites y añadir colisiones (bloquea el paso)
+            if self.rejas_trial_sprites:
+                for reja in self.rejas_trial_sprites:
+                    reja.visible = True
+                    if reja not in self.lista_bloques:
+                        self.lista_bloques.append(reja)
+            self.rejas_trial_activas = True
+            Log.info("Palanca", "Rejas del Trial ACTIVADAS: colisiones añadidas y mostradas (paso bloqueado)")
+
+            # Iniciar oleadas al cerrar las rejas
             if not getattr(self, "oleadas_activas", False) and not getattr(self, "oleadas_completadas", False):
                 self.iniciar_oleadas()
+        else:
+            if getattr(self, "rejas_segura_activas", False):
+                return
+
+            # Activar las rejas de la zona segura: mostrar sprites y añadir colisiones (bloquea el paso)
+            if self.rejas_segura_sprites:
+                for reja in self.rejas_segura_sprites:
+                    reja.visible = True
+                    if reja not in self.lista_bloques:
+                        self.lista_bloques.append(reja)
+            self.rejas_segura_activas = True
+            Log.info("Palanca", "Rejas de Zona Segura ACTIVADAS: colisiones añadidas y mostradas (paso bloqueado)")
 
         # Actualizar dinámicamente el motor de física y el pathfinding
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
@@ -863,7 +968,9 @@ class VistaJuego(arcade.View):
                 radio_r=200,
                 intervalo_ataque=2.0,
                 inteligencia=False,
-                rango_ataque=300
+                rango_ataque=300,
+                velocidad=300,
+                velocidad_patrulla=100
             )
         else:
             enemigo = EnemigoIA(
@@ -873,8 +980,8 @@ class VistaJuego(arcade.View):
                 area_radio=250,
                 dano_ataque=15.0,
                 vista_rango=800,
-                velocidad=180,
-                velocidad_patrulla=50
+                velocidad=300,
+                velocidad_patrulla=120
             )
             
         enemigo.enemy_id = "bandido"
@@ -916,7 +1023,9 @@ class VistaJuego(arcade.View):
                 radio_r=200,
                 intervalo_ataque=2.0,
                 inteligencia=False,
-                rango_ataque=300
+                rango_ataque=300,
+                velocidad=300,
+                velocidad_patrulla=100
             )
         else:
             enemigo = EnemigoIA(
@@ -926,8 +1035,8 @@ class VistaJuego(arcade.View):
                 area_radio=250,
                 dano_ataque=15.0,
                 vista_rango=800,
-                velocidad=180,
-                velocidad_patrulla=50
+                velocidad=300,
+                velocidad_patrulla=120
             )
         
         enemigo.enemy_id = "bandido"
@@ -972,12 +1081,12 @@ class VistaJuego(arcade.View):
                         Log.info("Waves", "Todas las oleadas de la zona Spawn completadas")
 
                         # Abrir las rejas automáticamente al completar las oleadas
-                        if getattr(self, "rejas_activas", False) and self.lista_rejas:
-                            for reja in self.lista_rejas:
+                        if getattr(self, "rejas_trial_activas", False) and self.rejas_trial_sprites:
+                            for reja in self.rejas_trial_sprites:
                                 reja.visible = False
                                 if reja in self.lista_bloques:
                                     self.lista_bloques.remove(reja)
-                            self.rejas_activas = False
+                            self.rejas_trial_activas = False
                             self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
                             self.nav_manager.actualizar_desde_bloques(self.lista_bloques)
                             Log.info("Waves", "Rejas abiertas automáticamente al limpiar la zona")
