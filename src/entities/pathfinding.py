@@ -183,8 +183,8 @@ class GridPathfinder:
 
         return vecinos
 
-    MAX_DISTANCIA_BUSQUEDA = 100
-    MAX_ITERACIONES = 5000
+    MAX_DISTANCIA_BUSQUEDA = 60
+    MAX_ITERACIONES = 1500
 
     def encontrar_ruta(self, inicio: Tuple[float, float],
                       fin: Tuple[float, float]) -> Optional[List[Tuple[float, float]]]:

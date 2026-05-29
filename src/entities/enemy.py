@@ -143,6 +143,7 @@ class EnemigoIA(arcade.Sprite):
         self._knockback_timer = 0.0
         self._base_x = x
         self._base_y = y
+        self._timer_recalculo_ruta = 0.0
 
     def on_draw(self):
         super().on_draw()
@@ -336,10 +337,12 @@ class EnemigoIA(arcade.Sprite):
             self.waypoint_actual = self.waypoints[self._indice_waypoint]
 
         if not self.ruta or self._llegado_a_waypoint():
-            self.ruta = nav_manager.encontrar_ruta(
-                self.position,
-                self.waypoint_actual
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                self.ruta = nav_manager.encontrar_ruta(
+                    self.position,
+                    self.waypoint_actual
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta else random.uniform(1.5, 2.5)
 
         self._mover_por_ruta(self.velocidad_patrulla)
 
@@ -374,12 +377,14 @@ class EnemigoIA(arcade.Sprite):
     def _update_patrulla_paredes(self, delta_time, nav_manager):
         """Patrulla siguiendo paredes."""
         if not self.ruta or self._llegado_a_waypoint_aux(self.waypoint_actual):
-            siguiente = self._encontrar_siguiente_punto_pared()
-            self.waypoint_actual = siguiente
-            self.ruta = nav_manager.encontrar_ruta(
-                self.position,
-                self.waypoint_actual
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                siguiente = self._encontrar_siguiente_punto_pared()
+                self.waypoint_actual = siguiente
+                self.ruta = nav_manager.encontrar_ruta(
+                    self.position,
+                    self.waypoint_actual
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta else random.uniform(1.5, 2.5)
 
         self._mover_por_ruta(self.velocidad_patrulla)
 
@@ -411,10 +416,12 @@ class EnemigoIA(arcade.Sprite):
         destino = (player.center_x, player.center_y)
 
         if not self.ruta_actual or self._llegado_a_destino(destino, blocks_list):
-            self.ruta_actual = nav_manager.encontrar_ruta(
-                self.position,
-                destino
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                self.ruta_actual = nav_manager.encontrar_ruta(
+                    self.position,
+                    destino
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta_actual else random.uniform(1.5, 2.5)
 
         self._mover_por_ruta(self.velocidad)
 
@@ -437,11 +444,13 @@ class EnemigoIA(arcade.Sprite):
             return
 
         if not self.ruta:
-            punto_origen = self.pos_origen
-            self.ruta = nav_manager.encontrar_ruta(
-                self.position,
-                punto_origen
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                punto_origen = self.pos_origen
+                self.ruta = nav_manager.encontrar_ruta(
+                    self.position,
+                    punto_origen
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta else random.uniform(1.5, 2.5)
 
         self._mover_por_ruta(self.velocidad_patrulla)
 
@@ -480,6 +489,8 @@ class EnemigoIA(arcade.Sprite):
 
     def update(self, delta_time, player, blocks_list=None, nav_manager=None):
         """Update principal del enemigo IA."""
+        if hasattr(self, '_timer_recalculo_ruta') and self._timer_recalculo_ruta > 0:
+            self._timer_recalculo_ruta -= delta_time
 
         if nav_manager is None:
             nav_manager = self.nav
@@ -589,7 +600,7 @@ class EnemigoRanged(EnemigoIA):
         vista_rango: float = 32 * 25,
         tiempo_buscar: float = 3.0,
         tiempo_esperar: float = 1.0,
-        dano_ataque: float = 10.0,
+        dano_ataque: float = 5.0,
         rango_ataque: float = 300,
         tiempo_cortesia: float = 4.0
     ):
@@ -647,10 +658,12 @@ class EnemigoRanged(EnemigoIA):
     
     def _mover_hacia_posicion(self, target_x, target_y, nav_manager, delta_time):
         if not self.ruta_actual or self._llegado_a_destino((target_x, target_y), [], tolerancia=50):
-            self.ruta_actual = nav_manager.encontrar_ruta(
-                self.position,
-                (target_x, target_y)
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                self.ruta_actual = nav_manager.encontrar_ruta(
+                    self.position,
+                    (target_x, target_y)
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta_actual else random.uniform(1.5, 2.5)
 
         if self.ruta_actual:
             try:
@@ -677,10 +690,12 @@ class EnemigoRanged(EnemigoIA):
         target_y = self.center_y * 2 - player.center_y
 
         if not self.ruta_actual:
-            self.ruta_actual = nav_manager.encontrar_ruta(
-                self.position,
-                (target_x, target_y)
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                self.ruta_actual = nav_manager.encontrar_ruta(
+                    self.position,
+                    (target_x, target_y)
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.5, 1.0) if self.ruta_actual else random.uniform(1.5, 2.5)
 
         if self.ruta_actual:
             try:
@@ -814,6 +829,9 @@ class EnemigoRanged(EnemigoIA):
             self._timer_ataque_ranged -= deltatime
     
     def update(self, delta_time, player, blocks_list=None, nav_manager=None, proyectiles_list=None):
+        if hasattr(self, '_timer_recalculo_ruta') and self._timer_recalculo_ruta > 0:
+            self._timer_recalculo_ruta -= delta_time
+
         if proyectiles_list is None:
             proyectiles_list = []
         self._proyectiles_list = proyectiles_list

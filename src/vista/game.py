@@ -216,6 +216,13 @@ class VistaJuego(arcade.View):
         self.timer_entre_oleadas = 0.0
         self.tiempo_espera_oleada = 5.0
 
+        # Variables para el sistema de spawn dinámico en Nido
+        nido_layer = self.tile_map.object_lists.get("Capa_spawn_enemigos", [])
+        self.zona_nido = nido_layer[0] if nido_layer else None
+        self.spawn_rate_nido = 6.0
+        self.timer_spawn_nido = 0.0
+        self.max_enemigos_nido = 10
+
         # Cargar textura de fondo fijo
         self.fondo_pantalla = arcade.load_texture("assets/fondos/fondo_bosque.png")
 
@@ -289,6 +296,20 @@ class VistaJuego(arcade.View):
 
         for enemy_obj in enemigos_layer:
             try:
+                x = (enemy_obj.shape[0][0] + enemy_obj.shape[2][0]) / 2
+                y = (enemy_obj.shape[0][1] + enemy_obj.shape[2][1]) / 2
+
+                # Si el enemigo está en la zona del nido, lo ignoramos para spawnearlo dinámicamente
+                if self.zona_nido:
+                    pts = self.zona_nido.shape
+                    nido_x_min = min(p[0] for p in pts)
+                    nido_x_max = max(p[0] for p in pts)
+                    nido_y_min = min(p[1] for p in pts)
+                    nido_y_max = max(p[1] for p in pts)
+                    if nido_x_min <= x <= nido_x_max and nido_y_min <= y <= nido_y_max:
+                        Log.info("Game", f"Ignorando enemigo pre-generado en zona del nido en ({x}, {y})")
+                        continue
+
                 props = getattr(enemy_obj, 'properties', {})
                 Log.info("Game", f"Enemigo: {getattr(enemy_obj, 'name', 'unnamed')}, props: {props}")
 
@@ -296,7 +317,7 @@ class VistaJuego(arcade.View):
                 subtipo = props.get('subtipo', 'melee')
                 tipo_patrulla_str = props.get('tipo_patrulla', 'area')
                 area_radio = props.get('area_radio', 500)
-                dano = props.get('dano', 15.0)
+                dano = props.get('dano', 5.0 if subtipo == 'ranged' else 15.0)
                 vista_rango = props.get('vista_rango', 800)
 
                 if tipo_patrulla_str == 'waypoint':
@@ -307,9 +328,6 @@ class VistaJuego(arcade.View):
                     tipo_patrulla = EnemigoIA.TIPO_PAREDES
                 else:
                     tipo_patrulla = EnemigoIA.TIPO_AREA
-
-                x = (enemy_obj.shape[0][0] + enemy_obj.shape[2][0]) / 2
-                y = (enemy_obj.shape[0][1] + enemy_obj.shape[2][1]) / 2
 
                 if subtipo == "ranged":
                     radio_R = props.get('radio_R', 450)
@@ -526,6 +544,25 @@ class VistaJuego(arcade.View):
             return
 
         self.actualizar_oleadas(delta_time)
+
+        # Actualizar spawn dinámico en la zona del nido
+        if self.zona_nido:
+            pts = self.zona_nido.shape
+            nido_x_min = min(p[0] for p in pts)
+            nido_x_max = max(p[0] for p in pts)
+            nido_y_min = min(p[1] for p in pts)
+            nido_y_max = max(p[1] for p in pts)
+            
+            enemigos_en_nido = 0
+            for e in self.lista_enemigos:
+                if e.vida > 0 and nido_x_min <= e.center_x <= nido_x_max and nido_y_min <= e.center_y <= nido_y_max:
+                    enemigos_en_nido += 1
+            
+            if enemigos_en_nido < self.max_enemigos_nido:
+                self.timer_spawn_nido -= delta_time
+                if self.timer_spawn_nido <= 0:
+                    self.spawnear_enemigo_nido()
+                    self.timer_spawn_nido = self.spawn_rate_nido
 
         self.sprite_jugador.move(
             self.arriba_presionado,
@@ -789,6 +826,61 @@ class VistaJuego(arcade.View):
         self.spawnear_oleada(self.oleada_actual)
         Log.info("Waves", "Sistema de oleadas iniciado en la zona Spawn")
 
+    def spawnear_enemigo_nido(self):
+        if not self.zona_nido:
+            return
+            
+        pts = self.zona_nido.shape
+        x_min = int(min(p[0] for p in pts))
+        x_max = int(max(p[0] for p in pts))
+        y_min = int(min(p[1] for p in pts))
+        y_max = int(max(p[1] for p in pts))
+        
+        spawn_x, spawn_y = (x_min + x_max) / 2, (y_min + y_max) / 2
+        
+        # Buscar punto transitable
+        for _ in range(50):
+            rx = random.randint(x_min, x_max)
+            ry = random.randint(y_min, y_max)
+            gx = rx // 32
+            gy = ry // 32
+            nodo = self.nav_manager.grid_pathfinder.grid.get((gx, gy))
+            if nodo and nodo.transitable:
+                spawn_x, spawn_y = rx, ry
+                break
+                
+        tipo = "ranged" if random.random() < 0.3 else "melee"
+        
+        if tipo == "ranged":
+            enemigo = EnemigoRanged(
+                x=spawn_x, y=spawn_y,
+                tipo_patrulla=EnemigoIA.TIPO_AREA,
+                area_center=(spawn_x, spawn_y),
+                area_radio=250,
+                dano_ataque=5.0,
+                vista_rango=800,
+                radio_R=450,
+                radio_r=200,
+                intervalo_ataque=2.0,
+                inteligencia=False,
+                rango_ataque=300
+            )
+        else:
+            enemigo = EnemigoIA(
+                x=spawn_x, y=spawn_y,
+                tipo_patrulla=EnemigoIA.TIPO_AREA,
+                area_center=(spawn_x, spawn_y),
+                area_radio=250,
+                dano_ataque=15.0,
+                vista_rango=800,
+                velocidad=180,
+                velocidad_patrulla=50
+            )
+            
+        enemigo.enemy_id = "bandido"
+        self.lista_enemigos.append(enemigo)
+        Log.info("Game", f"Enemigo dinámico ({tipo}) spawneado en zona de nido en ({spawn_x}, {spawn_y})")
+
     def spawnear_enemigo(self, tipo="melee"):
         if not self.zona_spawn:
             return
@@ -818,7 +910,7 @@ class VistaJuego(arcade.View):
                 tipo_patrulla=EnemigoIA.TIPO_AREA,
                 area_center=(spawn_x, spawn_y),
                 area_radio=250,
-                dano_ataque=10.0,
+                dano_ataque=5.0,
                 vista_rango=800,
                 radio_R=450,
                 radio_r=200,
