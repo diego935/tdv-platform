@@ -1,10 +1,10 @@
 {
     "activeFile": "assets/maps/mapa.tmx",
     "expandedProjectPaths": [
+        "assets/tilesets",
         "assets/maps",
-        ".",
         "assets",
-        "assets/tilesets"
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos los archivos (*)",
     "fileStates": {
@@ -17,11 +17,11 @@
             "scaleInEditor": 1
         },
         "assets/maps/mapa.tmx": {
-            "scale": 0.25,
-            "selectedLayer": 1,
+            "scale": 0.5,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 1844,
-                "y": 3462
+                "x": 2040,
+                "y": 1223
             }
         },
         "assets/maps/pared_ejemplo.tsx": {
