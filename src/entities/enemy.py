@@ -145,6 +145,8 @@ class EnemigoIA(arcade.Sprite):
         self._base_y = y
         self._timer_recalculo_ruta = 0.0
 
+        self.sonido_ataque = arcade.load_sound("assets/sonidos/sonido_enemigo.wav")
+
     def on_draw(self):
         super().on_draw()
         
@@ -278,14 +280,21 @@ class EnemigoIA(arcade.Sprite):
     
     def _atacar(self, player):
         """Realiza el ataque al player."""
+        ataque_exitoso = False
         if hasattr(player, 'recibir_dano'):
             player.recibir_dano(self.dano_ataque, self.center_x, self.center_y)
+            ataque_exitoso = True
             self._timer_ataque = self.tiempo_entre_ataques
             Log.debug("Enemigo", "Atacando jugador (recibir_dano)", dano=self.dano_ataque, vida_player=player.vida, tipo=self.tipo_ataque if hasattr(self, 'tipo_ataque') else 'unknown')
         elif hasattr(player, 'vida'):
             player.vida -= self.dano_ataque
+            ataque_exitoso = True
             self._timer_ataque = self.tiempo_entre_ataques
             Log.debug("Enemigo", "Atacando jugador (vida directa)", dano=self.dano_ataque, vida_player=player.vida, tipo=self.tipo_ataque if hasattr(self, 'tipo_ataque') else 'unknown')
+        if ataque_exitoso:
+            self._timer_ataque = self.tiempo_entre_ataques
+            if self.sonido_ataque:
+                arcade.play_sound(self.sonido_ataque)
 
     def _llegado_a_destino(self, destino, blocks_list, tolerancia: float = 10) -> bool:
         """Check si llegó a posición destino."""
