@@ -1,5 +1,5 @@
 import arcade
-
+import time
 
 class VistaGameOver(arcade.View):
 
@@ -7,11 +7,23 @@ class VistaGameOver(arcade.View):
         super().__init__()
         self.bg_texture = arcade.load_texture("assets/fondos/fondo_muerte.png")
         self.fondo = arcade.load_font("assets/fuentes/Melted Monster.ttf")
+        self.sonido_muerte = arcade.load_sound("assets/sonidos/muerte_personaje.wav")
+        self.tiempo_inicio = time.time()
+        self.audio_reproducido = False
+
+    def on_update(self, delta_time: float):
+        """Este método se encarga de revisar el reloj real de tu ordenador."""
+        if not self.audio_reproducido:
+            tiempo_actual = time.time()
+            if tiempo_actual - self.tiempo_inicio >= 1.5:
+                if self.sonido_muerte:
+                    arcade.play_sound(self.sonido_muerte)
+                self.audio_reproducido = True
 
     def on_draw(self):
 
         self.clear()
-
+        self.window.dispatch_event('on_update', 1/60)
         arcade.draw_texture_rect(
             self.bg_texture,
             arcade.XYWH(
@@ -72,6 +84,17 @@ class VistaGameOver(arcade.View):
             anchor_y="center",
             font_name="Times New Roman"
         )
+    
+    def on_show_view(self):
+        """Se ejecuta automáticamente justo cuando esta pantalla se vuelve activa."""
+        self.window.ctx.sound_stream_player.volume = 1.0
+        arcade.schedule(self.reproducir_audio, 1.5)
+
+    def reproducir_audio(self, delta_time: float):
+        """Función que activa el sonido y se desprograma automáticamente."""
+        if self.sonido_muerte:
+            arcade.play_sound(self.sonido_muerte)
+        arcade.unschedule(self.reproducir_audio)
 
     def on_mouse_press(self, x, y, button, modifiers):
 
@@ -87,7 +110,5 @@ class VistaGameOver(arcade.View):
         top_btn = center_y + boton_height / 2
 
         if left_btn <= x <= right_btn and bottom_btn <= y <= top_btn:
-
             from vista.menu_principal import MenuPrincipal
-
             self.window.show_view(MenuPrincipal())
