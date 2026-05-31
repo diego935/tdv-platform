@@ -188,6 +188,9 @@ def cmd_tp(vista, args):
     vista.camera.position = vista.sprite_jugador.position
     return f"Teletransportado a {args[0]}, {args[1]}", "SUCCESS"
 
+def cmd_getPos(vista, args): 
+    return f"Posición actual: ({vista.sprite_jugador.position[0]/32},{vista.sprite_jugador.position[1]/32}) "
+
 def cmd_heal(vista, args):
     vista.sprite_jugador.vida = vista.sprite_jugador.stamina = 100
     return "Salud y stamina al máximo.", "SUCCESS"
@@ -384,4 +387,5 @@ COMANDOS = {
     "debug": cmd_debug, 
     "bloques": cmd_bloques,
     "damage": cmd_dmg,
+    "pos": cmd_getPos
 }
