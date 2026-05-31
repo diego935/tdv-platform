@@ -277,17 +277,7 @@ class VistaJuego(arcade.View):
                     if muro in self.lista_bloques:
                         self.lista_bloques.remove(muro)
 
-        # Filtrar barrera del jefe de los muros (empieza desactivada y sin colisión)
-        self.barrera_jefe_sprites = []
-        self.barrera_jefe_activas = False
-        if muros_mapa and getattr(self, "bounds_barrera_jefe", None):
-            for muro in muros_mapa:
-                if (self.bounds_barrera_jefe["x_min"] <= muro.center_x <= self.bounds_barrera_jefe["x_max"] and
-                    self.bounds_barrera_jefe["y_min"] <= muro.center_y <= self.bounds_barrera_jefe["y_max"]):
-                    self.barrera_jefe_sprites.append(muro)
-                    muro.visible = False
-                    if muro in self.lista_bloques:
-                        self.lista_bloques.remove(muro)
+
 
         # Cargar rejas y palancas
         self.lista_rejas = self.scene.get_sprite_list("Rejas")
@@ -451,6 +441,18 @@ class VistaJuego(arcade.View):
                 if (self.bounds_rejas_final["x_min"] <= reja.center_x <= self.bounds_rejas_final["x_max"] and
                     self.bounds_rejas_final["y_min"] <= reja.center_y <= self.bounds_rejas_final["y_max"]):
                     self.rejas_final_sprites.append(reja)
+
+        # Filtrar rejas de la barrera del jefe (empiezan desactivadas, invisibles y sin colisión)
+        self.barrera_jefe_sprites = []
+        self.barrera_jefe_activas = False
+        if self.lista_rejas and getattr(self, "bounds_barrera_jefe", None):
+            for reja in self.lista_rejas:
+                if (self.bounds_barrera_jefe["x_min"] <= reja.center_x <= self.bounds_barrera_jefe["x_max"] and
+                    self.bounds_barrera_jefe["y_min"] <= reja.center_y <= self.bounds_barrera_jefe["y_max"]):
+                    self.barrera_jefe_sprites.append(reja)
+                    reja.visible = False
+                    if reja in self.lista_bloques:
+                        self.lista_bloques.remove(reja)
 
         # Rejas finales
         self.rejas_final_activas = True
