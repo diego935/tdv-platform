@@ -55,7 +55,7 @@ class Sanacion(Estado):
 
 
 class BendicionDelBosque(Estado):
-    def __init__(self, regeneracion_por_segundo: float = 1.5):
+    def __init__(self, regeneracion_por_segundo: float = 3.0):
         super().__init__(None)  # Duración infinita
         self.regeneracion_por_segundo = regeneracion_por_segundo
     

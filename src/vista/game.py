@@ -115,6 +115,9 @@ class VistaJuego(arcade.View):
         self.reproductor_miedo = None
         self.musica_miedo_activa = False
         
+        self.barrera_final_activas = False
+        self.barrera_final_sprites = []
+        
     def setup(self):
         # Cargar progreso
         self._cargar_misiones()
@@ -149,6 +152,7 @@ class VistaJuego(arcade.View):
         self.activadores_bounds = []
         self.miedo_inicio_bounds = []
         self.miedo_fin_bounds = []
+        self.bounds_barrera_final = None
         for obj in eventos:
             name_lower = obj.name.lower() if obj.name else ""
             if name_lower == "activador":
@@ -178,6 +182,26 @@ class VistaJuego(arcade.View):
                         "y_min": min(p[1] for p in pts),
                         "y_max": max(p[1] for p in pts)
                     })
+            elif name_lower == "barrera_final":
+                pts = obj.shape
+                if isinstance(pts, list) and len(pts) >= 3:
+                    self.bounds_barrera_final = {
+                        "x_min": min(p[0] for p in pts),
+                        "x_max": max(p[0] for p in pts),
+                        "y_min": min(p[1] for p in pts),
+                        "y_max": max(p[1] for p in pts)
+                    }
+                elif isinstance(pts, tuple) or hasattr(pts, "__len__"):
+                    x = getattr(obj, "x", pts[0])
+                    y = getattr(obj, "y", pts[1])
+                    w = getattr(obj, "width", 0)
+                    h = getattr(obj, "height", 0)
+                    self.bounds_barrera_final = {
+                        "x_min": x,
+                        "x_max": x + w,
+                        "y_min": y,
+                        "y_max": y + h
+                    }
         
         # Crear NPCs
         self.lista_npc_sprites = arcade.SpriteList()
@@ -218,6 +242,18 @@ class VistaJuego(arcade.View):
         if arbustos_mapa:
             for arbusto in arbustos_mapa:
                 self.lista_bloques.append(arbusto)
+
+        # Filtrar barrera final de los muros (empieza desactivada y sin colisión)
+        self.barrera_final_sprites = []
+        self.barrera_final_activas = False
+        if muros_mapa and getattr(self, "bounds_barrera_final", None):
+            for muro in muros_mapa:
+                if (self.bounds_barrera_final["x_min"] <= muro.center_x <= self.bounds_barrera_final["x_max"] and
+                    self.bounds_barrera_final["y_min"] <= muro.center_y <= self.bounds_barrera_final["y_max"]):
+                    self.barrera_final_sprites.append(muro)
+                    muro.visible = False
+                    if muro in self.lista_bloques:
+                        self.lista_bloques.remove(muro)
 
         # Cargar rejas y palancas
         self.lista_rejas = self.scene.get_sprite_list("Rejas")
@@ -646,12 +682,20 @@ class VistaJuego(arcade.View):
 
         # Filtro de saturación para la zona de miedo
         if self.musica_miedo_activa:
+            player_x = self.sprite_jugador.center_x
+            player_y = self.sprite_jugador.center_y
+            
+            if getattr(self, "rejas_final_activas", True) is False and (8400 <= player_x <= 9150) and (player_y >= 11872):
+                color_filtro = (255, 20, 0, 45)
+            else:
+                color_filtro = (255, 60, 0, 30)
+                
             arcade.draw_lrbt_rectangle_filled(
                 0,
                 self.window.width,
                 0,
                 self.window.height,
-                (255, 60, 0, 30)  # Filtro rojo-naranja vibrante con baja opacidad
+                color_filtro
             )
 
         self.hud.draw(self.sprite_jugador)
@@ -769,6 +813,12 @@ class VistaJuego(arcade.View):
             Log.info("Quests", "Zona final abierta. Rejas removidas.")
             self.text_manager.show_message("LA ZONA FINAL SE HA ABIERTO", self.sprite_jugador.center_x, self.sprite_jugador.center_y + 40, arcade.color.GOLDENROD)
 
+        # Manejar zoom dinámico en la zona final
+        if getattr(self, "rejas_final_activas", True) is False and (8400 <= player_x <= 9150) and (player_y >= 11872):
+            self.camera.zoom = 1.5
+        else:
+            self.camera.zoom = 1.3
+
         # Comprobar trigger de los activadores de la zona segura
         if not getattr(self, "rejas_segura_activas", False):
             en_activador = False
@@ -854,10 +904,23 @@ class VistaJuego(arcade.View):
                                 Log.error("Audio", f"No se pudo reproducir musica de miedo: {e}")
                         break
 
-        # Terminar tema de miedo
+        # Terminar tema de miedo y activar barrera final
         if getattr(self, "miedo_fin_bounds", None):
             for bounds in self.miedo_fin_bounds:
                 if bounds["x_min"] <= player_x <= bounds["x_max"] and bounds["y_min"] <= player_y <= bounds["y_max"]:
+                    # Activar barrera final
+                    if not getattr(self, "barrera_final_activas", False):
+                        self.barrera_final_activas = True
+                        if getattr(self, "barrera_final_sprites", None):
+                            for muro in self.barrera_final_sprites:
+                                muro.visible = True
+                                if muro not in self.lista_bloques:
+                                    self.lista_bloques.append(muro)
+                            self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
+                            self.nav_manager.actualizar_desde_bloques(self.lista_bloques)
+                            Log.info("Events", "Barrera final activada al cruzar fin_musica.")
+                            self.text_manager.show_message("SE HA CERRADO UNA BARRERA DETRÁS DE TI", self.sprite_jugador.center_x, self.sprite_jugador.center_y + 40, arcade.color.RED)
+
                     if self.musica_miedo_activa:
                         self.musica_miedo_activa = False
                         Log.info("Audio", "Jugador entró en fin_musica. Desactivando música de miedo y volviendo al ambiente.")
@@ -1405,6 +1468,8 @@ class VistaJuego(arcade.View):
             self.reproductor_miedo = None
         self.en_combate = False
         self.musica_miedo_activa = False
+        self.barrera_final_activas = False
+        self.barrera_final_sprites = []
 
         # Vaciar los managers por dentro llamando a sus nuevos métodos clear
         from dialog.dialog_system import DialogSystem
