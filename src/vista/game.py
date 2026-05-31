@@ -233,10 +233,11 @@ class VistaJuego(arcade.View):
         self.hud = HUD()
         self.console = ConsoleUI()
         
-        # Buscar posiciones de Nota_bosque, Nota_palanca y nota_korus en la capa de Eventos
+        # Buscar posiciones de Nota_bosque, Nota_palanca, nota_korus y nota_boss en la capa de Eventos
         pos_nota_bosque = None
         pos_nota_palanca = None
         pos_nota_korus = None
+        pos_nota_boss = None
         self.objeto_palanca = None
         self.bounds_rejas_trial = None
         for obj in eventos:
@@ -244,7 +245,7 @@ class VistaJuego(arcade.View):
             if not obj_name:
                 continue
             name_lower = obj_name.lower()
-            if name_lower in ("nota_bosque", "nota_palanca", "nota_korus"):
+            if name_lower in ("nota_bosque", "nota_palanca", "nota_korus", "nota_boss"):
                 if isinstance(obj.shape, list) and len(obj.shape) >= 3:
                     x = (obj.shape[0][0] + obj.shape[2][0]) / 2
                     y = (obj.shape[0][1] + obj.shape[2][1]) / 2
@@ -260,6 +261,8 @@ class VistaJuego(arcade.View):
                     pos_nota_palanca = (x, y)
                 elif name_lower == "nota_korus":
                     pos_nota_korus = (x, y)
+                elif name_lower == "nota_boss":
+                    pos_nota_boss = (x, y)
             elif name_lower == "palanca":
                 self.objeto_palanca = obj
             elif name_lower == "rejas_trial":
@@ -352,6 +355,14 @@ class VistaJuego(arcade.View):
             nota_palanca.center_x = (85 + 100) * 32
             nota_palanca.center_y = (160 + 100) * 32
         self.item_manager.add_to_world(nota_palanca)
+
+        nota_boss = Nota(502, "Nota", "Advertencia", "Si sigues por este camino te encontrarás algo terrible", "assets/items/Nota.png")
+        if pos_nota_boss:
+            nota_boss.center_x, nota_boss.center_y = pos_nota_boss
+        else:
+            nota_boss.center_x = 8736
+            nota_boss.center_y = 12064
+        self.item_manager.add_to_world(nota_boss)
 
         self.sprite_jugador.inventory[0] = Pistola()
         self.sprite_jugador.inventory[1] = Cuchillo()

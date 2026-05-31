@@ -1,19 +1,19 @@
 {
     "player": {
-        "x": 4576.0,
-        "y": 5204.25,
-        "vida": 115.0,
-        "max_vida": 300.0,
-        "stamina": 100.00402000000008,
+        "x": 1335.667,
+        "y": 16239.0,
+        "vida": 100.0,
+        "max_vida": 100.0,
+        "stamina": 100,
         "indice_activo": 0,
-        "direccion": "left",
+        "direccion": "right",
         "inventario": [
             "Pistola",
             "Cuchillo",
             null,
-            "Nota",
             null,
-            "Nota",
+            null,
+            null,
             null,
             null
         ]
