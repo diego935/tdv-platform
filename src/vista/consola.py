@@ -129,6 +129,8 @@ class ConsoleUI:
         nuevo_bloque = Bloque(size, size, color=arcade.color.GRAY)
         nuevo_bloque.position = (vista.mouse_world_x, vista.mouse_world_y)
         vista.lista_bloques.append(nuevo_bloque)
+        if hasattr(vista, 'lista_bloques_debug'):
+            vista.lista_bloques_debug.append(nuevo_bloque)
             
         
     def draw(self):
@@ -253,6 +255,8 @@ def cmd_bloque(vista, args):
         nuevo_bloque = Bloque(size, size, color=arcade.color.GRAY)
         nuevo_bloque.position = (vista.mouse_world_x, vista.mouse_world_y)
         vista.lista_bloques.append(nuevo_bloque)
+        if hasattr(vista, 'lista_bloques_debug'):
+            vista.lista_bloques_debug.append(nuevo_bloque)
         vista.nav_manager.actualizar_desde_bloques(vista.lista_bloques)
         return "Bloque creado.", "SUCCESS"
     except: return "Error en tamaño.", "ERROR"

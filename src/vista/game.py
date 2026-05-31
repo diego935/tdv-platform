@@ -96,7 +96,8 @@ class VistaJuego(arcade.View):
         }
         self.lista_enemigos = arcade.SpriteList()
         self.lista_puertas = arcade.SpriteList()
-        self.lista_bloques = arcade.SpriteList()
+        self.lista_bloques = arcade.SpriteList(use_spatial_hash=True)
+        self.lista_bloques_debug = arcade.SpriteList()
         self.lista_jugadores = arcade.SpriteList()
         
         # Variables para doble click en inventario
@@ -143,7 +144,8 @@ class VistaJuego(arcade.View):
         self.lista_jugadores = arcade.SpriteList()
         self.lista_enemigos = arcade.SpriteList()
         self.lista_puertas = arcade.SpriteList()
-        self.lista_bloques = arcade.SpriteList()
+        self.lista_bloques = arcade.SpriteList(use_spatial_hash=True)
+        self.lista_bloques_debug = arcade.SpriteList()
         self.lista_proyectiles = arcade.SpriteList()
         self.item_manager = ItemManager() 
         self.text_manager = TextManager()
@@ -719,7 +721,7 @@ class VistaJuego(arcade.View):
 
         with self.camera.activate():
             self.scene.draw()            
-            self.lista_bloques.draw()
+            self.lista_bloques_debug.draw()
             self.lista_puertas.draw()
             self.item_manager.draw()
             self.lista_proyectiles.draw()
@@ -1649,6 +1651,7 @@ class VistaJuego(arcade.View):
         self.barrera_jefe_sprites = []
         self.lista_esbirros_jefe = []
         self.esbirros_respawn_timer = 0.0
+        self.lista_bloques_debug = arcade.SpriteList()
 
         # Vaciar los managers por dentro llamando a sus nuevos métodos clear
         from dialog.dialog_system import DialogSystem
@@ -1684,7 +1687,8 @@ class VistaJuego(arcade.View):
         self.lista_jugadores = arcade.SpriteList()
         self.lista_enemigos = arcade.SpriteList()
         self.lista_puertas = arcade.SpriteList()
-        self.lista_bloques = arcade.SpriteList()
+        self.lista_bloques = arcade.SpriteList(use_spatial_hash=True)
+        self.lista_bloques_debug = arcade.SpriteList()
         self.lista_proyectiles = arcade.SpriteList()
         self.lista_npc_sprites = arcade.SpriteList()
         self.lista_npcs = []

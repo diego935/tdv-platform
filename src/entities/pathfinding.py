@@ -36,10 +36,82 @@ class Nodo:
         self.padre = None
 
 
+class GridDict(dict):
+    def __init__(self, pathfinder):
+        super().__init__()
+        self.pathfinder = pathfinder
+        self.nodes_cache = {}
+
+    def clear(self):
+        super().clear()
+        self.nodes_cache.clear()
+
+    def get(self, key, default=None):
+        if not isinstance(key, tuple) or len(key) != 2:
+            return default
+        gx, gy = key
+        pf = self.pathfinder
+        if pf.gx_min is None or not (pf.gx_min <= gx <= pf.gx_max and pf.gy_min <= gy <= pf.gy_max):
+            return default
+        
+        if key in self.nodes_cache:
+            return self.nodes_cache[key]
+        
+        transitable = key not in pf.celdas_bloqueadas
+        nodo = Nodo(gx, gy, transitable)
+        self.nodes_cache[key] = nodo
+        return nodo
+
+    def __getitem__(self, key):
+        val = self.get(key)
+        if val is None:
+            raise KeyError(key)
+        return val
+
+    def __contains__(self, key):
+        if not isinstance(key, tuple) or len(key) != 2:
+            return False
+        gx, gy = key
+        pf = self.pathfinder
+        return pf.gx_min is not None and pf.gx_min <= gx <= pf.gx_max and pf.gy_min <= gy <= pf.gy_max
+
+    def values(self):
+        pf = self.pathfinder
+        if pf.gx_min is None:
+            return []
+        nodes = []
+        for gx in range(pf.gx_min, pf.gx_max + 1):
+            for gy in range(pf.gy_min, pf.gy_max + 1):
+                nodes.append(self.get((gx, gy)))
+        return nodes
+
+    def items(self):
+        pf = self.pathfinder
+        if pf.gx_min is None:
+            return []
+        items_list = []
+        for gx in range(pf.gx_min, pf.gx_max + 1):
+            for gy in range(pf.gy_min, pf.gy_max + 1):
+                key = (gx, gy)
+                items_list.append((key, self.get(key)))
+        return items_list
+
+    def __len__(self):
+        pf = self.pathfinder
+        if pf.gx_min is None:
+            return 0
+        return (pf.gx_max - pf.gx_min + 1) * (pf.gy_max - pf.gy_min + 1)
+
+
 class GridPathfinder:
     def __init__(self, cell_size: int = CELL_SIZE):
         self.cell_size = cell_size
-        self.grid: dict = {}
+        self.grid = GridDict(self)
+        self.gx_min = None
+        self.gx_max = None
+        self.gy_min = None
+        self.gy_max = None
+        self.celdas_bloqueadas = set()
         self.world_bounds = None
         self._grid_actualizado = False
         self._version_nodos = 0
@@ -107,6 +179,7 @@ class GridPathfinder:
 
     def _actualizar_grid_sync(self, bloques, padding: int = 2):
         self.grid.clear()
+        self.celdas_bloqueadas.clear()
 
         if not bloques:
             self._grid_actualizado = True
@@ -125,8 +198,6 @@ class GridPathfinder:
 
         self.world_bounds = (x_min, y_min, x_max, y_max)
 
-        celdas_bloqueadas: Set[Tuple[int, int]] = set()
-
         for bloque in bloques:
             bx_min, by_min = self._mundo_a_grid(bloque.left, bloque.bottom)
             bx_max, by_max = self._mundo_a_grid(bloque.right - 1, bloque.top - 1)
@@ -138,15 +209,10 @@ class GridPathfinder:
 
             for gx in range(bx_min, bx_max + 1):
                 for gy in range(by_min, by_max + 1):
-                    celdas_bloqueadas.add((gx, gy))
+                    self.celdas_bloqueadas.add((gx, gy))
 
-        gx_min, gy_min = self._mundo_a_grid(x_min, y_min)
-        gx_max, gy_max = self._mundo_a_grid(x_max, y_max)
-
-        for gx in range(gx_min, gx_max + 1):
-            for gy in range(gy_min, gy_max + 1):
-                transitable = (gx, gy) not in celdas_bloqueadas
-                self.grid[(gx, gy)] = Nodo(gx, gy, transitable)
+        self.gx_min, self.gy_min = self._mundo_a_grid(x_min, y_min)
+        self.gx_max, self.gy_max = self._mundo_a_grid(x_max, y_max)
 
         self._grid_actualizado = True
         self._cache_rutas.clear()
