@@ -920,8 +920,8 @@ class VistaJuego(arcade.View):
                 self.esbirros_respawn_timer = 0.0
                 # Limpiar esbirros muertos
                 self.lista_esbirros_jefe = [e for e in getattr(self, "lista_esbirros_jefe", []) if e in self.lista_enemigos]
-                if len(self.lista_esbirros_jefe) < 3:
-                    cantidad_a_spawnear = 3 - len(self.lista_esbirros_jefe)
+                if len(self.lista_esbirros_jefe) < 6:
+                    cantidad_a_spawnear = 6 - len(self.lista_esbirros_jefe)
                     self._spawn_esbirros_cantidad(cantidad_a_spawnear)
 
         # Actualizar spawn dinámico en la zona del nido
@@ -1332,7 +1332,7 @@ class VistaJuego(arcade.View):
     def _spawn_enemigos_jefe(self):
         self.lista_esbirros_jefe = []
         self.esbirros_respawn_timer = 0.0
-        self._spawn_esbirros_cantidad(3)
+        self._spawn_esbirros_cantidad(6)
 
     def _spawn_esbirros_cantidad(self, cantidad):
         dominio_jefe_layer = self.tile_map.object_lists.get("dominio_jefe", [])
