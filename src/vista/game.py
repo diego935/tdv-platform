@@ -123,6 +123,7 @@ class VistaJuego(arcade.View):
         self.barrera_jefe_sprites = []
         self.lista_esbirros_jefe = []
         self.esbirros_respawn_timer = 0.0
+        self.jefe_derrotado = False
         
     def setup(self):
         # Cargar progreso
@@ -815,12 +816,89 @@ class VistaJuego(arcade.View):
         if self.estado_actual == "CONSOLE":
             self.console.draw()
 
+        # Dibujar fundido negro y texto del desenlace si el combate ha terminado
+        if self.estado_actual == "DESENLACE":
+            fade_duration = 3.0
+            elapsed = getattr(self, "desenlace_fade_timer", 0.0)
+            alpha = min(255, int((elapsed / fade_duration) * 255))
+            
+            # Dibujar rectángulo negro sobre toda la pantalla
+            arcade.draw_lrbt_rectangle_filled(
+                0, self.window.width,
+                0, self.window.height,
+                (0, 0, 0, alpha)
+            )
+            
+            # Si el fundido ha avanzado, mostrar el texto del desenlace
+            if elapsed > 1.0:
+                text_alpha = min(255, int(((elapsed - 1.0) / (fade_duration - 1.0)) * 255))
+                
+                texto = (
+                    "He acabado con el jefe.\n\n"
+                    "Al final, parece que si era el bueno....\n\n"
+                    "-Señor, aqui tiene sus pastillas-\n"
+                    "\"Si.... muchas gracias.....\"\n\n"
+                    "Me meto las pastillas en la boca.\n ¿Por que saben como a metal y polvora?.\n\n"
+                    "*Lo ultimo que se pudo oir fue un disparo*\n\n"
+                    "Todo se quedó en silencio"
+                )
+                
+                arcade.draw_text(
+                    texto,
+                    self.window.width / 2,
+                    self.window.height / 2,
+                    (255, 255, 255, text_alpha),
+                    font_size=16,
+                    anchor_x="center",
+                    anchor_y="center",
+                    multiline=True,
+                    width=600,
+                    align="center"
+                )
+                
+                if elapsed > 5.0:
+                    import time
+                    arcade.draw_text(
+                        "Presiona ENTER para volver al menú principal",
+                        self.window.width / 2,
+                        self.window.height / 2 - 200,
+                        (150, 150, 150, min(text_alpha, int(abs(math.sin(time.time() * 3)) * 255))),
+                        font_size=12,
+                        anchor_x="center",
+                        anchor_y="center"
+                    )
+
     def cerca_con_margen(self, sprite1, sprite2, margen=10):
         dx = abs(sprite1.center_x - sprite2.center_x)
         dy = abs(sprite1.center_y - sprite2.center_y)
         return (dx < (sprite1.width / 2 + sprite2.width / 2 + margen) and dy < (sprite1.height / 2 + sprite2.height / 2 + margen))
 
     def on_update(self, delta_time):
+        if self.estado_actual == "DESENLACE":
+            if self.camera is not None:
+                window = self.window
+                self.mouse_world_x, self.mouse_world_y = self.camera.unproject_with_origin(
+                    self.mouse_pos_x, 
+                    self.mouse_pos_y, 
+                    window.width, 
+                    window.height
+                )
+            self.sprite_jugador.change_x = 0
+            self.sprite_jugador.change_y = 0
+            self.desenlace_fade_timer = getattr(self, "desenlace_fade_timer", 0.0) + delta_time
+            return
+
+        # Check boss death to trigger ending sequence
+        if getattr(self, "barrera_jefe_activas", False) and not getattr(self, "jefe_derrotado", False):
+            boss_alive = any(isinstance(e, Jefe) for e in self.lista_enemigos)
+            if not boss_alive:
+                self.jefe_derrotado = True
+                self.estado_actual = "DESENLACE"
+                self.desenlace_fade_timer = 0.0
+                self.sprite_jugador.change_x = 0
+                self.sprite_jugador.change_y = 0
+                self.arriba_presionado = self.abajo_presionado = self.izquierda_presionado = self.derecha_presionado = self.shift_presionado = False
+
         if self.playerDead: 
             delta_time *= (0.8)** int(self.it/20)
             self.it +=1
@@ -1083,6 +1161,13 @@ class VistaJuego(arcade.View):
             self.console.input_text += text
 
     def on_key_press(self, key, modifiers):
+        if self.estado_actual == "DESENLACE":
+            if key == arcade.key.ENTER and getattr(self, "desenlace_fade_timer", 0.0) > 5.0:
+                from vista.menu import MenuInicio
+                self.limpiar_estado()
+                self.window.show_view(MenuInicio())
+            return
+
         if key == arcade.key.ESCAPE:
             self.window.show_view(MenuPausa(self))
             return
@@ -1538,6 +1623,8 @@ class VistaJuego(arcade.View):
             self.sprite_jugador.vistaInventario.set_hover(slot)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
+        if self.estado_actual == "DESENLACE":
+            return
         window = self.window
         self.mouse_world_x, self.mouse_world_y = self.camera.unproject_with_origin(x, y, window.width, window.height)
         self.mouse_pos_x = x
@@ -1551,6 +1638,8 @@ class VistaJuego(arcade.View):
                 self.sprite_jugador.vistaInventario._drag_source = None
 
     def on_mouse_press(self, x, y, button, modifiers):
+        if self.estado_actual == "DESENLACE":
+            return
         if self.show_inventory and button == arcade.MOUSE_BUTTON_LEFT:
             slot = self.sprite_jugador.vistaInventario.get_slot_at_pointer(x, y)
             if slot and slot < len(self.sprite_jugador.inventory):
@@ -1573,10 +1662,14 @@ class VistaJuego(arcade.View):
                 self.sprite_jugador.usar_arma_activa(target_x, target_y, self.lista_proyectiles)
 
     def on_mouse_release(self, x, y, button, modifiers):
+        if self.estado_actual == "DESENLACE":
+            return
         if self.show_inventory and button == arcade.MOUSE_BUTTON_LEFT:
             self.sprite_jugador.vistaInventario._drag_source = None
 
     def on_key_release(self, key, modifiers):
+        if self.estado_actual == "DESENLACE":
+            return
         if key in [arcade.key.W, arcade.key.UP]: self.arriba_presionado = False
         elif key in [arcade.key.S, arcade.key.DOWN]: self.abajo_presionado = False
         elif key in [arcade.key.A, arcade.key.LEFT]: self.izquierda_presionado = False
@@ -1584,6 +1677,8 @@ class VistaJuego(arcade.View):
         elif key in [arcade.key.LSHIFT, arcade.key.RSHIFT]: self.shift_presionado = False
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        if self.estado_actual == "DESENLACE":
+            return
         pass
 
     def procesar_comando(self, comando_raw):
@@ -1652,6 +1747,7 @@ class VistaJuego(arcade.View):
         self.lista_esbirros_jefe = []
         self.esbirros_respawn_timer = 0.0
         self.lista_bloques_debug = arcade.SpriteList()
+        self.jefe_derrotado = False
 
         # Vaciar los managers por dentro llamando a sus nuevos métodos clear
         from dialog.dialog_system import DialogSystem
