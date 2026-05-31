@@ -56,8 +56,10 @@ class VistaJuego(arcade.View):
         self.hud = None 
         self.estado_actual = "MENU"
         self.console = None
-        self.mouse_world_x = None 
-        self.mouse_world_y = None  
+        self.mouse_world_x = 0.0
+        self.mouse_world_y = 0.0
+        self.mouse_pos_x = 0
+        self.mouse_pos_y = 0
         self.nav_manager = None
         self.dm = None
         self.timer_dia_noche = 0.0 
@@ -118,6 +120,8 @@ class VistaJuego(arcade.View):
         self.barrera_final_sprites = []
         self.barrera_jefe_activas = False
         self.barrera_jefe_sprites = []
+        self.lista_esbirros_jefe = []
+        self.esbirros_respawn_timer = 0.0
         
     def setup(self):
         # Cargar progreso
@@ -829,6 +833,17 @@ class VistaJuego(arcade.View):
 
         self.actualizar_oleadas(delta_time)
 
+        # Respawn de esbirros del jefe cada 5 segundos
+        if getattr(self, "barrera_jefe_activas", False) and any(isinstance(e, Jefe) for e in self.lista_enemigos):
+            self.esbirros_respawn_timer = getattr(self, "esbirros_respawn_timer", 0.0) + delta_time
+            if self.esbirros_respawn_timer >= 5.0:
+                self.esbirros_respawn_timer = 0.0
+                # Limpiar esbirros muertos
+                self.lista_esbirros_jefe = [e for e in getattr(self, "lista_esbirros_jefe", []) if e in self.lista_enemigos]
+                if len(self.lista_esbirros_jefe) < 3:
+                    cantidad_a_spawnear = 3 - len(self.lista_esbirros_jefe)
+                    self._spawn_esbirros_cantidad(cantidad_a_spawnear)
+
         # Actualizar spawn dinámico en la zona del nido
         if self.zona_nido:
             pts = self.zona_nido.shape
@@ -936,6 +951,16 @@ class VistaJuego(arcade.View):
         self.physics_engine.update()
         
         self.camera.position = self.sprite_jugador.position
+        
+        # Recalcular la posición del ratón en el mundo en base a la cámara y posición de pantalla actuales
+        if self.camera is not None:
+            window = self.window
+            self.mouse_world_x, self.mouse_world_y = self.camera.unproject_with_origin(
+                self.mouse_pos_x, 
+                self.mouse_pos_y, 
+                window.width, 
+                window.height
+            )
         self.text_manager.update()
         self.item_manager.update()
         self.im.update()
@@ -1211,8 +1236,64 @@ class VistaJuego(arcade.View):
                 for enemigo in self.lista_enemigos:
                     if isinstance(enemigo, Jefe):
                         enemigo.activar_combate()
+            
+            self._spawn_enemigos_jefe()
+            
             TextManager().show_message("EL COMBATE HA COMENZADO", self.sprite_jugador.center_x, self.sprite_jugador.center_y + 40)
             Log.info("Game", "Combate contra el jefe iniciado: barrera_jefe activada.")
+
+    def _spawn_enemigos_jefe(self):
+        self.lista_esbirros_jefe = []
+        self.esbirros_respawn_timer = 0.0
+        self._spawn_esbirros_cantidad(3)
+
+    def _spawn_esbirros_cantidad(self, cantidad):
+        dominio_jefe_layer = self.tile_map.object_lists.get("dominio_jefe", [])
+        if not dominio_jefe_layer:
+            Log.warning("Game", "No se encontró la capa 'dominio_jefe' para spawnear esbirros.")
+            return
+        
+        obj = dominio_jefe_layer[0]
+        pts = obj.shape
+        if isinstance(pts, list) and len(pts) >= 3:
+            x_min = min(p[0] for p in pts)
+            x_max = max(p[0] for p in pts)
+            y_min = min(p[1] for p in pts)
+            y_max = max(p[1] for p in pts)
+        else:
+            x = getattr(obj, "x", pts[0])
+            y = getattr(obj, "y", pts[1])
+            w = getattr(obj, "width", 0)
+            h = getattr(obj, "height", 0)
+            x_min = x
+            x_max = x + w
+            y_min = y
+            y_max = y + h
+
+        enemies_spawned = 0
+        max_attempts = 100
+        while enemies_spawned < cantidad and max_attempts > 0:
+            max_attempts -= 1
+            rx = random.uniform(x_min + 32, x_max - 32)
+            ry = random.uniform(y_min + 32, y_max - 32)
+            
+            enemigo = EnemigoIA(
+                x=rx, y=ry,
+                tipo_patrulla=EnemigoIA.TIPO_AREA,
+                area_center=(rx, ry),
+                area_radio=400,
+                dano_ataque=15.0,
+                vista_rango=800,
+                velocidad=320,
+                velocidad_patrulla=120
+            )
+            enemigo.enemy_id = "bandido"
+            
+            if not arcade.check_for_collision_with_list(enemigo, self.lista_bloques) and not arcade.check_for_collision(enemigo, self.sprite_jugador):
+                self.lista_enemigos.append(enemigo)
+                self.lista_esbirros_jefe.append(enemigo)
+                enemies_spawned += 1
+                Log.info("Game", f"Esbirro del jefe creado en ({rx:.1f}, {ry:.1f})")
 
     def activar_rejas(self, iniciar_oleadas=True):
         if iniciar_oleadas:
@@ -1566,6 +1647,8 @@ class VistaJuego(arcade.View):
         self.barrera_final_sprites = []
         self.barrera_jefe_activas = False
         self.barrera_jefe_sprites = []
+        self.lista_esbirros_jefe = []
+        self.esbirros_respawn_timer = 0.0
 
         # Vaciar los managers por dentro llamando a sus nuevos métodos clear
         from dialog.dialog_system import DialogSystem
