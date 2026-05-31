@@ -78,7 +78,7 @@ class VistaJuego(arcade.View):
         self.MIN_ZOOM = 0.2
         self.MAX_ZOOM = 4.0
         
-        self.playerDead= False; 
+        self.playerDead = False
         # Optimización de distancia
         self.DISTANCIA_ACTUALIZACION = DISTANCIA_ACTUALIZACION
         
@@ -857,7 +857,6 @@ class VistaJuego(arcade.View):
                 )
                 
                 if elapsed > 5.0:
-                    import time
                     arcade.draw_text(
                         "Presiona ENTER para volver al menú principal",
                         self.window.width / 2,
@@ -1579,7 +1578,6 @@ class VistaJuego(arcade.View):
                         Log.info("Waves", "Todas las oleadas de la zona Spawn completadas. Bufo aplicado.")
 
                         # Completar misión de trial en el gestor de misiones
-                        from dialog.quest_manager import QM
                         QM.actualizar_objetivo("mision_trial", "obj_waves")
 
                         # Abrir las rejas automáticamente al completar las oleadas
@@ -1720,8 +1718,8 @@ class VistaJuego(arcade.View):
 
 
     def _on_player_death(self, data):
-        self.playerDead = True; 
-        self.it = 0; 
+        self.playerDead = True
+        self.it = 0
 
     def limpiar_estado(self):
         """Limpia a cero absoluto el estado visual, frena inputs y vacía los managers globales 

@@ -9,22 +9,19 @@ def verificar_condicion(condicion: dict) -> bool:
     if not condicion:
         return True
 
+    from dialog.quest_manager import QM
+
     for clave, valor in condicion.items():
         if clave == "mision_completada":
-            from dialog.quest_manager import QM
             return QM.esta_completada(valor)
         elif clave == "mision_activa":
-            from dialog.quest_manager import QM
             return QM.esta_activa(valor)
         elif clave == "mision_no_activa":
-            from dialog.quest_manager import QM
             quest = QM.get_mision(valor)
             return quest is not None and quest.estado not in ["en_progreso", "completada"]
         elif clave == "flag":
-            from dialog.quest_manager import QM
             return QM.esta_completada(valor) or QM.esta_activa(valor)
         elif clave == "recompensa_no_recibida":
-            from dialog.quest_manager import QM
             return QM.esta_completada(valor) and not QM.recompensa_entregada(valor)
 
     return True

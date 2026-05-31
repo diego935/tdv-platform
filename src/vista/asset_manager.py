@@ -1,6 +1,5 @@
 import arcade
 from utils.log import Log
-from utils.log import Log
 
 class AssetManager:
     """
