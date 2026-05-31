@@ -571,7 +571,7 @@ class VistaJuego(arcade.View):
                     self.sprite_jugador.position[0] + 2000,
                     self.sprite_jugador.position[1] - 2000,
                     self.sprite_jugador.position[1] + 2000,
-                    (0, 0, 0, int(255 * self.it / 400))
+                    (0, 0, 0, min(255, int(255 * self.it / 200)))
                 )
 
         self.hud.draw(self.sprite_jugador)
@@ -632,9 +632,8 @@ class VistaJuego(arcade.View):
         if self.playerDead: 
             delta_time *= (0.8)** int(self.it/20)
             self.it +=1
-            if self.it >= 400: 
+            if self.it >= 300: 
                 self.window.show_view(VistaGameOver())
-            return
 
         if self.estado_actual == "CONSOLE":
             self.console.update(delta_time, self)
