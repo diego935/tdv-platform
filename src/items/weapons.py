@@ -49,6 +49,9 @@ class Proyectil(arcade.Sprite):
         self._vx = math.cos(math.radians(angle)) * velocidad
         self._vy = math.sin(math.radians(angle)) * velocidad
 
+        if self.objetivo == ObjetivoProyectil.PLAYER:
+            self.color = (0, 255, 0)
+
     def update(self, delta_time, blocks_list=None, enemies_list=None, player=None):
         self.center_x += self._vx * delta_time
         self.center_y += self._vy * delta_time

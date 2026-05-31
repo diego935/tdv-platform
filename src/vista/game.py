@@ -1648,7 +1648,7 @@ class VistaJuego(arcade.View):
                 self._ultimo_click_tiempo = ahora
                 
                 if item and hasattr(item, 'usar') and es_doble_click:
-                    item.usar(self.sprite_jugador, slot, None, None, None)
+                    item.usar(self.sprite_jugador, slot, None, None)
                 elif item is not None:
                     self.sprite_jugador.vistaInventario._drag_source = slot
             return
