@@ -77,6 +77,7 @@ class VistaJuego(arcade.View):
         self.MIN_ZOOM = 0.2
         self.MAX_ZOOM = 4.0
         
+        self.playerDead= False; 
         # Optimización de distancia
         self.DISTANCIA_ACTUALIZACION = DISTANCIA_ACTUALIZACION
         
@@ -143,9 +144,7 @@ class VistaJuego(arcade.View):
         
         self.sprite_jugador = Jugador()
         EB.subscribe("player_death", self._on_player_death)
-        print("\n\n\n\n\n\n")
-        print(self.sprite_jugador.__dict__)
-        print("\n\n\n\n\n\n")
+
 
         
         if spawn:
@@ -345,6 +344,12 @@ class VistaJuego(arcade.View):
         return (dx < (sprite1.width / 2 + sprite2.width / 2 + margen) and dy < (sprite1.height / 2 + sprite2.height / 2 + margen))
 
     def on_update(self, delta_time):
+        if self.playerDead: 
+            delta_time *= (0.8)** int(self.it/20)
+            self.it +=1
+            if self.it >= 400: 
+                self.window.show_view(VistaGameOver())
+
         if self.estado_actual == "CONSOLE":
             self.console.update(delta_time, self)
             return
@@ -626,7 +631,8 @@ class VistaJuego(arcade.View):
 
 
     def _on_player_death(self, data):
-            self.window.show_view(VistaGameOver())
+        self.playerDead = True; 
+        self.it = 0; 
 
     def limpiar_estado(self):
         """Limpia a cero absoluto el estado visual, frena inputs y vacía los managers globales 
