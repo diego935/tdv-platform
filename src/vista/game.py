@@ -111,6 +111,10 @@ class VistaJuego(arcade.View):
         self.en_combate = False
         self.DISTANCIA_ACTIVACION_COMBATE = 400.0
         
+        self.sonido_miedo = None
+        self.reproductor_miedo = None
+        self.musica_miedo_activa = False
+        
     def setup(self):
         #Cargar misiones guardadas
         self._cargar_misiones()
@@ -143,12 +147,32 @@ class VistaJuego(arcade.View):
         
         # Buscar zonas de activación de rejas en la zona segura (nombre: "activador")
         self.activadores_bounds = []
+        self.miedo_inicio_bounds = []
+        self.miedo_fin_bounds = []
         for obj in eventos:
             name_lower = obj.name.lower() if obj.name else ""
             if name_lower == "activador":
                 pts = obj.shape
                 if isinstance(pts, list) and len(pts) >= 3:
                     self.activadores_bounds.append({
+                        "x_min": min(p[0] for p in pts),
+                        "x_max": max(p[0] for p in pts),
+                        "y_min": min(p[1] for p in pts),
+                        "y_max": max(p[1] for p in pts)
+                    })
+            elif name_lower == "inicio_musica_miedo":
+                pts = obj.shape
+                if isinstance(pts, list) and len(pts) >= 3:
+                    self.miedo_inicio_bounds.append({
+                        "x_min": min(p[0] for p in pts),
+                        "x_max": max(p[0] for p in pts),
+                        "y_min": min(p[1] for p in pts),
+                        "y_max": max(p[1] for p in pts)
+                    })
+            elif name_lower == "fin_musica":
+                pts = obj.shape
+                if isinstance(pts, list) and len(pts) >= 3:
+                    self.miedo_fin_bounds.append({
                         "x_min": min(p[0] for p in pts),
                         "x_max": max(p[0] for p in pts),
                         "y_min": min(p[1] for p in pts),
@@ -521,10 +545,17 @@ class VistaJuego(arcade.View):
                 MissionCoin.mision_completada  # Función al recoger todas
             )
         
-       #Cargar e iniciar sonido
+        # Cargar zonas de música
+        self.music_zones = []
+        for obj in eventos:
+            if getattr(obj, "name", "").lower() == "musica_zona":
+                self.music_zones.append(obj)
+
+        # Cargar e iniciar sonido
         try:
             self.sonido_ambiente = arcade.load_sound("assets/musica/ambiente_basico.mp3")
             self.sonido_combate = arcade.load_sound("assets/musica/ambiente_PVP.mp3")
+            self.sonido_miedo = arcade.load_sound("assets/musica/miedo.mp3")
  
             self.reproductor_ambiente = arcade.play_sound(self.sonido_ambiente, volume=0.5, loop=True)
             Log.info("Audio", "Sonido ambiente continuo iniciado en bucle.")
@@ -564,6 +595,16 @@ class VistaJuego(arcade.View):
 
             self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager, self.sprite_jugador)
             self.text_manager.draw()
+
+        # --- DIBUJAR FILTRO DE SATURACIÓN DE COLOR (COORDINADAS DE PANTALLA) ---
+        if self.musica_miedo_activa:
+            arcade.draw_lrbt_rectangle_filled(
+                0,
+                self.window.width,
+                0,
+                self.window.height,
+                (255, 60, 0, 30)  # Filtro rojo-naranja vibrante con baja opacidad
+            )
 
         self.hud.draw(self.sprite_jugador)
         
@@ -727,6 +768,52 @@ class VistaJuego(arcade.View):
         self.im.update()
         self.actualizar_ciclo_dia_noche(delta_time)
 
+        # Comprobar trigger de inicio y fin de música de miedo
+        player_x = self.sprite_jugador.center_x
+        player_y = self.sprite_jugador.center_y
+
+        # Activar música de miedo si pasa por inicio_musica_miedo
+        if getattr(self, "miedo_inicio_bounds", None):
+            for bounds in self.miedo_inicio_bounds:
+                if bounds["x_min"] <= player_x <= bounds["x_max"] and bounds["y_min"] <= player_y <= bounds["y_max"]:
+                    if not self.musica_miedo_activa:
+                        self.musica_miedo_activa = True
+                        Log.info("Audio", "Jugador entró en inicio_musica_miedo. Activando música de miedo.")
+                        
+                        # Detener sonido ambiente normal si está sonando
+                        if self.reproductor_ambiente:
+                            arcade.stop_sound(self.reproductor_ambiente)
+                            self.reproductor_ambiente = None
+                        
+                        # Iniciar sonido miedo (si no estamos en combate)
+                        if not self.en_combate and self.sonido_miedo:
+                            try:
+                                self.reproductor_miedo = arcade.play_sound(self.sonido_miedo, volume=0.5, loop=True)
+                            except Exception as e:
+                                Log.error("Audio", f"No se pudo reproducir musica de miedo: {e}")
+                        break
+
+        # Terminar música de miedo si pasa por fin_musica
+        if getattr(self, "miedo_fin_bounds", None):
+            for bounds in self.miedo_fin_bounds:
+                if bounds["x_min"] <= player_x <= bounds["x_max"] and bounds["y_min"] <= player_y <= bounds["y_max"]:
+                    if self.musica_miedo_activa:
+                        self.musica_miedo_activa = False
+                        Log.info("Audio", "Jugador entró en fin_musica. Desactivando música de miedo y volviendo al ambiente.")
+                        
+                        # Detener música de miedo
+                        if self.reproductor_miedo:
+                            arcade.stop_sound(self.reproductor_miedo)
+                            self.reproductor_miedo = None
+                        
+                        # Volver a iniciar sonido ambiente normal (si no estamos en combate)
+                        if not self.en_combate and self.sonido_ambiente:
+                            try:
+                                self.reproductor_ambiente = arcade.play_sound(self.sonido_ambiente, volume=0.5, loop=True)
+                            except Exception as e:
+                                Log.error("Audio", f"No se pudo reproducir musica ambiente: {e}")
+                        break
+
         # alternancia de música pvp y ambiente
 
         enemigo_cercano_detectado = False
@@ -753,6 +840,10 @@ class VistaJuego(arcade.View):
             if self.reproductor_ambiente:
                 arcade.stop_sound(self.reproductor_ambiente)
                 self.reproductor_ambiente = None
+                
+            if self.reproductor_miedo:
+                arcade.stop_sound(self.reproductor_miedo)
+                self.reproductor_miedo = None
             
             if self.sonido_combate:
                 self.reproductor_combate = arcade.play_sound(self.sonido_combate, volume=0.5, loop=True)
@@ -766,8 +857,12 @@ class VistaJuego(arcade.View):
                 arcade.stop_sound(self.reproductor_combate)
                 self.reproductor_combate = None
                 
-            if self.sonido_ambiente:
-                self.reproductor_ambiente = arcade.play_sound(self.sonido_ambiente, volume=0.5, loop=True)
+            if self.musica_miedo_activa:
+                if self.sonido_miedo:
+                    self.reproductor_miedo = arcade.play_sound(self.sonido_miedo, volume=0.5, loop=True)
+            else:
+                if self.sonido_ambiente:
+                    self.reproductor_ambiente = arcade.play_sound(self.sonido_ambiente, volume=0.5, loop=True)
     
 
     def on_text_input(self, text):
@@ -1239,7 +1334,11 @@ class VistaJuego(arcade.View):
         if self.reproductor_combate:
             arcade.stop_sound(self.reproductor_combate)
             self.reproductor_combate = None
+        if self.reproductor_miedo:
+            arcade.stop_sound(self.reproductor_miedo)
+            self.reproductor_miedo = None
         self.en_combate = False
+        self.musica_miedo_activa = False
 
         # 1. Vaciar los managers por dentro llamando a sus nuevos métodos clear
         from dialog.dialog_system import DialogSystem
@@ -1305,6 +1404,8 @@ class VistaJuego(arcade.View):
             self.reproductor_ambiente.volume = 0.0
         if self.reproductor_combate:
             self.reproductor_combate.volume = 0.0
+        if self.reproductor_miedo:
+            self.reproductor_miedo.volume = 0.0
 
         if self.sprite_jugador and self.sprite_jugador.player_pasos:
             arcade.stop_sound(self.sprite_jugador.player_pasos)
@@ -1316,8 +1417,11 @@ class VistaJuego(arcade.View):
 
         if self.en_combate and self.reproductor_combate:
             self.reproductor_combate.volume = 0.5
-        elif not self.en_combate and self.reproductor_ambiente:
-            self.reproductor_ambiente.volume = 0.5
+        elif not self.en_combate:
+            if self.musica_miedo_activa and self.reproductor_miedo:
+                self.reproductor_miedo.volume = 0.5
+            elif self.reproductor_ambiente:
+                self.reproductor_ambiente.volume = 0.5
 
 
     def dibujar_linterna_vectorial(self):
@@ -1377,6 +1481,10 @@ class VistaJuego(arcade.View):
 
     def actualizar_ciclo_dia_noche(self, delta_time): 
         self.timer_dia_noche = (self.timer_dia_noche + delta_time) % DURACION_DIA_SEGUNDOS
+
+        if self.musica_miedo_activa:
+            self.alpha_actual_oscuridad = 0
+            return
 
         progreso_ciclo = self.timer_dia_noche / DURACION_DIA_SEGUNDOS
         factor_oscuridad = (1.0 - math.cos(progreso_ciclo * 2 * math.pi)) / 2.0

@@ -19,6 +19,60 @@
             "dynamicWrapping": true,
             "scaleInDock": 4,
             "scaleInEditor": 11
+        },
+        "assets/tilesets/arbol1.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/arbol2.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/arbol3.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/arbusto.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/base_militar.tsx": {
+            "scaleInDock": 0.33
+        },
+        "assets/tilesets/caminotierra.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/campoPlantas.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/carretera.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/coche.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/furgo.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/muroEsquinas.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/muroFlores.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/palanca.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/pisadas.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/quitaMiedos.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/rejas.tsx": {
+            "scaleInDock": 1
+        },
+        "assets/tilesets/sueloCampo.tsx": {
+            "scaleInDock": 0.5
+        },
+        "assets/tilesets/suelometal.tsx": {
+            "scaleInDock": 0.5
         }
     },
     "last.imagePath": "C:/Users/D4NI/Documents/Tec.Videojuegos/tdv-platform/assets/tilesets",
