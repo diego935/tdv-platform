@@ -12,12 +12,12 @@
 
 ## 2. Narrativa y Personajes
 
-### 📜 Sinopsis de la Historia
+### Sinopsis de la Historia
 Eres un soldado aparentemente como cualquier otro, uno más entre las filas. Se ha desatado el caos en la ciudad más cercana y las autoridades han tenido que evacuar a toda la población civil a gran velocidad. Sin previo aviso ni detalles sobre la raíz del problema, se te asigna una misión clandestina en solitario: *“Limpia la ciudad y vuelve entero”*. 
 
 Los superiores insisten de manera sospechosa en una sola directriz: *“No te cuestiones nada, incluso demasiado”*. A medida que avanzas por los escenarios neutralizando todo lo que aún se mueve, la intriga te supera. Decides romper el silencio y descubrir la verdad de lo que realmente ocurrió por tu propia cuenta.
 
-### 👥 Perfiles de Personajes (Planificación)
+### Perfiles de Personajes (Planificación)
 * **El Soldado (Jugador):** El protagonista. Un militar disciplinado que comienza acatando órdenes a ciegas pero cuya curiosidad lo lleva a investigar el trasfondo del desastre.
 * **Los Altos Mandos:** Voces u órdenes en la sombra que guían al jugador de forma estricta, ocultando información crucial sobre el origen de la catástrofe.
 * **NPCs:** Ciudadanos infectados que dan lugar a la constraposición del videojuego.
