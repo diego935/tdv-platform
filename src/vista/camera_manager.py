@@ -14,7 +14,7 @@ class CameraManager:
 
     def __init__(self):
         self.camera = arcade.camera.Camera2D()
-        self.camera.zoom = 1.85
+        self.camera.zoom = 1.3
         self.zoom_target = 1.0
 
     def seguir_sprite(self, sprite):

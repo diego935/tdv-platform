@@ -554,6 +554,15 @@ class VistaJuego(arcade.View):
             self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager, self.sprite_jugador)
             self.text_manager.draw()
 
+            if self.playerDead:
+                arcade.draw_lrbt_rectangle_filled(
+                    self.sprite_jugador.position[0] - 2000,
+                    self.sprite_jugador.position[0] + 2000,
+                    self.sprite_jugador.position[1] - 2000,
+                    self.sprite_jugador.position[1] + 2000,
+                    (0, 0, 0, int(255 * self.it / 400))
+                )
+
         self.hud.draw(self.sprite_jugador)
         
         # Dibujar información de oleadas
@@ -614,6 +623,7 @@ class VistaJuego(arcade.View):
             self.it +=1
             if self.it >= 400: 
                 self.window.show_view(VistaGameOver())
+            return
 
         if self.estado_actual == "CONSOLE":
             self.console.update(delta_time, self)
