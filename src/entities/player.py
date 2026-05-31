@@ -124,6 +124,11 @@ class Jugador(arcade.Sprite):
             objeto.is_dropped = True
             objeto.center_x = self.center_x
             objeto.center_y = self.center_y
+
+            if hasattr(objeto, 'escala_suelo'):
+                objeto.scale = objeto.escala_suelo
+            else:
+                objeto.scale = 0.08
               
             # Lo devolvemos para que el ItemManager lo añada a su lista
             return objeto

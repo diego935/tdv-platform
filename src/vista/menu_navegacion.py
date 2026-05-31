@@ -25,9 +25,9 @@ class MenuNavegacion(arcade.View):
     def _destino_al_volver(self):
         from vista.menu_principal import MenuPrincipal
         return MenuPrincipal()
-
-    def on_draw(self):
-        self.clear()
+    
+    def dibujar_boton_volver(self):
+        """Método auxiliar para dibujar solo el botón sin limpiar la pantalla"""
         left, right, bottom, top = self._get_boton_volver_bounds()
 
         arcade.draw_lrbt_rectangle_filled(
@@ -50,6 +50,10 @@ class MenuNavegacion(arcade.View):
             anchor_y="center",
             font_name="Times New Roman"
         )
+
+    def on_draw(self):
+        self.clear()
+        self.dibujar_boton_volver()
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self._click_en_volver(x, y):
