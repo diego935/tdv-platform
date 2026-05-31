@@ -295,10 +295,10 @@ class VistaJuego(arcade.View):
         self.hud = HUD()
         self.console = ConsoleUI()
         
-        # Buscar posiciones de Nota_bosque, Nota_palanca, nota_korus y nota_boss en la capa de Eventos
+        # Buscar posiciones de Nota_bosque, Nota_palanca, nota_bienvenida y nota_boss en la capa de Eventos
         pos_nota_bosque = None
         pos_nota_palanca = None
-        pos_nota_korus = None
+        pos_nota_bienvenida = None
         pos_nota_boss = None
         self.objeto_palanca = None
         self.bounds_rejas_trial = None
@@ -307,7 +307,7 @@ class VistaJuego(arcade.View):
             if not obj_name:
                 continue
             name_lower = obj_name.lower()
-            if name_lower in ("nota_bosque", "nota_palanca", "nota_korus", "nota_boss"):
+            if name_lower in ("nota_bosque", "nota_palanca", "nota_bienvenida", "nota_boss"):
                 if isinstance(obj.shape, list) and len(obj.shape) >= 3:
                     x = (obj.shape[0][0] + obj.shape[2][0]) / 2
                     y = (obj.shape[0][1] + obj.shape[2][1]) / 2
@@ -321,8 +321,8 @@ class VistaJuego(arcade.View):
                     pos_nota_bosque = (x, y)
                 elif name_lower == "nota_palanca":
                     pos_nota_palanca = (x, y)
-                elif name_lower == "nota_korus":
-                    pos_nota_korus = (x, y)
+                elif name_lower == "nota_bienvenida":
+                    pos_nota_bienvenida = (x, y)
                 elif name_lower == "nota_boss":
                     pos_nota_boss = (x, y)
             elif name_lower == "palanca":
@@ -429,15 +429,15 @@ class VistaJuego(arcade.View):
                 if reja not in self.rejas_final_sprites:
                     reja.visible = False
 
-        nota_prueba = Nota(500, "Se busca", "SE BUSCAN KORUS",
-            "Si alguien lee esto...\nYo de niña tenía unos muñecos... \ny los he perdido \n¿me ayudas a encontrarlos? \n\nquizás recibas algo a cambio :)",
+        nota_bienvenida = Nota(500, "Nota", "Como he acabado aqui",
+            "Tenía pensado seguir las huellas y luego avanzar hacia el este. \n Quizá si sigues mis pasos te vaya bien, no como a mi",
             "assets/items/Nota.png")
-        if pos_nota_korus:
-            nota_prueba.center_x, nota_prueba.center_y = pos_nota_korus
+        if pos_nota_bienvenida:
+            nota_bienvenida.center_x, nota_bienvenida.center_y = pos_nota_bienvenida
         else:
-            nota_prueba.center_x = (156 + 100) * 32
-            nota_prueba.center_y = (151 + 100) * 32
-        self.item_manager.add_to_world(nota_prueba)
+            nota_bienvenida.center_x = (156 + 100) * 32
+            nota_bienvenida.center_y = (151 + 100) * 32
+        self.item_manager.add_to_world(nota_bienvenida)
 
         nota_bosque = Nota(500, "...", "Algo extraño pasa en este bosque", "Igual si pruebo a cruzarlo...", "assets/items/Nota.png")
         if pos_nota_bosque:

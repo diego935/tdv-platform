@@ -2160,7 +2160,7 @@
   <object id="97" name="Trampa" x="7232" y="3808" width="128" height="96"/>
   <object id="98" name="Trampa_Venenosa" x="8170" y="3007.33" width="46" height="35.3333"/>
   <object id="99" name="Trampa_venenosa" x="6776" y="3938" width="52" height="55"/>
-  <object id="196" name="nota_korus" x="750" y="578" width="66" height="52"/>
+  <object id="196" name="nota_bienvenida" x="750" y="578" width="66" height="52"/>
   <object id="199" name="Rejas_segura" x="6402" y="768" width="193.333" height="288"/>
   <object id="202" name="activador" x="6483" y="509" width="346.5" height="172.5"/>
   <object id="203" name="activador" x="6713" y="638" width="124" height="727"/>
