@@ -18,7 +18,7 @@ class Jugador(arcade.Sprite):
         self.vel_caminar = 5
         self.velocidad = self.vel_caminar
         self.vel_correr = 10
-        self.capacidad = 8 # NOTE: Está hardcodeada la capacidad del inventario.  
+        self.capacidad = 8 # NOTE: Está hardcodeada la capacidad del inventario.
         self.inventory = [None] * self.capacidad
         self.vistaInventario = BaseInventoryUI(self.capacidad)
         self.vistaNota = None 
@@ -35,7 +35,7 @@ class Jugador(arcade.Sprite):
         self.estados = []
         self.linterna_encendida = True
         self.bateria_linterna = 100.0
-        #Curacion
+        # Curacion
         self.tasa_regen_hp = 25
         self.direccion = "down"
         assets = AssetManager()
@@ -112,20 +112,20 @@ class Jugador(arcade.Sprite):
         """
         Extrae el objeto del inventario y lo prepara para el suelo.
         """
-        # 1. Verificamos que el índice sea válido y no esté ya vacío
+        # Verificamos que el índice sea válido y no esté ya vacío
         if 0 <= index < len(self.inventory) and self.inventory[index] is not None:
             # Extraemos el objeto
             objeto = self.inventory[index]
             
-            # 2. Vaciamos el slot
+            # Vaciamos el slot
             self.inventory[index] = None
                 
-            # 3. Configuramos el objeto para el mundo
+            # Configuramos el objeto para el mundo
             objeto.is_dropped = True
             objeto.center_x = self.center_x
             objeto.center_y = self.center_y
               
-            # 4. Lo devolvemos para que el ItemManager lo añada a su lista
+            # Lo devolvemos para que el ItemManager lo añada a su lista
             return objeto
            
         return None
@@ -138,7 +138,7 @@ class Jugador(arcade.Sprite):
 
         intencion_movimiento = arriba or abajo or izq or der
         
-        #Logica de velocidad
+        # Logica de velocidad
         if shift and intencion_movimiento and self.stamina > 0:
             self.velocidad_actual = self.vel_correr
             self.stamina -= self.tasa_consumo_stamina * delta_time
@@ -153,7 +153,7 @@ class Jugador(arcade.Sprite):
             elif self.stamina < self.max_stamina:
                 self.stamina += self.tasa_regen_stamina * delta_time
 
-        # 3. Calcular change_x y change_y
+        # Calcular change_x y change_y
         self.change_x = 0
         self.change_y = 0
 
@@ -205,7 +205,7 @@ class Jugador(arcade.Sprite):
             self.texture = self.texturas[self.direccion]
 
 
-        #sonido movimiento
+        # Sonido movimiento
         corriendo = (shift and moviendose and self.stamina > 0 and self.velocidad_actual == self.vel_correr)
 
         if moviendose:

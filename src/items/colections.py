@@ -5,18 +5,18 @@ from vista.asset_manager import AssetManager
 from utils.log import Log
 
 # ==========================================
-# 1. EL MANAGER (Singleton)
+# EL MANAGER (Singleton)
 # ==========================================
 class InteractionManager:
     _instance = None
 
     def __new__(cls, player: Optional[arcade.Sprite] = None):
         if cls._instance is None:
-            # 1. Primera vez: se crea la instancia y se inicializa todo
+            # Primera vez: se crea la instancia y se inicializa todo
             cls._instance = super(InteractionManager, cls).__new__(cls)
             cls._instance._init_manager(player)
         else:
-            # 2. Las siguientes veces: si nos pasan un player nuevo, lo actualizamos
+            # Las siguientes veces: si nos pasan un player nuevo, lo actualizamos
             if player is not None:
                 cls._instance.player = player
                 
@@ -144,10 +144,10 @@ class SpikeTrap(arcade.Sprite):
 
     def activar(self, player):
         """Se ejecuta automáticamente cuando el jugador la pisa."""
-        # 1. Aplicamos daño
+        # Aplicamos daño
         player.pisa_trampa(self.damage, self.damage_veneno, self.tiempo_veneno, self.tiempo_slow, self.porcentajeSlow )
         
         
       
-        # 3. La trampa se destruye a sí misma
+        # La trampa se destruye a sí misma
         self.remove_from_sprite_lists()

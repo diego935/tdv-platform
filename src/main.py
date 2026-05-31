@@ -11,7 +11,6 @@ class PantallaCompleta(arcade.Window):
         super().__init__(width, height, title, fullscreen=True)
 
     def on_key_press(self, key, modifiers):
-        # PRESIONAR F11 PARA VOVERLA A PONER
         if key == arcade.key.F11:
             self.set_fullscreen(not self.fullscreen)
             

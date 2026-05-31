@@ -141,6 +141,18 @@ def ejecutar_accion(accion: str, vista) -> None:
                     cantidad = int(recompensa_valor) if recompensa_valor.isdigit() else 100
                     if vista and hasattr(vista, 'sprite_jugador'):
                         vista.sprite_jugador.dinero = getattr(vista.sprite_jugador, 'dinero', 0) + cantidad
+                elif recompensa_tipo == "dar-bendicion":
+                    if recompensa_valor == "bendicion_bosque":
+                        if vista and hasattr(vista, 'sprite_jugador'):
+                            from entities.estados import BendicionDelBosque
+                            from vista.textos import TextManager
+                            jugador = vista.sprite_jugador
+                            
+                            tiene_bendicion = any(isinstance(est, BendicionDelBosque) for est in jugador.estados)
+                            if not tiene_bendicion:
+                                jugador.estados.append(BendicionDelBosque())
+                                TextManager().show_message("BENDICION DEL BOSQUE ADQUIRIDA", jugador.center_x, jugador.center_y + 40)
+                                Log.info("DialogAcciones", "Bendición del bosque aplicada al jugador")
                 Log.info("DialogAcciones", "Recompensa entregada", quest_id=quest_id)
     elif tipo == "dar-dinero":
         cantidad = int(param) if param.isdigit() else 100

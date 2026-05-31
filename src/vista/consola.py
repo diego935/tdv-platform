@@ -66,7 +66,7 @@ class ConsoleUI:
                     arcade.draw_text(f"[{cx},{cy}]", x + 5, y + 5, 
                                      arcade.color.ASH_GREY, 8)
 
-        # 1. Dibujar Hitboxes (rectángulos verdes alrededor de bloques)
+        # Dibujar Hitboxes (rectángulos verdes alrededor de bloques)
         if self.flags["hitbox"]:
             for bloque in lista_bloques:
                 arcade.draw_rect_outline(bloque.rect, arcade.color.LIME_GREEN, 2)
@@ -82,7 +82,7 @@ class ConsoleUI:
                                 sprite_jugador.center_x, sprite_jugador.center_y,
                                 color, 1)
 
-        # 2. Dibujar el Grid de pathfinding (celdas 32x32)
+        # Dibujar el Grid de pathfinding (celdas 32x32)
         if self.flags["grid"] and nav_manager.grafo:
             if hasattr(nav_manager.grafo, 'debug_dibujar_grid'):
                 nav_manager.grafo.debug_dibujar_grid(
@@ -136,7 +136,7 @@ class ConsoleUI:
             return
             
         window = arcade.get_window()
-        # Alterna la visibilidad del cursor cada 0.5 segundos
+        # Parpadeo del cursor
         mostrar_cursor = int(time.time() * 2) % 2 == 0
         cursor = "_" if mostrar_cursor else ""
 
@@ -146,7 +146,7 @@ class ConsoleUI:
             self.background_color
         )
         
-        # Dibujar el texto con el cursor dinámico
+        # Escribir comando
         arcade.draw_text(
             f"> {self.input_text}{cursor}", # <-- Aquí usamos la variable cursor
             20, window.height - 180,

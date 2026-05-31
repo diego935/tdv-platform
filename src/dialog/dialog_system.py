@@ -220,7 +220,7 @@ class DialogSystem:
         """Fuerza el cierre del diálogo y limpia todas las variables y listeners de la UI."""
         Log.info("DialogSystem", "Limpiando el sistema de diálogos...")
         
-        # 1. Forzar el estado lúdico a cerrado
+        # Forzar el estado lúdico a cerrado
         self.dialogo_activo = False
         self.dialogo_actual = None
         self.nodo_actual = None
@@ -228,12 +228,12 @@ class DialogSystem:
         self.nodo_accion = ""
         self._nombre_dialogo = ""
         
-        # 2. Limpiar diccionarios de opciones
+        # Limpiar diccionarios de opciones
         self.opciones.clear()
         self._opciones_filtradas.clear()
         self.acciones.clear()
         
-        # 3. Desvincular la vista gráfica anterior y limpiar observadores de interfaz
+        # Desvincular la vista gráfica anterior y limpiar observadores de interfaz
         self._vista = None
         self._listeners.clear()
         

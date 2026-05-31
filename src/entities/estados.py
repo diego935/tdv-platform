@@ -53,3 +53,14 @@ class Sanacion(Estado):
         self.cantidad_restante -= cura
         return self.cantidad_restante > 0
 
+
+class BendicionDelBosque(Estado):
+    def __init__(self, regeneracion_por_segundo: float = 1.5):
+        super().__init__(None)  # Duración infinita
+        self.regeneracion_por_segundo = regeneracion_por_segundo
+    
+    def actualizar(self, jugador, delta_time: float) -> bool:
+        if jugador.vida < jugador.max_vida and jugador.vida > 0:
+            jugador.vida = min(jugador.vida + self.regeneracion_por_segundo * delta_time, jugador.max_vida)
+        return True
+

@@ -455,20 +455,20 @@ class QuestManager:
         """Vacía por completo el progreso de las misiones y las restablece a su estado inicial."""
         Log.info("QuestManager", "Vaciando datos lógicos de misiones...")
         
-        # 1. Limpiar diccionarios y listas de progreso
+        # Limpiar diccionarios y listas de progreso
         self.misiones.clear()
         self.misiones_activas.clear()
         self.misiones_completadas.clear()
         
-        # 2. Quitar los callbacks globales de la interfaz
+        # Quitar los callbacks globales de la interfaz
         self._on_progress_callback = None
         self._on_complete_callback = None
         
-        # 3. Limpiar los suscriptores del EventBus propio
+        # Limpiar los suscriptores del EventBus propio
         if self.event_bus:
             self.event_bus.clear_bus()
             
-        # 4. ¡CRÍTICO!: Volvemos a cargar las misiones por defecto aquí
+        # ¡CRÍTICO!: Volvemos a cargar las misiones por defecto aquí
         # Esto asegura que el diccionario misiones no esté vacío y que "verificar_condicion" no falle
         if default: self.cargar_misiones_defecto()
             

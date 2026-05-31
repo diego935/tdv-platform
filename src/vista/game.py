@@ -82,7 +82,7 @@ class VistaJuego(arcade.View):
         self.DISTANCIA_ACTUALIZACION = DISTANCIA_ACTUALIZACION
         
 
-        #Inicializar variables del mapa.
+        # Inicializar variables del mapa.
         self.CAPAS = {
             "suelo": "Suelo",
             "muros": "Pared",
@@ -103,7 +103,7 @@ class VistaJuego(arcade.View):
         self._ultimo_click_tiempo = 0.0
         self._DOUBLE_CLICK_DELAY = 0.3
 
-       # variables sonido de fondo
+       # Sonido de fondo
         self.sonido_ambiente = None       
         self.reproductor_ambiente = None
         self.sonido_combate = None
@@ -116,11 +116,11 @@ class VistaJuego(arcade.View):
         self.musica_miedo_activa = False
         
     def setup(self):
-        #Cargar misiones guardadas
+        # Cargar progreso
         self._cargar_misiones()
         QM.suscripcion_automatica()
 
-        #Mapa--------------------------------------
+        # Mapa--------------------------------------
         map_name = "assets/maps/mapa.tmx"
         layer_options = {
             self.CAPAS["muros"]: {"use_spatial_hash": True},
@@ -145,7 +145,7 @@ class VistaJuego(arcade.View):
         spawn = next((obj for obj in eventos if obj.name == "Spawnpoint"), None)
         self.lista_npcs = self.tile_map.object_lists.get(self.CAPAS["npcs"], [])
         
-        # Buscar zonas de activación de rejas en la zona segura (nombre: "activador")
+        # Buscar activadores de rejas
         self.activadores_bounds = []
         self.miedo_inicio_bounds = []
         self.miedo_fin_bounds = []
@@ -179,7 +179,7 @@ class VistaJuego(arcade.View):
                         "y_max": max(p[1] for p in pts)
                     })
         
-        # Crear sprites para NPCs desde objetos Tiled
+        # Crear NPCs
         self.lista_npc_sprites = arcade.SpriteList()
         for npc_obj in self.lista_npcs:
             props = getattr(npc_obj, 'properties', {})
@@ -204,7 +204,7 @@ class VistaJuego(arcade.View):
         self.scene.add_sprite("Player", self.sprite_jugador)
         self.lista_jugadores.append(self.sprite_jugador)
 
-        # Añadir NPCs a la lista de colisiones
+        #  NPCs a colisiones
         for npc_sprite in self.lista_npc_sprites:
             self.lista_bloques.append(npc_sprite)
         
@@ -219,15 +219,17 @@ class VistaJuego(arcade.View):
             for arbusto in arbustos_mapa:
                 self.lista_bloques.append(arbusto)
 
-        # Cargar las capas de Rejas y Palanca
+        # Cargar rejas y palancas
         self.lista_rejas = self.scene.get_sprite_list("Rejas")
         self.lista_palanca = self.scene.get_sprite_list("Palanca")
         self.rejas_activas = False
         self.rejas_trial_activas = False
         self.rejas_segura_activas = False
+        self.rejas_final_activas = True
         self.rejas_trial_sprites = []
         self.rejas_segura_sprites = []
-        # Variables para el sistema de oleadas (trial) y spawn dinámico en Nido (ambos en Capa_spawn_enemigos)
+        self.rejas_final_sprites = []
+        # Oleadas y spawn dinámico
         nido_layer = self.tile_map.object_lists.get("Capa_spawn_enemigos", [])
         self.zona_spawn = None
         self.zona_nido = None
@@ -249,7 +251,7 @@ class VistaJuego(arcade.View):
         self.timer_spawn_nido = 0.0
         self.max_enemigos_nido = 15
 
-        # Cargar textura de fondo fijo
+        # Fondo de pantalla
         self.fondo_pantalla = arcade.load_texture("assets/fondos/fondo_bosque.png")
 
 
@@ -329,8 +331,28 @@ class VistaJuego(arcade.View):
                         "y_min": y,
                         "y_max": y + h
                     }
+            elif name_lower == "rejas_final":
+                pts = obj.shape
+                if isinstance(pts, list) and len(pts) >= 3:
+                    self.bounds_rejas_final = {
+                        "x_min": min(p[0] for p in pts),
+                        "x_max": max(p[0] for p in pts),
+                        "y_min": min(p[1] for p in pts),
+                        "y_max": max(p[1] for p in pts)
+                    }
+                elif isinstance(pts, tuple) or hasattr(pts, "__len__"):
+                    x = getattr(obj, "x", pts[0])
+                    y = getattr(obj, "y", pts[1])
+                    w = getattr(obj, "width", 0)
+                    h = getattr(obj, "height", 0)
+                    self.bounds_rejas_final = {
+                        "x_min": x,
+                        "x_max": x + w,
+                        "y_min": y,
+                        "y_max": y + h
+                    }
 
-        # Filtrar las rejas que pertenecen al trial
+        # Filtrar rejas
         self.rejas_trial_sprites = []
         if self.lista_rejas and self.bounds_rejas_trial:
             for reja in self.lista_rejas:
@@ -341,7 +363,7 @@ class VistaJuego(arcade.View):
         if not self.rejas_trial_sprites and self.lista_rejas:
             self.rejas_trial_sprites = list(self.lista_rejas)
 
-        # Filtrar las rejas que pertenecen a la zona segura
+        # Filtrar rejas
         self.rejas_segura_sprites = []
         if self.lista_rejas and getattr(self, "bounds_rejas_segura", None):
             for reja in self.lista_rejas:
@@ -349,10 +371,27 @@ class VistaJuego(arcade.View):
                     self.bounds_rejas_segura["y_min"] <= reja.center_y <= self.bounds_rejas_segura["y_max"]):
                     self.rejas_segura_sprites.append(reja)
 
-        # Todas las rejas en el mapa inician inactivas (invisibles y sin colisiones físicas)
+        # Filtrar rejas
+        self.rejas_final_sprites = []
+        if self.lista_rejas and getattr(self, "bounds_rejas_final", None):
+            for reja in self.lista_rejas:
+                if (self.bounds_rejas_final["x_min"] <= reja.center_x <= self.bounds_rejas_final["x_max"] and
+                    self.bounds_rejas_final["y_min"] <= reja.center_y <= self.bounds_rejas_final["y_max"]):
+                    self.rejas_final_sprites.append(reja)
+
+        # Rejas finales
+        self.rejas_final_activas = True
+        if self.rejas_final_sprites:
+            for reja in self.rejas_final_sprites:
+                reja.visible = True
+                if reja not in self.lista_bloques:
+                    self.lista_bloques.append(reja)
+
+        # Las rejas empiezan invisibles
         if self.lista_rejas:
             for reja in self.lista_rejas:
-                reja.visible = False
+                if reja not in self.rejas_final_sprites:
+                    reja.visible = False
 
         nota_prueba = Nota(500, "Se busca", "SE BUSCAN KORUS",
             "Si alguien lee esto...\nYo de niña tenía unos muñecos... \ny los he perdido \n¿me ayudas a encontrarlos? \n\nquizás recibas algo a cambio :)",
@@ -394,7 +433,7 @@ class VistaJuego(arcade.View):
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
         self.nav_manager = SistemaNavegacion(self.lista_bloques)
 
-        # Cargar enemigos desde Tiled
+        # Cargar enemigos
         Log.info("Game", f"Buscando capa de enemigos: {self.CAPAS.get('enemigos')}")
         enemigos_layer = self.tile_map.object_lists.get(self.CAPAS["enemigos"], [])
         Log.info("Game", f"Enemigos encontrados: {len(enemigos_layer)}")
@@ -505,7 +544,7 @@ class VistaJuego(arcade.View):
         # En tu setup del juego
         self.im = InteractionManager(self.sprite_jugador)
 
-        # Añadir trampas desde el mapa Tiled (Eventos)
+        # Trampas del mapa
         for obj in eventos:
             obj_name = getattr(obj, "name", "")
             if not obj_name:
@@ -524,10 +563,10 @@ class VistaJuego(arcade.View):
                     continue
 
                 if name_lower == "trampa":
-                    # Trampa común (sin veneno)
+                    # Trampa de pinchos
                     trampa = SpikeTrap(x, y, damage_veneno=0, tiempo_veneno=0)
                 else:
-                    # Trampa venenosa (con valores de veneno por defecto)
+                    # Trampa de veneno
                     trampa = SpikeTrap(x, y)
                 
                 self.im.add_trap(trampa, trampa.activar)
@@ -537,7 +576,7 @@ class VistaJuego(arcade.View):
         for i in range(3):
             coin = MissionCoin((150 + 100 + (i*8))*32, (155 + 100)*32)
             
-            # Tienes que pasarle la categoría y las dos funciones de la moneda
+            # Configurar coleccionable
             self.im.add_collectible(
                 coin, 
                 coin.categoria,         # "monedas_ancestrales"
@@ -596,7 +635,7 @@ class VistaJuego(arcade.View):
             self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager, self.sprite_jugador)
             self.text_manager.draw()
 
-        # --- DIBUJAR FILTRO DE SATURACIÓN DE COLOR (COORDINADAS DE PANTALLA) ---
+        # Filtro de saturación para la zona de miedo
         if self.musica_miedo_activa:
             arcade.draw_lrbt_rectangle_filled(
                 0,
@@ -708,6 +747,19 @@ class VistaJuego(arcade.View):
         player_x = self.sprite_jugador.center_x
         player_y = self.sprite_jugador.center_y
         
+        # Abrir zona final
+        if getattr(self, "rejas_final_activas", True) and len(QM.misiones_completadas) >= 2:
+            self.rejas_final_activas = False
+            if getattr(self, "rejas_final_sprites", None):
+                for reja in self.rejas_final_sprites:
+                    reja.visible = False
+                    if reja in self.lista_bloques:
+                        self.lista_bloques.remove(reja)
+            self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
+            self.nav_manager.actualizar_desde_bloques(self.lista_bloques)
+            Log.info("Quests", "Zona final abierta. Rejas removidas.")
+            self.text_manager.show_message("LA ZONA FINAL SE HA ABIERTO", self.sprite_jugador.center_x, self.sprite_jugador.center_y + 40, arcade.color.GOLDENROD)
+
         # Comprobar trigger de los activadores de la zona segura
         if not getattr(self, "rejas_segura_activas", False):
             en_activador = False
@@ -768,11 +820,11 @@ class VistaJuego(arcade.View):
         self.im.update()
         self.actualizar_ciclo_dia_noche(delta_time)
 
-        # Comprobar trigger de inicio y fin de música de miedo
+        # Triggers de música de miedo
         player_x = self.sprite_jugador.center_x
         player_y = self.sprite_jugador.center_y
 
-        # Activar música de miedo si pasa por inicio_musica_miedo
+        # Activar tema de miedo
         if getattr(self, "miedo_inicio_bounds", None):
             for bounds in self.miedo_inicio_bounds:
                 if bounds["x_min"] <= player_x <= bounds["x_max"] and bounds["y_min"] <= player_y <= bounds["y_max"]:
@@ -780,12 +832,12 @@ class VistaJuego(arcade.View):
                         self.musica_miedo_activa = True
                         Log.info("Audio", "Jugador entró en inicio_musica_miedo. Activando música de miedo.")
                         
-                        # Detener sonido ambiente normal si está sonando
+                        # Detener ambiente
                         if self.reproductor_ambiente:
                             arcade.stop_sound(self.reproductor_ambiente)
                             self.reproductor_ambiente = None
                         
-                        # Iniciar sonido miedo (si no estamos en combate)
+                        # Reproducir miedo
                         if not self.en_combate and self.sonido_miedo:
                             try:
                                 self.reproductor_miedo = arcade.play_sound(self.sonido_miedo, volume=0.5, loop=True)
@@ -793,7 +845,7 @@ class VistaJuego(arcade.View):
                                 Log.error("Audio", f"No se pudo reproducir musica de miedo: {e}")
                         break
 
-        # Terminar música de miedo si pasa por fin_musica
+        # Terminar tema de miedo
         if getattr(self, "miedo_fin_bounds", None):
             for bounds in self.miedo_fin_bounds:
                 if bounds["x_min"] <= player_x <= bounds["x_max"] and bounds["y_min"] <= player_y <= bounds["y_max"]:
@@ -814,7 +866,7 @@ class VistaJuego(arcade.View):
                                 Log.error("Audio", f"No se pudo reproducir musica ambiente: {e}")
                         break
 
-        # alternancia de música pvp y ambiente
+        # Alternancia de música pvp y ambiente
 
         enemigo_cercano_detectado = False
         px = self.sprite_jugador.center_x
@@ -832,7 +884,7 @@ class VistaJuego(arcade.View):
                 enemigo_cercano_detectado = True
                 break
 
-        # si hay enemigo
+        # Si hay enemigo
         if enemigo_cercano_detectado and not self.en_combate:
             self.en_combate = True
             Log.info("Audio", "¡Enemigo de oleada detectado cerca! Cambiando a música de combate.")
@@ -848,7 +900,7 @@ class VistaJuego(arcade.View):
             if self.sonido_combate:
                 self.reproductor_combate = arcade.play_sound(self.sonido_combate, volume=0.5, loop=True)
 
-        # si ya no hay enemigos
+        # Si ya no hay enemigos
         elif not enemigo_cercano_detectado and self.en_combate:
             self.en_combate = False
             Log.info("Audio", "Zona despejada de amenazas. Volviendo a la música ambiental.")
@@ -1172,7 +1224,7 @@ class VistaJuego(arcade.View):
         Log.info("Waves", f"Oleada {num_oleada} spawneada: {config['melee']} melee, {config['ranged']} ranged")
 
     def actualizar_oleadas(self, delta_time):
-        # 1. Si las oleadas están activas
+        # Si las oleadas están activas
         if self.oleadas_activas:
             # Filtrar enemigos vivos de la oleada actual
             self.enemigos_oleada_actual = [e for e in self.enemigos_oleada_actual if e.vida > 0]
@@ -1187,9 +1239,14 @@ class VistaJuego(arcade.View):
                     else:
                         # Completó todas las oleadas
                         self.oleadas_activas = False
+                        # Bufo de estadísticas
                         self.oleadas_completadas = True
-                        self.text_manager.show_message("¡ZONA LIMPIA! OLEADAS COMPLETADAS", self.sprite_jugador.center_x, self.sprite_jugador.center_y + 40, arcade.color.GREEN)
-                        Log.info("Waves", "Todas las oleadas de la zona Spawn completadas")
+                        self.sprite_jugador.max_vida += 50.0
+                        self.sprite_jugador.vida += 50.0
+                        self.sprite_jugador.vel_caminar += 2
+                        self.sprite_jugador.vel_correr += 3
+                        self.text_manager.show_message("¡ZONA LIMPIA! BUFO DE SALUD (+50 HP) Y VELOCIDAD ADQUIRIDOS", self.sprite_jugador.center_x, self.sprite_jugador.center_y + 40, arcade.color.GOLDENROD)
+                        Log.info("Waves", "Todas las oleadas de la zona Spawn completadas. Bufo aplicado.")
 
                         # Abrir las rejas automáticamente al completar las oleadas
                         if getattr(self, "rejas_trial_activas", False) and self.rejas_trial_sprites:
@@ -1202,7 +1259,7 @@ class VistaJuego(arcade.View):
                             self.nav_manager.actualizar_desde_bloques(self.lista_bloques)
                             Log.info("Waves", "Rejas abiertas automáticamente al limpiar la zona")
                 
-        # 2. Temporizador de cuenta atrás entre oleadas
+        # Temporizador de cuenta atrás entre oleadas
         if self.timer_entre_oleadas > 0:
             self.timer_entre_oleadas -= delta_time
             if self.timer_entre_oleadas <= 0:
@@ -1340,7 +1397,7 @@ class VistaJuego(arcade.View):
         self.en_combate = False
         self.musica_miedo_activa = False
 
-        # 1. Vaciar los managers por dentro llamando a sus nuevos métodos clear
+        # Vaciar los managers por dentro llamando a sus nuevos métodos clear
         from dialog.dialog_system import DialogSystem
 
         QM.clear_manager()                             # Vacía progreso de misiones y el EventBus
@@ -1348,20 +1405,20 @@ class VistaJuego(arcade.View):
         ItemManager().clear()                          # Elimina los ítems esparcidos por el suelo
         InteractionManager().clear()                   # Limpia monedas, trampas y desvincula al jugador viejo
 
-        # 2. Resetear estados lógicos internos de la interfaz de la vista
+        # Resetear estados lógicos internos de la interfaz de la vista
         self.estado_actual = "JUGANDO"
         self.show_inventory = False
         self._ultimo_click_slot = None
         self._ultimo_click_tiempo = 0.0
 
-        # 3. Forzar el frenado de los inputs (soluciona el bug de caminar solos tras recargar)
+        # Forzar el frenado de los inputs (soluciona el bug de caminar solos tras recargar)
         self.izquierda_presionado = False
         self.derecha_presionado = False
         self.arriba_presionado = False
         self.abajo_presionado = False
         self.shift_presionado = False
 
-        # 4. Vaciar por completo las SpriteLists antiguas de Arcade para liberar memoria de video
+        # Vaciar por completo las SpriteLists antiguas de Arcade para liberar memoria de video
         listas_a_limpiar = [
             'lista_jugadores', 'lista_enemigos', 'lista_puertas', 
             'lista_bloques', 'lista_npc_sprites', 'lista_proyectiles'
@@ -1370,7 +1427,7 @@ class VistaJuego(arcade.View):
             if hasattr(self, lista_attr) and getattr(self, lista_attr):
                 getattr(self, lista_attr).clear()
 
-        # 5. Re-inicializar las SpriteLists vacías listas para la nueva inyección de datos
+        # Re-inicializar las SpriteLists vacías listas para la nueva inyección de datos
         self.lista_jugadores = arcade.SpriteList()
         self.lista_enemigos = arcade.SpriteList()
         self.lista_puertas = arcade.SpriteList()
@@ -1379,14 +1436,14 @@ class VistaJuego(arcade.View):
         self.lista_npc_sprites = arcade.SpriteList()
         self.lista_npcs = []
 
-        # 6. Reiniciar utilidades del motor de renderizado y UI básica de la pantalla
+        # Reiniciar utilidades del motor de renderizado y UI básica de la pantalla
        
         self.text_manager = TextManager()
         self.camera = CameraManager()
         self.hud = HUD()
         self.console = ConsoleUI()
         
-        # 7. Reiniciar variables de oleadas y fondo
+        # Reiniciar variables de oleadas y fondo
         self.zona_spawn = None
         self.oleadas_activas = False
         self.oleadas_completadas = False
@@ -1427,16 +1484,16 @@ class VistaJuego(arcade.View):
     def dibujar_linterna_vectorial(self):
             if self.mouse_world_x is None or self.mouse_world_y is None:
                 return
-            # 1. Posición central del jugador
+            # Posición central del jugador
             cx = self.sprite_jugador.center_x
             cy = self.sprite_jugador.center_y
 
-            # 2. Calcular el ángulo hacia el ratón (en radianes)
+            # Calcular el ángulo hacia el ratón (en radianes)
             dx = self.mouse_world_x - cx
             dy = self.mouse_world_y - cy
             angulo_centro = math.atan2(dy, dx)
 
-            # 3. Mapeo de parámetros desde el archivo Config
+            # Mapeo de parámetros desde el archivo Config
             apertura = math.radians(LINTERNA_APERTURA_GRADOS)
             alcance_luz = LINTERNA_ALCANCE
             radio_interior = LINTERNA_RADIO_JUGADOR
@@ -1449,12 +1506,12 @@ class VistaJuego(arcade.View):
             if self.alpha_actual_oscuridad <= 5:
                 return
 
-            # 4. Definir las zonas de luz y oscuridad
+            # Definir las zonas de luz y oscuridad
             angulo_luz_der = angulo_centro - apertura
             angulo_luz_izq = angulo_centro + apertura
             arco_negro = 2 * math.pi - (apertura * 2)
 
-            # 5. Dibujar el anillo (donut) de oscuridad a trozos para evitar parpadeos
+            # Dibujar el anillo (donut) de oscuridad a trozos para evitar parpadeos
             segmentos = 24 
             for i in range(segmentos):
                 a1 = angulo_luz_izq + (i * arco_negro / segmentos)
@@ -1468,7 +1525,7 @@ class VistaJuego(arcade.View):
 
                 arcade.draw_polygon_filled([p1_in, p2_in, p2_out, p1_out], color_oscuridad)
 
-            # 6. Dibujar las barreras frontales que limitan el alcance del cono de luz
+            # Dibujar las barreras frontales que limitan el alcance del cono de luz
             p_luz_der_out = (cx + math.cos(angulo_luz_der) * radio_oscuridad, cy + math.sin(angulo_luz_der) * radio_oscuridad)
             p_luz_izq_out = (cx + math.cos(angulo_luz_izq) * radio_oscuridad, cy + math.sin(angulo_luz_izq) * radio_oscuridad)
 

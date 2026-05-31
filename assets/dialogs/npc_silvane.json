@@ -36,8 +36,8 @@
         }
     },
     "recompensa": {
-        "texto": "Toma, esto es para ti. ¡Has salvado mi hogar!",
-        "accion": "recompensa:mision_silvane:dar-item:Botiquin",
+        "texto": "Toma, recibe la Bendición del Bosque. ¡Has salvado mi hogar y ahora el bosque te regenerará permanentemente!",
+        "accion": "recompensa:mision_silvane:dar-bendicion:bendicion_bosque",
         "opciones": {"1": {"nodo": "saludo", "texto": "Gracias"}}
     },
     "despedida": {
