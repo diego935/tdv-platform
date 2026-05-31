@@ -11,7 +11,7 @@ class PantallaCompleta(arcade.Window):
         super().__init__(width, height, title, fullscreen=True)
 
     def on_key_press(self, key, modifiers):
-        # PRESIONAR ESCAPE PARA SALIR DE PANTALLA COMPLETA y F11 PARA VOVERLA A PONER
+        # PRESIONAR F11 PARA VOVERLA A PONER
         if key == arcade.key.F11:
             self.set_fullscreen(not self.fullscreen)
             
@@ -25,6 +25,5 @@ def main():
     vista_menu = MenuPrincipal()
     window.show_view(vista_menu)
     arcade.run()
-
 if __name__ == "__main__":
     main()

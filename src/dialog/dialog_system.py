@@ -3,7 +3,6 @@ import os
 import arcade
 from typing import Callable, Optional
 from utils.log import Log
-from utils.log import Log
 
 
 def verificar_condicion(condicion: dict) -> bool:

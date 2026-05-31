@@ -73,8 +73,8 @@ class EnemigoIA(arcade.Sprite):
         waypoints: list = None,
         area_center: tuple = None,
         area_radio: float = 100,
-        velocidad: float = 200,
-        velocidad_patrulla: float = 50,
+        velocidad: float = 320,
+        velocidad_patrulla: float = 120,
         vista_rango: float = 32*25,
         tiempo_buscar: float = 3.0,
         tiempo_esperar: float = 1.0,
@@ -143,6 +143,9 @@ class EnemigoIA(arcade.Sprite):
         self._knockback_timer = 0.0
         self._base_x = x
         self._base_y = y
+        self._timer_recalculo_ruta = 0.0
+
+        self.sonido_ataque = arcade.load_sound("assets/sonidos/sonido_enemigo.wav")
 
     def on_draw(self):
         super().on_draw()
@@ -277,12 +280,21 @@ class EnemigoIA(arcade.Sprite):
     
     def _atacar(self, player):
         """Realiza el ataque al player."""
-        if hasattr(player, 'vida'):
-            player.vida -= self.dano_ataque
+        ataque_exitoso = False
+        if hasattr(player, 'recibir_dano'):
+            player.recibir_dano(self.dano_ataque, self.center_x, self.center_y)
+            ataque_exitoso = True
             self._timer_ataque = self.tiempo_entre_ataques
-            
-            # Feedback visual
-            Log.debug("Enemigo", "Atacando jugador", dano=self.dano_ataque, vida_player=player.vida, tipo=self.tipo_ataque if hasattr(self, 'tipo_ataque') else 'unknown')
+            Log.debug("Enemigo", "Atacando jugador (recibir_dano)", dano=self.dano_ataque, vida_player=player.vida, tipo=self.tipo_ataque if hasattr(self, 'tipo_ataque') else 'unknown')
+        elif hasattr(player, 'vida'):
+            player.vida -= self.dano_ataque
+            ataque_exitoso = True
+            self._timer_ataque = self.tiempo_entre_ataques
+            Log.debug("Enemigo", "Atacando jugador (vida directa)", dano=self.dano_ataque, vida_player=player.vida, tipo=self.tipo_ataque if hasattr(self, 'tipo_ataque') else 'unknown')
+        if ataque_exitoso:
+            self._timer_ataque = self.tiempo_entre_ataques
+            if self.sonido_ataque:
+                arcade.play_sound(self.sonido_ataque)
 
     def _llegado_a_destino(self, destino, blocks_list, tolerancia: float = 10) -> bool:
         """Check si llegó a posición destino."""
@@ -334,10 +346,12 @@ class EnemigoIA(arcade.Sprite):
             self.waypoint_actual = self.waypoints[self._indice_waypoint]
 
         if not self.ruta or self._llegado_a_waypoint():
-            self.ruta = nav_manager.encontrar_ruta(
-                self.position,
-                self.waypoint_actual
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                self.ruta = nav_manager.encontrar_ruta(
+                    self.position,
+                    self.waypoint_actual
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta else random.uniform(0.3, 0.6)
 
         self._mover_por_ruta(self.velocidad_patrulla)
 
@@ -372,12 +386,14 @@ class EnemigoIA(arcade.Sprite):
     def _update_patrulla_paredes(self, delta_time, nav_manager):
         """Patrulla siguiendo paredes."""
         if not self.ruta or self._llegado_a_waypoint_aux(self.waypoint_actual):
-            siguiente = self._encontrar_siguiente_punto_pared()
-            self.waypoint_actual = siguiente
-            self.ruta = nav_manager.encontrar_ruta(
-                self.position,
-                self.waypoint_actual
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                siguiente = self._encontrar_siguiente_punto_pared()
+                self.waypoint_actual = siguiente
+                self.ruta = nav_manager.encontrar_ruta(
+                    self.position,
+                    self.waypoint_actual
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta else random.uniform(0.3, 0.6)
 
         self._mover_por_ruta(self.velocidad_patrulla)
 
@@ -409,10 +425,12 @@ class EnemigoIA(arcade.Sprite):
         destino = (player.center_x, player.center_y)
 
         if not self.ruta_actual or self._llegado_a_destino(destino, blocks_list):
-            self.ruta_actual = nav_manager.encontrar_ruta(
-                self.position,
-                destino
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                self.ruta_actual = nav_manager.encontrar_ruta(
+                    self.position,
+                    destino
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta_actual else random.uniform(0.3, 0.6)
 
         self._mover_por_ruta(self.velocidad)
 
@@ -435,11 +453,13 @@ class EnemigoIA(arcade.Sprite):
             return
 
         if not self.ruta:
-            punto_origen = self.pos_origen
-            self.ruta = nav_manager.encontrar_ruta(
-                self.position,
-                punto_origen
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                punto_origen = self.pos_origen
+                self.ruta = nav_manager.encontrar_ruta(
+                    self.position,
+                    punto_origen
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta else random.uniform(0.3, 0.6)
 
         self._mover_por_ruta(self.velocidad_patrulla)
 
@@ -478,17 +498,26 @@ class EnemigoIA(arcade.Sprite):
 
     def update(self, delta_time, player, blocks_list=None, nav_manager=None):
         """Update principal del enemigo IA."""
+        if hasattr(self, '_timer_recalculo_ruta') and self._timer_recalculo_ruta > 0:
+            self._timer_recalculo_ruta -= delta_time
 
         if nav_manager is None:
             nav_manager = self.nav
         if blocks_list is None:
             blocks_list = []
 
-        # Manejar knockback
+        # Manejar knockback con colisiones
         if self._knockback_timer > 0:
             self._knockback_timer -= delta_time
+            old_x = self.center_x
             self.center_x += self._knockback_vel[0] * delta_time
+            if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+                self.center_x = old_x
+            
+            old_y = self.center_y
             self.center_y += self._knockback_vel[1] * delta_time
+            if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+                self.center_y = old_y
             return
 
         # FSM
@@ -503,8 +532,16 @@ class EnemigoIA(arcade.Sprite):
 
         self._check_transiciones(player, blocks_list, nav_manager, delta_time)
 
+        # Mover y resolver colisiones eje por eje
+        old_x = self.center_x
         self.center_x += self.change_x * delta_time
+        if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+            self.center_x = old_x
+
+        old_y = self.center_y
         self.center_y += self.change_y * delta_time
+        if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+            self.center_y = old_y
 
         if abs(self.change_x) > abs(self.change_y):
 
@@ -567,12 +604,12 @@ class EnemigoRanged(EnemigoIA):
         waypoints: list = None,
         area_center: tuple = None,
         area_radio: float = 100,
-        velocidad: float = 200,
-        velocidad_patrulla: float = 50,
+        velocidad: float = 300,
+        velocidad_patrulla: float = 100,
         vista_rango: float = 32 * 25,
         tiempo_buscar: float = 3.0,
         tiempo_esperar: float = 1.0,
-        dano_ataque: float = 10.0,
+        dano_ataque: float = 5.0,
         rango_ataque: float = 300,
         tiempo_cortesia: float = 4.0
     ):
@@ -630,10 +667,12 @@ class EnemigoRanged(EnemigoIA):
     
     def _mover_hacia_posicion(self, target_x, target_y, nav_manager, delta_time):
         if not self.ruta_actual or self._llegado_a_destino((target_x, target_y), [], tolerancia=50):
-            self.ruta_actual = nav_manager.encontrar_ruta(
-                self.position,
-                (target_x, target_y)
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                self.ruta_actual = nav_manager.encontrar_ruta(
+                    self.position,
+                    (target_x, target_y)
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta_actual else random.uniform(0.3, 0.6)
 
         if self.ruta_actual:
             try:
@@ -660,10 +699,12 @@ class EnemigoRanged(EnemigoIA):
         target_y = self.center_y * 2 - player.center_y
 
         if not self.ruta_actual:
-            self.ruta_actual = nav_manager.encontrar_ruta(
-                self.position,
-                (target_x, target_y)
-            ) or []
+            if self._timer_recalculo_ruta <= 0:
+                self.ruta_actual = nav_manager.encontrar_ruta(
+                    self.position,
+                    (target_x, target_y)
+                ) or []
+                self._timer_recalculo_ruta = random.uniform(0.1, 0.2) if self.ruta_actual else random.uniform(0.3, 0.6)
 
         if self.ruta_actual:
             try:
@@ -797,6 +838,9 @@ class EnemigoRanged(EnemigoIA):
             self._timer_ataque_ranged -= deltatime
     
     def update(self, delta_time, player, blocks_list=None, nav_manager=None, proyectiles_list=None):
+        if hasattr(self, '_timer_recalculo_ruta') and self._timer_recalculo_ruta > 0:
+            self._timer_recalculo_ruta -= delta_time
+
         if proyectiles_list is None:
             proyectiles_list = []
         self._proyectiles_list = proyectiles_list
@@ -808,8 +852,15 @@ class EnemigoRanged(EnemigoIA):
         
         if self._knockback_timer > 0:
             self._knockback_timer -= delta_time
+            old_x = self.center_x
             self.center_x += self._knockback_vel[0] * delta_time
+            if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+                self.center_x = old_x
+            
+            old_y = self.center_y
             self.center_y += self._knockback_vel[1] * delta_time
+            if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+                self.center_y = old_y
             return
         
         self._actualizar_buffer_player(player, delta_time)
@@ -825,8 +876,16 @@ class EnemigoRanged(EnemigoIA):
         
         self._check_transiciones_ranged(player, blocks_list, nav_manager, delta_time)
         
+        # Mover y resolver colisiones eje por eje
+        old_x = self.center_x
         self.center_x += self.change_x * delta_time
+        if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+            self.center_x = old_x
+
+        old_y = self.center_y
         self.center_y += self.change_y * delta_time
+        if blocks_list and arcade.check_for_collision_with_list(self, blocks_list):
+            self.center_y = old_y
         
         if abs(self.change_x) > abs(self.change_y):
             self.texture = self.texture_right if self.change_x > 0 else self.texture_left

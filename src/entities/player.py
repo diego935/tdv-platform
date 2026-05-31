@@ -24,7 +24,7 @@ class Jugador(arcade.Sprite):
         self.vistaNota = None 
         self.indice_seleccionado = None
         self.indice_activo = 0
-        self.stamina = 100; 
+        self.stamina = 100
         self.max_stamina = 100.0
         self.stamina_cooldown_timer = 0.0
         self.stamina_delay= 1.5 
