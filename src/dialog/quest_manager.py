@@ -250,6 +250,12 @@ class QuestManager:
         for quest_data in data.get("misiones", []):
             quest = Quest.from_dict(quest_data)
             self.misiones[quest.id] = quest
+            if quest.estado == Quest.ESTADO_EN_PROGRESO:
+                if quest.id not in self.misiones_activas:
+                    self.misiones_activas.append(quest.id)
+            elif quest.estado == Quest.ESTADO_COMPLETADA:
+                if quest.id not in self.misiones_completadas:
+                    self.misiones_completadas.append(quest.id)
             Log.debug("QuestManager", "Misión cargada", quest_id=quest.id, nombre=quest.nombre)
 
     def get_mision(self, quest_id: str) -> Optional[Quest]:
@@ -443,6 +449,13 @@ class QuestManager:
                     self.misiones_completadas.append(quest_id)
                 elif estado == Quest.ESTADO_EN_PROGRESO and quest_id not in self.misiones_activas:
                     self.misiones_activas.append(quest_id)
+
+        # Misión del trial en la zona spawn se fuerza a estar en progreso si no está completada
+        if "mision_trial" in self.misiones:
+            if self.misiones["mision_trial"].estado != Quest.ESTADO_COMPLETADA:
+                self.misiones["mision_trial"].estado = Quest.ESTADO_EN_PROGRESO
+                if "mision_trial" not in self.misiones_activas:
+                    self.misiones_activas.append("mision_trial")
 
         for quest_id, objetivos_data in progreso.items():
             if quest_id in self.misiones:

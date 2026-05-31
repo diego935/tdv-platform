@@ -8,7 +8,7 @@
                 {"id": "obj_monedero", "tipo": "collect", "target": "moneda_ancestral", "cantidad": 3, "descripcion": "Recolectar 3 monedas ancestrales"}
             ],
             "recompensas": {"items": ["EspadaLegendaria"]},
-            "estado": "disponible",
+            "estado": "bloqueada",
             "dialogo_inicio": "npc_mentor:saludo",
             "dialogo_completado": "npc_mentor:mision_completada_monedero"
         },
@@ -20,7 +20,7 @@
                 {"id": "obj_bandidos", "tipo": "kill", "target": "bandido", "cantidad": 5, "descripcion": "Derrotar 5 bandidos"}
             ],
             "recompensas": {"dinero": 200, "items": ["PocionSalud"]},
-            "estado": "disponible",
+            "estado": "bloqueada",
             "dialogo_inicio": "npc_capitan:saludo",
             "dialogo_completado": "npc_capitan:mision_completada_guerrera"
         },
@@ -35,6 +35,16 @@
             "estado": "disponible",
             "dialogo_inicio": "npc_silvane:saludo",
             "dialogo_completado": "npc_silvane:completada"
+        },
+        {
+            "id": "mision_trial",
+            "nombre": "Sobrevivir al Trial",
+            "descripcion": "Sobrevive a todas las oleadas del Trial.",
+            "objetivos": [
+                {"id": "obj_waves", "tipo": "kill", "target": "trial", "cantidad": 1, "descripcion": "Sobrevivir a las oleadas"}
+            ],
+            "recompensas": {},
+            "estado": "en_progreso"
         },
         {
             "id": "derrotar_jefe",

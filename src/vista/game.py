@@ -1320,6 +1320,10 @@ class VistaJuego(arcade.View):
                         self.text_manager.show_message("¡ZONA LIMPIA! BUFO DE SALUD (+50 HP) Y VELOCIDAD ADQUIRIDOS", self.sprite_jugador.center_x, self.sprite_jugador.center_y + 40, arcade.color.GOLDENROD)
                         Log.info("Waves", "Todas las oleadas de la zona Spawn completadas. Bufo aplicado.")
 
+                        # Completar misión de trial en el gestor de misiones
+                        from dialog.quest_manager import QM
+                        QM.actualizar_objetivo("mision_trial", "obj_waves")
+
                         # Abrir las rejas automáticamente al completar las oleadas
                         if getattr(self, "rejas_trial_activas", False) and self.rejas_trial_sprites:
                             for reja in self.rejas_trial_sprites:

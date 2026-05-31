@@ -8,11 +8,11 @@
             "scaleInDock": 0.125
         },
         "assets/maps/mapa.tmx": {
-            "scale": 1.5,
-            "selectedLayer": 0,
+            "scale": 0.125,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 55.333333333333314,
-                "y": 42.333333333333314
+                "x": 15448,
+                "y": 6460
             }
         },
         "assets/tilesets/Ejemplo.tsx": {
@@ -21,40 +21,40 @@
             "scaleInEditor": 11
         },
         "assets/tilesets/arbol1.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 0.33
         },
         "assets/tilesets/arbol2.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 0.5
         },
         "assets/tilesets/arbol3.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 0.33
         },
         "assets/tilesets/arbusto.tsx": {
             "scaleInDock": 1
         },
         "assets/tilesets/base_militar.tsx": {
-            "scaleInDock": 0.33
+            "scaleInDock": 1
         },
         "assets/tilesets/caminotierra.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 0.5
         },
         "assets/tilesets/campoPlantas.tsx": {
             "scaleInDock": 1
         },
         "assets/tilesets/carretera.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 0.5
         },
         "assets/tilesets/coche.tsx": {
             "scaleInDock": 1
         },
         "assets/tilesets/furgo.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 0.75
         },
         "assets/tilesets/muroEsquinas.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 0.25
         },
         "assets/tilesets/muroFlores.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 0.25
         },
         "assets/tilesets/palanca.tsx": {
             "scaleInDock": 1
@@ -63,10 +63,10 @@
             "scaleInDock": 1
         },
         "assets/tilesets/quitaMiedos.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 0.75
         },
         "assets/tilesets/rejas.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 0.33
         },
         "assets/tilesets/sueloCampo.tsx": {
             "scaleInDock": 0.5
@@ -80,14 +80,13 @@
     "map.lastUsedFormat": "tmx",
     "map.width": 200,
     "openFiles": [
-        "assets/maps/mapa.tmx",
-        "assets/tilesets/Ejemplo.tsx"
+        "assets/maps/mapa.tmx"
     ],
     "project": "sin nombre.tiled-project",
     "property.type": "object",
     "recentFiles": [
-        "assets/tilesets/Ejemplo.tsx",
-        "assets/maps/mapa.tmx"
+        "assets/maps/mapa.tmx",
+        "assets/tilesets/Ejemplo.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.type": 0
