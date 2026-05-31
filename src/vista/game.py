@@ -465,6 +465,8 @@ class VistaJuego(arcade.View):
 
         self.sprite_jugador.inventory[0] = Pistola()
         self.sprite_jugador.inventory[1] = Cuchillo()
+        self.sprite_jugador.inventory[2] = Botiquin()
+        self.sprite_jugador.inventory[3] = Botiquin()
 
         self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
         self.nav_manager = SistemaNavegacion(self.lista_bloques)
