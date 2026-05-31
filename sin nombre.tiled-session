@@ -68,6 +68,10 @@
         "assets/tilesets/rejas.tsx": {
             "scaleInDock": 0.33
         },
+        "assets/tilesets/sangre.tsx": {
+            "scaleInDock": 0.25,
+            "scaleInEditor": 0.33
+        },
         "assets/tilesets/sueloCampo.tsx": {
             "scaleInDock": 0.5
         },
@@ -85,6 +89,7 @@
     "project": "sin nombre.tiled-project",
     "property.type": "object",
     "recentFiles": [
+        "assets/tilesets/sangre.tsx",
         "assets/maps/mapa.tmx",
         "assets/tilesets/Ejemplo.tsx"
     ],
