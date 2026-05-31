@@ -163,6 +163,20 @@ class WeaponBase(BaseItem):
             'esta_recargando': self.esta_recargando,
         }
 
+    def to_dict(self):
+        return {
+            "__type__": self.__class__.__name__,
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "damage": self.damage,
+            "cooldown": self.cooldown,
+            "rango": self.rango,
+            "durability": self.durability,
+            "_timer_cooldown": self._timer_cooldown,
+            "esta_recargando": self.esta_recargando,
+        }
+
 
 # ==================== PISTOLA ====================
 
@@ -260,6 +274,20 @@ class Pistola(WeaponBase):
             'recarga_progress': self._get_recarga_progress(),
         })
         return info
+
+    def to_dict(self):
+        d = super().to_dict()
+        d.update({
+            "tamano_cargador": self.tamano_cargador,
+            "municion_actual": self.municion_actual,
+            "_timer_cooldown": self._timer_cooldown,
+            "esta_recargando": self.esta_recargando,
+            "_timer_recarga": self._timer_recarga,
+            "_tiempo_recarga": self._tiempo_recarga,
+            "velocidad_proyectil": self.velocidad_proyectil,
+            "lifetime_proyectil": self.lifetime_proyectil,
+        })
+        return d
 
 
 # ==================== HITBOX TEMPORAL ====================
@@ -395,6 +423,18 @@ class Cuchillo(WeaponBase):
 
     def recargar(self) -> bool:
         return False
+
+    def to_dict(self):
+        d = super().to_dict()
+        d.update({
+            "offset_dist": self.offset_dist,
+            "hitbox_width": self.hitbox_width,
+            "hitbox_height": self.hitbox_height,
+            "lifetime_hitbox": self.lifetime_hitbox,
+            "arc_angle": self.arc_angle,
+            "_timer_cooldown": self._timer_cooldown,
+        })
+        return d
 
     def get_info_hud(self) -> dict:
         info = super().get_info_hud()

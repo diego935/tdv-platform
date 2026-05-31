@@ -42,6 +42,7 @@ from dialog.quest_manager import EB
 from vista.vista_muerte import VistaGameOver
 import os
 from dialog.quest_manager import QM
+from utils.save_system import guardar_partida, cargar_partida, hay_partida_guardada, borrar_partida
 
 
 class VistaJuego(arcade.View):
@@ -78,8 +79,6 @@ class VistaJuego(arcade.View):
         self.MIN_ZOOM = 0.2
         self.MAX_ZOOM = 4.0
         
-        self.playerDead = False
-        # Optimización de distancia
         self.DISTANCIA_ACTUALIZACION = DISTANCIA_ACTUALIZACION
         
 
@@ -125,9 +124,13 @@ class VistaJuego(arcade.View):
         self.esbirros_respawn_timer = 0.0
         self.jefe_derrotado = False
         
-    def setup(self):
-        # Cargar progreso
-        self._cargar_misiones()
+    def setup(self, load_saved=False):
+        if not load_saved:
+            borrar_partida()
+            QM.clear_manager()
+        else:
+            self._cargar_misiones()
+
         QM.suscripcion_automatica()
 
         # Mapa--------------------------------------
@@ -644,6 +647,10 @@ class VistaJuego(arcade.View):
             except Exception as e:
                 Log.error("Game", f"Error creando enemigo: {e}")
 
+        self._map_enemy_positions = {
+            (e.center_x, e.center_y) for e in self.lista_enemigos if not isinstance(e, Jefe)
+        }
+
         self.dm = DialogManager()
         self.dm.set_vista(self)
         # En tu setup del juego
@@ -706,6 +713,10 @@ class VistaJuego(arcade.View):
         except Exception as e:
             Log.error("Audio", f"No se pudo cargar el sistema de audio: {e}")
 
+        if load_saved:
+            cargar_partida(self)
+            self.estado_actual = "JUGANDO"
+
     def on_draw(self):
         self.clear()
 
@@ -740,13 +751,14 @@ class VistaJuego(arcade.View):
             self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager, self.sprite_jugador)
             self.text_manager.draw()
 
-            if self.playerDead:
+            if self.estado_actual == "MUERTO":
+                it = getattr(self, '_death_fade_it', 0)
                 arcade.draw_lrbt_rectangle_filled(
                     self.sprite_jugador.position[0] - 2000,
                     self.sprite_jugador.position[0] + 2000,
                     self.sprite_jugador.position[1] - 2000,
                     self.sprite_jugador.position[1] + 2000,
-                    (0, 0, 0, min(255, int(255 * self.it / 200)))
+                    (0, 0, 0, min(255, int(255 * it / 200)))
                 )
 
         # Filtro de saturación para la zona de miedo
@@ -898,11 +910,13 @@ class VistaJuego(arcade.View):
                 self.sprite_jugador.change_y = 0
                 self.arriba_presionado = self.abajo_presionado = self.izquierda_presionado = self.derecha_presionado = self.shift_presionado = False
 
-        if self.playerDead: 
-            delta_time *= (0.8)** int(self.it/20)
-            self.it +=1
-            if self.it >= 300: 
-                self.window.show_view(VistaGameOver())
+        if self.estado_actual == "MUERTO":
+            it = getattr(self, '_death_fade_it', 0) + 1
+            self._death_fade_it = it
+            delta_time *= (0.8) ** int(it / 20)
+            if it >= 300:
+                vista = VistaGameOver()
+                self.window.show_view(vista)
 
         if self.estado_actual == "CONSOLE":
             self.console.update(delta_time, self)
@@ -1718,13 +1732,16 @@ class VistaJuego(arcade.View):
 
 
     def _on_player_death(self, data):
-        self.playerDead = True
-        self.it = 0
+        self.estado_actual = "MUERTO"
+        self._death_fade_it = 0
 
     def limpiar_estado(self):
         """Limpia a cero absoluto el estado visual, frena inputs y vacía los managers globales 
         sin destruir sus instancias, preparándolos para recibir datos nuevos."""
         Log.info("Game", "=== INICIANDO LIMPIEZA DEL ESTADO GLOBAL ===")
+
+        if self.sprite_jugador and self.estado_actual != "MUERTO":
+            guardar_partida(self)
         
         # Detener audio
         if self.reproductor_ambiente:

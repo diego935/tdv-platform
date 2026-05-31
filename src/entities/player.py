@@ -292,10 +292,16 @@ class Jugador(arcade.Sprite):
             "vida": self.vida,
             "max_vida": self.max_vida,
             "stamina": self.stamina,
+            "max_stamina": self.max_stamina,
             "indice_activo": self.indice_activo,
             "direccion": self.direccion,
+            "bateria_linterna": self.bateria_linterna,
+            "linterna_encendida": self.linterna_encendida,
+            "slowed": self.slowed,
+            "stamina_cooldown_timer": self.stamina_cooldown_timer,
             "inventario": [
-                item.__class__.__name__ if item else None
+                item.to_dict() if item else None
                 for item in self.inventory
-            ]
+            ],
+            "estados": [e.to_dict() for e in self.estados],
         }

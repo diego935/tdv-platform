@@ -1,6 +1,6 @@
 import arcade
-import json
 from utils.log import Log
+from utils.save_system import guardar_partida
 
 
 class MenuPausa(arcade.View):
@@ -128,16 +128,5 @@ class MenuPausa(arcade.View):
                 return
 
     def guardar_partida(self):
-
-        jugador = self.vista_juego.sprite_jugador
-
-        from dialog.quest_manager import QM
-        datos_guardado = {
-            "player": jugador.to_dict(),
-            "misiones": QM.to_dict()
-        }
-
-        with open("savegame.json", "w") as f:
-            json.dump(datos_guardado, f, indent=4)
-
-        Log.info("MenuPausa", "Partida guardada", archivo="savegame.json", pos_x=jugador.center_x, pos_y=jugador.center_y)
+        guardar_partida(self.vista_juego)
+        Log.info("MenuPausa", "Partida guardada manualmente")

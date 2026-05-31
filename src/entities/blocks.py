@@ -90,6 +90,24 @@ class Puerta(arcade.Sprite):
                 self.estado = "cerrada"
                 self.activa_colision = True
 
+    def to_dict(self):
+        return {
+            "x": self.center_x,
+            "y": self.center_y,
+            "width": self.width,
+            "height": self.height,
+            "estado": self.estado,
+            "activa_colision": self.activa_colision,
+            "tiempo_estado": self.tiempo_estado,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        p = cls(data["x"], data["y"], data["width"], data["height"])
+        p.estado = data.get("estado", "cerrada")
+        p.activa_colision = data.get("activa_colision", True)
+        p.tiempo_estado = data.get("tiempo_estado", 0.0)
+        return p
 
 
 

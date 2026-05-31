@@ -1,0 +1,858 @@
+{
+    "version": 2,
+    "player": {
+        "x": 1075.667,
+        "y": 16289.0,
+        "vida": 100.0,
+        "max_vida": 100.0,
+        "stamina": 89.99240835000819,
+        "max_stamina": 100.0,
+        "indice_activo": 0,
+        "direccion": "up",
+        "bateria_linterna": 100.0,
+        "linterna_encendida": true,
+        "slowed": 1.0,
+        "inventario": [
+            {
+                "__type__": "Pistola",
+                "id": 100,
+                "name": "Pistola",
+                "description": "Pistola semi-autom\u00e1tica b\u00e1sica.",
+                "damage": 25,
+                "cooldown": 0.4,
+                "rango": 800.0,
+                "durability": 100.0,
+                "_timer_cooldown": 0.0,
+                "esta_recargando": false,
+                "tamano_cargador": 12,
+                "municion_actual": 12,
+                "_timer_recarga": 0.0,
+                "_tiempo_recarga": 1.5,
+                "velocidad_proyectil": 600.0,
+                "lifetime_proyectil": 2.0
+            },
+            {
+                "__type__": "Cuchillo",
+                "id": 101,
+                "name": "Cuchillo",
+                "description": "Cuchillo afilado.",
+                "damage": 40,
+                "cooldown": 0.6,
+                "rango": 80.0,
+                "durability": 100.0,
+                "_timer_cooldown": 0.0,
+                "esta_recargando": false,
+                "offset_dist": 45.0,
+                "hitbox_width": 70.0,
+                "hitbox_height": 50.0,
+                "lifetime_hitbox": 0.15,
+                "arc_angle": 120.0
+            },
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "estados": []
+    },
+    "misiones": {
+        "misiones_activas": [
+            "mision_trial"
+        ],
+        "misiones_completadas": [],
+        "estados": {
+            "mision_trial": "en_progreso"
+        },
+        "progreso": {
+            "mision_trial": [
+                {
+                    "id": "obj_waves",
+                    "tipo": "kill",
+                    "target": "trial",
+                    "cantidad": 1,
+                    "descripcion": "Sobrevivir a las oleadas",
+                    "progreso": 0
+                }
+            ]
+        }
+    },
+    "enemigos": [
+        {
+            "enemy_type": "EnemigoIA",
+            "x": 347.0,
+            "y": 11739.0,
+            "vida": 100,
+            "enemy_id": "silvane",
+            "tipo_patrulla": "area",
+            "dano_ataque": 15.0,
+            "rango_ataque": 40.0,
+            "vista_rango": 800,
+            "velocidad": 320,
+            "velocidad_patrulla": 120,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "melee",
+            "pos_origen_x": 347.0,
+            "pos_origen_y": 11739.0,
+            "waypoints": [
+                [
+                    347.0,
+                    11739.0
+                ]
+            ]
+        },
+        {
+            "enemy_type": "EnemigoIA",
+            "x": 1081.0,
+            "y": 11351.0,
+            "vida": 100,
+            "enemy_id": "silvane",
+            "tipo_patrulla": "area",
+            "dano_ataque": 15.0,
+            "rango_ataque": 40.0,
+            "vista_rango": 800,
+            "velocidad": 320,
+            "velocidad_patrulla": 120,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "melee",
+            "pos_origen_x": 1081.0,
+            "pos_origen_y": 11351.0,
+            "waypoints": [
+                [
+                    1081.0,
+                    11351.0
+                ]
+            ]
+        },
+        {
+            "enemy_type": "EnemigoIA",
+            "x": 671.0,
+            "y": 10915.0,
+            "vida": 100,
+            "enemy_id": "silvane",
+            "tipo_patrulla": "area",
+            "dano_ataque": 15.0,
+            "rango_ataque": 40.0,
+            "vista_rango": 800,
+            "velocidad": 320,
+            "velocidad_patrulla": 120,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "melee",
+            "pos_origen_x": 671.0,
+            "pos_origen_y": 10915.0,
+            "waypoints": [
+                [
+                    671.0,
+                    10915.0
+                ]
+            ]
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 1149.0,
+            "y": 11007.0,
+            "vida": 100,
+            "enemy_id": "silvane",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 1149.0,
+            "pos_origen_y": 11007.0,
+            "waypoints": [
+                [
+                    1149.0,
+                    11007.0
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 1565.0,
+            "y": 11777.0,
+            "vida": 100,
+            "enemy_id": "silvane",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 1565.0,
+            "pos_origen_y": 11777.0,
+            "waypoints": [
+                [
+                    1565.0,
+                    11777.0
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 1127.0,
+            "y": 11717.0,
+            "vida": 100,
+            "enemy_id": "silvane",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 1127.0,
+            "pos_origen_y": 11717.0,
+            "waypoints": [
+                [
+                    1127.0,
+                    11717.0
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 6412.0,
+            "y": 16440.0,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 6412.0,
+            "pos_origen_y": 16440.0,
+            "waypoints": [
+                [
+                    6412.0,
+                    16440.0
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 6340.0,
+            "y": 16148.0,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 6340.0,
+            "pos_origen_y": 16148.0,
+            "waypoints": [
+                [
+                    6340.0,
+                    16148.0
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 6344.0,
+            "y": 15788.0,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 6344.0,
+            "pos_origen_y": 15788.0,
+            "waypoints": [
+                [
+                    6344.0,
+                    15788.0
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 6287.0,
+            "y": 15509.0,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 6287.0,
+            "pos_origen_y": 15509.0,
+            "waypoints": [
+                [
+                    6287.0,
+                    15509.0
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 8916.0,
+            "y": 15316.0,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 8916.0,
+            "pos_origen_y": 15316.0,
+            "waypoints": [
+                [
+                    8916.0,
+                    15316.0
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 8912.0,
+            "y": 14816.0,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 8912.0,
+            "pos_origen_y": 14816.0,
+            "waypoints": [
+                [
+                    8912.0,
+                    14816.0
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 8924.0,
+            "y": 14080.0,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 8924.0,
+            "pos_origen_y": 14080.0,
+            "waypoints": [
+                [
+                    8924.0,
+                    14080.0
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 8793.94,
+            "y": 13660.97,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 8793.94,
+            "pos_origen_y": 13660.97,
+            "waypoints": [
+                [
+                    8793.94,
+                    13660.97
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 8866.67,
+            "y": 13030.67,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 8866.67,
+            "pos_origen_y": 13030.67,
+            "waypoints": [
+                [
+                    8866.67,
+                    13030.67
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 8766.67,
+            "y": 12485.21,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 8766.67,
+            "pos_origen_y": 12485.21,
+            "waypoints": [
+                [
+                    8766.67,
+                    12485.21
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 8939.39,
+            "y": 14494.3,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 8939.39,
+            "pos_origen_y": 14494.3,
+            "waypoints": [
+                [
+                    8939.39,
+                    14494.3
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "Jefe",
+            "x": 13168.0,
+            "y": 13728.0,
+            "vida": 1000,
+            "enemy_id": "jefe",
+            "combate_iniciado": false,
+            "width": 736.0,
+            "height": 448.0
+        },
+        {
+            "enemy_type": "EnemigoIA",
+            "x": 4174.0,
+            "y": 15972.0,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 15.0,
+            "rango_ataque": 40.0,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 120,
+            "area_radio": 250,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "melee",
+            "pos_origen_x": 4174.0,
+            "pos_origen_y": 15972.0,
+            "waypoints": [
+                [
+                    4174.0,
+                    15972.0
+                ]
+            ]
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 4174.0,
+            "y": 15972.0,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 250,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "patrullar",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 4174.0,
+            "pos_origen_y": 15972.0,
+            "waypoints": [
+                [
+                    4174.0,
+                    15972.0
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        },
+        {
+            "enemy_type": "EnemigoIA",
+            "x": 1295.89671169821,
+            "y": 16416.000047149933,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "waypoint",
+            "dano_ataque": 10.0,
+            "rango_ataque": 40.0,
+            "vista_rango": 400,
+            "velocidad": 320,
+            "velocidad_patrulla": 120,
+            "area_radio": 100,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "perseguir",
+            "tipo_ataque": "melee",
+            "pos_origen_x": 1376.4362307692306,
+            "pos_origen_y": 16475.923076923078,
+            "waypoints": [
+                [
+                    1376.4362307692306,
+                    16475.923076923078
+                ],
+                [
+                    1476.4362307692306,
+                    16475.923076923078
+                ],
+                [
+                    1476.4362307692306,
+                    16575.923076923078
+                ],
+                [
+                    1376.4362307692306,
+                    16575.923076923078
+                ]
+            ]
+        },
+        {
+            "enemy_type": "EnemigoRanged",
+            "x": 1419.0380164015344,
+            "y": 16373.26914107942,
+            "vida": 100,
+            "enemy_id": "bandido",
+            "tipo_patrulla": "area",
+            "dano_ataque": 5.0,
+            "rango_ataque": 300,
+            "vista_rango": 800,
+            "velocidad": 300,
+            "velocidad_patrulla": 100,
+            "area_radio": 500,
+            "tiempo_cortesia": 4.0,
+            "estado_fsm": "mantener_distancia",
+            "tipo_ataque": "ranged",
+            "pos_origen_x": 1376.4362307692306,
+            "pos_origen_y": 16475.923076923078,
+            "waypoints": [
+                [
+                    1376.4362307692306,
+                    16475.923076923078
+                ]
+            ],
+            "radio_R": 450,
+            "radio_r": 200,
+            "intervalo_ataque": 2.0,
+            "velocidad_proyectil": 400,
+            "inteligencia": false,
+            "_timer_ataque_ranged": 0.0
+        }
+    ],
+    "enemigos_muertos": [],
+    "puertas": [],
+    "rejas": {
+        "trial_activas": false,
+        "segura_activas": false,
+        "final_activas": true,
+        "barrera_final_activas": false,
+        "barrera_jefe_activas": false,
+        "jefe_derrotado": false
+    },
+    "oleadas": {
+        "activas": false,
+        "completadas": false,
+        "actual": 0,
+        "timer_entre_oleadas": 0.0,
+        "max_oleadas": 3
+    },
+    "interactions": {
+        "stats": {
+            "monedas_ancestrales": {
+                "actual": 0,
+                "total": 3
+            }
+        }
+    },
+    "items_suelo": [
+        {
+            "__type__": "Nota",
+            "id": 500,
+            "name": "Nota",
+            "description": "",
+            "durability": 100.0,
+            "quantity": 1,
+            "is_dropped": false,
+            "center_x": 783.0,
+            "center_y": 16260.0,
+            "_timer_cooldown": 0.0,
+            "titulo": "Como he acabado aqui",
+            "texto": "Ten\u00eda pensado seguir las huellas y luego avanzar hacia el este. \n Quiz\u00e1 si sigues mis pasos te vaya bien, no como a mi"
+        },
+        {
+            "__type__": "Nota",
+            "id": 500,
+            "name": "...",
+            "description": "",
+            "durability": 100.0,
+            "quantity": 1,
+            "is_dropped": false,
+            "center_x": 3578.0,
+            "center_y": 13379.33335,
+            "_timer_cooldown": 0.0,
+            "titulo": "Algo extra\u00f1o pasa en este bosque",
+            "texto": "Igual si pruebo a cruzarlo..."
+        },
+        {
+            "__type__": "Nota",
+            "id": 501,
+            "name": "Nota",
+            "description": "",
+            "durability": 100.0,
+            "quantity": 1,
+            "is_dropped": false,
+            "center_x": 7184.0,
+            "center_y": 13616.0,
+            "_timer_cooldown": 0.0,
+            "titulo": "Palanca",
+            "texto": "Me pregunto que pasar\u00e1 si pulso la palanca..."
+        },
+        {
+            "__type__": "Nota",
+            "id": 502,
+            "name": "Nota",
+            "description": "",
+            "durability": 100.0,
+            "quantity": 1,
+            "is_dropped": false,
+            "center_x": 8736.0,
+            "center_y": 12064.0,
+            "_timer_cooldown": 0.0,
+            "titulo": "Advertencia",
+            "texto": "Si sigues por este camino te encontrar\u00e1s algo terrible"
+        },
+        {
+            "__type__": "Nota",
+            "id": 503,
+            "name": "Nota",
+            "description": "",
+            "durability": 100.0,
+            "quantity": 1,
+            "is_dropped": false,
+            "center_x": 13008.0,
+            "center_y": 10640.0,
+            "_timer_cooldown": 0.0,
+            "titulo": "NO ERES EL BUENO",
+            "texto": "VETEVETEVETEVETEVETE\nVETEVETEVETEVETEVETE\nVETEVETEVETEVETEVETE\nVETEVETEVETEVETEVETE\nVETEVETEVETEVETEVETE"
+        },
+        {
+            "__type__": "Botiquin",
+            "id": 200,
+            "name": "Botiquin",
+            "description": "Botiquin de primeros auxilios. Cura gradualmente al usarlo.",
+            "durability": 100.0,
+            "quantity": 1,
+            "is_dropped": true,
+            "center_x": 905.667,
+            "center_y": 16084.0,
+            "_timer_cooldown": 0.0,
+            "cantidad_curacion": 15,
+            "tiempo_curacion": 3.0,
+            "cantidad_usos": 1,
+            "cooldown": 1.0
+        },
+        {
+            "__type__": "Botiquin",
+            "id": 200,
+            "name": "Botiquin",
+            "description": "Botiquin de primeros auxilios. Cura gradualmente al usarlo.",
+            "durability": 100.0,
+            "quantity": 1,
+            "is_dropped": true,
+            "center_x": 1235.667,
+            "center_y": 16084.0,
+            "_timer_cooldown": 0.0,
+            "cantidad_curacion": 15,
+            "tiempo_curacion": 3.0,
+            "cantidad_usos": 1,
+            "cooldown": 1.0
+        }
+    ],
+    "dia_noche_timer": 13.25756470900069,
+    "esbirros_jefe": [],
+    "timer_spawn_nido": 4.1318318410003485
+}

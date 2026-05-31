@@ -17,6 +17,30 @@ class Estado:
     def remover(self, jugador):
         pass
 
+    def to_dict(self):
+        return {
+            "__type__": self.__class__.__name__,
+            "duracion": self.duracion,
+            "tiempo_restante": self.tiempo_restante,
+        }
+
+
+def estado_from_dict(data):
+    tipo = data.get("__type__", "")
+    if tipo == "Veneno":
+        e = Veneno.__new__(Veneno)
+    elif tipo == "Slow":
+        e = Slow.__new__(Slow)
+    elif tipo == "Sanacion":
+        e = Sanacion.__new__(Sanacion)
+    elif tipo == "BendicionDelBosque":
+        e = BendicionDelBosque.__new__(BendicionDelBosque)
+    else:
+        return None
+    e.__dict__.update({k: v for k, v in data.items() if k != "__type__"})
+    return e
+
+
 class Veneno(Estado):
     def __init__(self, dano_por_segundo: float, duracion: float):
         super().__init__(duracion)
@@ -25,6 +49,12 @@ class Veneno(Estado):
     def actualizar(self, jugador, delta_time: float) -> bool:
         jugador.recibir_dano(self.dano_por_segundo * delta_time)
         return super().actualizar(jugador, delta_time)
+
+    def to_dict(self):
+        d = super().to_dict()
+        d["dano_por_segundo"] = self.dano_por_segundo
+        return d
+
 
 class Slow(Estado):
     def __init__(self, factor_velocidad: float, duracion: float):
@@ -38,6 +68,10 @@ class Slow(Estado):
                 jugador.slowed/= self.factor
                 return False 
 
+    def to_dict(self):
+        d = super().to_dict()
+        d["factor"] = self.factor
+        return d
 
 
 class Sanacion(Estado):
@@ -53,10 +87,19 @@ class Sanacion(Estado):
         self.cantidad_restante -= cura
         return self.cantidad_restante > 0
 
+    def to_dict(self):
+        d = super().to_dict()
+        d.update({
+            "cantidad_total": self.cantidad_total,
+            "cantidad_restante": self.cantidad_restante,
+            "velocidad": self.velocidad,
+        })
+        return d
+
 
 class BendicionDelBosque(Estado):
     def __init__(self, regeneracion_por_segundo: float = 3.0):
-        super().__init__(None)  # Duración infinita
+        super().__init__(None)
         self.regeneracion_por_segundo = regeneracion_por_segundo
     
     def actualizar(self, jugador, delta_time: float) -> bool:
@@ -64,3 +107,7 @@ class BendicionDelBosque(Estado):
             jugador.vida = min(jugador.vida + self.regeneracion_por_segundo * delta_time, jugador.max_vida)
         return True
 
+    def to_dict(self):
+        d = super().to_dict()
+        d["regeneracion_por_segundo"] = self.regeneracion_por_segundo
+        return d

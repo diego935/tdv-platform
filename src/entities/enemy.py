@@ -583,6 +583,28 @@ class EnemigoIA(arcade.Sprite):
         except Exception:
             pass
 
+    def to_dict(self):
+        return {
+            "enemy_type": "EnemigoIA",
+            "x": self.center_x,
+            "y": self.center_y,
+            "vida": self.vida,
+            "enemy_id": self.enemy_id,
+            "tipo_patrulla": self.tipo_patrulla,
+            "dano_ataque": self.dano_ataque,
+            "rango_ataque": self.rango_ataque,
+            "vista_rango": self.vista_rango,
+            "velocidad": self.velocidad,
+            "velocidad_patrulla": self.velocidad_patrulla,
+            "area_radio": self.area_radio,
+            "tiempo_cortesia": self.tiempo_cortesia,
+            "estado_fsm": self.estado,
+            "tipo_ataque": self.tipo_ataque,
+            "pos_origen_x": self.pos_origen[0],
+            "pos_origen_y": self.pos_origen[1],
+            "waypoints": self.waypoints,
+        }
+
 
 # ==================== ENEMIGO RANGED ====================
 
@@ -893,6 +915,19 @@ class EnemigoRanged(EnemigoIA):
         else:
             self.texture = self.texture_up if self.change_y > 0 else self.texture_down
 
+    def to_dict(self):
+        d = super().to_dict()
+        d["enemy_type"] = "EnemigoRanged"
+        d.update({
+            "radio_R": self.radio_R,
+            "radio_r": self.radio_r,
+            "intervalo_ataque": self.intervalo_ataque,
+            "velocidad_proyectil": self.velocidad_proyectil,
+            "inteligencia": self.inteligencia,
+            "_timer_ataque_ranged": self._timer_ataque_ranged,
+        })
+        return d
+
 
 class Jefe(EnemigoIA):
     def __init__(self, x, y, width=736, height=448):
@@ -965,4 +1000,17 @@ class Jefe(EnemigoIA):
 
     def _check_transiciones(self, player, blocks_list, nav_manager, deltatime):
         pass
+
+    def to_dict(self):
+        d = {
+            "enemy_type": "Jefe",
+            "x": self.center_x,
+            "y": self.center_y,
+            "vida": self.vida,
+            "enemy_id": self.enemy_id,
+            "combate_iniciado": self.combate_iniciado,
+            "width": self.width,
+            "height": self.height,
+        }
+        return d
 
