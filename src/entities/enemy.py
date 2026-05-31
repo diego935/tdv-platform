@@ -294,7 +294,7 @@ class EnemigoIA(arcade.Sprite):
         if ataque_exitoso:
             self._timer_ataque = self.tiempo_entre_ataques
             if self.sonido_ataque:
-                arcade.play_sound(self.sonido_ataque)
+                arcade.play_sound(self.sonido_ataque, volume=0.3)
 
     def _llegado_a_destino(self, destino, blocks_list, tolerancia: float = 10) -> bool:
         """Check si llegó a posición destino."""
