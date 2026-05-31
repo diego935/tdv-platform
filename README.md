@@ -34,6 +34,14 @@ La misión sigue una estructura lineal y dividida en las siguientes fases consec
 
 ---
 
+## Características Técnicas Destacadas
+
+* **Comportamiento de Enemigos mediante IA:** Los enemigos del juego no siguen rutas fijas predecibles; están programados con lógica de Inteligencia Artificial para detectar la presencia del jugador, rastrear su posición y reaccionar de forma dinámica durante el combate.
+* **Sistema de Inventario Integrado:** Gestión de objetos en tiempo real que permite organizar, soltar y consumir recursos estratégicamente para sobrevivir.
+* **Consola de Comandos (Developer Console):** Sistema funcional integrado que permite interactuar directamente con el motor del juego en tiempo de ejecución para ejecutar comandos de depuración o testeo.
+
+---
+
 ## Controles Completos
 
 ### Movimiento
