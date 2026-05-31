@@ -1,5 +1,4 @@
 import arcade
-import time
 
 class VistaGameOver(arcade.View):
 
@@ -7,23 +6,12 @@ class VistaGameOver(arcade.View):
         super().__init__()
         self.bg_texture = arcade.load_texture("assets/fondos/fondo_muerte.png")
         self.fondo = arcade.load_font("assets/fuentes/Melted Monster.ttf")
-        self.sonido_muerte = arcade.load_sound("assets/sonidos/muerte_personaje.wav")
-        self.tiempo_inicio = time.time()
-        self.audio_reproducido = False
-
-    def on_update(self, delta_time: float):
-        """Este método se encarga de revisar el reloj real de tu ordenador."""
-        if not self.audio_reproducido:
-            tiempo_actual = time.time()
-            if tiempo_actual - self.tiempo_inicio >= 1.5:
-                if self.sonido_muerte:
-                    arcade.play_sound(self.sonido_muerte)
-                self.audio_reproducido = True
+        self.sonido_muerte = arcade.load_sound("assets/sonidos/sonido_pantalla_muerte.wav")
+        self.player_sonido = None
 
     def on_draw(self):
 
         self.clear()
-        self.window.dispatch_event('on_update', 1/60)
         arcade.draw_texture_rect(
             self.bg_texture,
             arcade.XYWH(
@@ -86,14 +74,15 @@ class VistaGameOver(arcade.View):
         )
     
     def on_show_view(self):
-        """Se ejecuta automáticamente justo cuando esta pantalla se vuelve activa."""
-        arcade.schedule(self.reproducir_audio, 1.5)
-
-    def reproducir_audio(self, delta_time: float):
-        """Función que activa el sonido y se desprograma automáticamente."""
+        """Se ejecuta al entrar en la pantalla."""
         if self.sonido_muerte:
-            arcade.play_sound(self.sonido_muerte)
-        arcade.unschedule(self.reproducir_audio)
+            self.player_sonido = arcade.play_sound(self.sonido_muerte)
+    
+    def on_hide_view(self):
+        """Se ejecuta al abandonar la pantalla."""
+        if self.player_sonido:
+            self.player_sonido.pause()
+            self.player_sonido = None
 
     def on_mouse_press(self, x, y, button, modifiers):
 

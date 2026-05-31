@@ -9,7 +9,7 @@ class VistaPartidas(MenuNavegacion):
 
         # TEXTO SUPERIOR
         arcade.draw_text(
-            "SELECCION DE PARTIDA", 
+            "SELECCIÓN DE PARTIDA", 
             self.window.width / 2, 
             self.window.height / 2 + 220, 
             arcade.color.GOLDENROD, 
