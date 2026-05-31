@@ -57,6 +57,8 @@ class Proyectil(arcade.Sprite):
         if blocks_list:
             for block in blocks_list:
                 if self._check_collision(block):
+                    if hasattr(block, 'recibir_dano'):
+                        block.recibir_dano(self.damage, self.center_x, self.center_y)
                     self.alive = False
                     break
 

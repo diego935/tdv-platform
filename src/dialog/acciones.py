@@ -159,6 +159,8 @@ def ejecutar_accion(accion: str, vista) -> None:
         if vista and hasattr(vista, 'sprite_jugador'):
             vista.sprite_jugador.dinero = getattr(vista.sprite_jugador, 'dinero', 0) + cantidad
         Log.info("DialogAcciones", "Dinero dado", cantidad=cantidad)
+    elif tipo == "iniciar_combate_jefe":
+        _safe_call('iniciar_combate_jefe')
     elif tipo == "cerrar":
         _safe_call('cerrar_dialogo')
     elif tipo == "debug":

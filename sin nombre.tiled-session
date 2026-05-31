@@ -39,7 +39,7 @@
             "scaleInDock": 0.5
         },
         "assets/tilesets/campoPlantas.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 0.5
         },
         "assets/tilesets/carretera.tsx": {
             "scaleInDock": 0.5
@@ -73,7 +73,7 @@
             "scaleInEditor": 0.33
         },
         "assets/tilesets/sueloCampo.tsx": {
-            "scaleInDock": 0.5
+            "scaleInDock": 0.75
         },
         "assets/tilesets/suelometal.tsx": {
             "scaleInDock": 0.5

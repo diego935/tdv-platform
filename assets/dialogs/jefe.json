@@ -1,0 +1,25 @@
+{
+    "saludo": {
+        "texto": "Sabes que no eres el bueno. Acaba con todo ya",
+        "accion": "",
+        "opciones": {
+            "1": {"nodo": "crees", "texto": "Soy el bueno"}
+        }
+    },
+    "crees": {
+        "texto": "Si eso crees...",
+        "accion": "iniciar_combate_jefe",
+        "opciones": {
+            "1": {"nodo": "despedida", "texto": "..."}
+        }
+    },
+    "despedida": {
+        "texto": "...",
+        "accion": "cerrar",
+        "opciones": {}
+    },
+    "_acciones": {
+        "iniciar_combate_jefe": "iniciar_combate_jefe",
+        "cerrar": "cerrar"
+    }
+}

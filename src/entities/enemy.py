@@ -1,4 +1,5 @@
 import arcade
+from arcade.hitbox import RotatableHitBox
 import random
 import math
 from utils.log import Log
@@ -891,3 +892,77 @@ class EnemigoRanged(EnemigoIA):
             self.texture = self.texture_right if self.change_x > 0 else self.texture_left
         else:
             self.texture = self.texture_up if self.change_y > 0 else self.texture_down
+
+
+class Jefe(EnemigoIA):
+    def __init__(self, x, y, width=736, height=448):
+        super().__init__(
+            x=x,
+            y=y,
+            tipo_patrulla="area",
+            area_radio=0,
+            velocidad=0,
+            velocidad_patrulla=0,
+            vista_rango=0,
+            dano_ataque=0,
+            rango_ataque=0
+        )
+        self.vida = 1000
+        self.enemy_id = "jefe"
+        
+        assets = AssetManager()
+        self.tex_normal = assets.get_texture("assets/Enemigo/jefe.png")
+        self.tex_enfadado = assets.get_texture("assets/Enemigo/jefe_enfadado.png")
+        self.tex_triste = assets.get_texture("assets/Enemigo/jefe_triste.png")
+        
+        self._set_boss_texture(self.tex_normal)
+        self.combate_iniciado = False
+        
+        self.width = width
+        self.height = height
+        
+        half_w = width / 2.0
+        half_h = height / 2.0
+        new_hb = RotatableHitBox(points=[
+            (-half_w, -half_h),
+            (half_w, -half_h),
+            (half_w, half_h),
+            (-half_w, half_h)
+        ])
+        self.hit_box = new_hb
+        new_hb.position = self.position
+        new_hb.scale = self.scale
+        new_hb.angle = self.angle
+
+    def _set_boss_texture(self, texture):
+        self.texture_up = texture
+        self.texture_down = texture
+        self.texture_left = texture
+        self.texture_right = texture
+        self.texture = texture
+
+    def activar_combate(self):
+        self.combate_iniciado = True
+        self._set_boss_texture(self.tex_enfadado)
+        self.width = self.width
+        self.height = self.height
+
+    def recibir_dano(self, cantidad: float, fuente_x: float = None, fuente_y: float = None):
+        super().recibir_dano(cantidad, fuente_x, fuente_y)
+        if self.combate_iniciado and self.vida <= 350:
+            self._set_boss_texture(self.tex_triste)
+            self.width = self.width
+            self.height = self.height
+
+    def update(self, delta_time, player, blocks_list=None, nav_manager=None):
+        self.change_x = 0
+        self.change_y = 0
+        if self._knockback_timer > 0:
+            self._knockback_timer -= delta_time
+
+    def _puede_atacar(self, player) -> bool:
+        return False
+
+    def _check_transiciones(self, player, blocks_list, nav_manager, deltatime):
+        pass
+

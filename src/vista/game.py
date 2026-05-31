@@ -29,8 +29,7 @@ from vista.consola import *
 from vista.camera_manager import CameraManager
 from vista.asset_manager import AssetManager
 import random
-from entities.enemy import EnemigoIA
-from entities.enemy import EnemigoRanged
+from entities.enemy import EnemigoIA, EnemigoRanged, Jefe
 from items.colections import InteractionManager, SpikeTrap,MissionCoin
 from items.weapons import Pistola, Cuchillo
 import inspect
@@ -117,6 +116,8 @@ class VistaJuego(arcade.View):
         
         self.barrera_final_activas = False
         self.barrera_final_sprites = []
+        self.barrera_jefe_activas = False
+        self.barrera_jefe_sprites = []
         
     def setup(self):
         # Cargar progreso
@@ -153,6 +154,7 @@ class VistaJuego(arcade.View):
         self.miedo_inicio_bounds = []
         self.miedo_fin_bounds = []
         self.bounds_barrera_final = None
+        self.bounds_barrera_jefe = None
         for obj in eventos:
             name_lower = obj.name.lower() if obj.name else ""
             if name_lower == "activador":
@@ -197,6 +199,26 @@ class VistaJuego(arcade.View):
                     w = getattr(obj, "width", 0)
                     h = getattr(obj, "height", 0)
                     self.bounds_barrera_final = {
+                        "x_min": x,
+                        "x_max": x + w,
+                        "y_min": y,
+                        "y_max": y + h
+                    }
+            elif name_lower == "barrera_jefe":
+                pts = obj.shape
+                if isinstance(pts, list) and len(pts) >= 3:
+                    self.bounds_barrera_jefe = {
+                        "x_min": min(p[0] for p in pts),
+                        "x_max": max(p[0] for p in pts),
+                        "y_min": min(p[1] for p in pts),
+                        "y_max": max(p[1] for p in pts)
+                    }
+                elif isinstance(pts, tuple) or hasattr(pts, "__len__"):
+                    x = getattr(obj, "x", pts[0])
+                    y = getattr(obj, "y", pts[1])
+                    w = getattr(obj, "width", 0)
+                    h = getattr(obj, "height", 0)
+                    self.bounds_barrera_jefe = {
                         "x_min": x,
                         "x_max": x + w,
                         "y_min": y,
@@ -255,6 +277,18 @@ class VistaJuego(arcade.View):
                     if muro in self.lista_bloques:
                         self.lista_bloques.remove(muro)
 
+        # Filtrar barrera del jefe de los muros (empieza desactivada y sin colisión)
+        self.barrera_jefe_sprites = []
+        self.barrera_jefe_activas = False
+        if muros_mapa and getattr(self, "bounds_barrera_jefe", None):
+            for muro in muros_mapa:
+                if (self.bounds_barrera_jefe["x_min"] <= muro.center_x <= self.bounds_barrera_jefe["x_max"] and
+                    self.bounds_barrera_jefe["y_min"] <= muro.center_y <= self.bounds_barrera_jefe["y_max"]):
+                    self.barrera_jefe_sprites.append(muro)
+                    muro.visible = False
+                    if muro in self.lista_bloques:
+                        self.lista_bloques.remove(muro)
+
         # Cargar rejas y palancas
         self.lista_rejas = self.scene.get_sprite_list("Rejas")
         self.lista_palanca = self.scene.get_sprite_list("Palanca")
@@ -295,11 +329,12 @@ class VistaJuego(arcade.View):
         self.hud = HUD()
         self.console = ConsoleUI()
         
-        # Buscar posiciones de Nota_bosque, Nota_palanca, nota_bienvenida y nota_boss en la capa de Eventos
+        # Buscar posiciones de Nota_bosque, Nota_palanca, nota_bienvenida, nota_boss y nota_locura en la capa de Eventos
         pos_nota_bosque = None
         pos_nota_palanca = None
         pos_nota_bienvenida = None
         pos_nota_boss = None
+        pos_nota_locura = None
         self.objeto_palanca = None
         self.bounds_rejas_trial = None
         for obj in eventos:
@@ -307,7 +342,7 @@ class VistaJuego(arcade.View):
             if not obj_name:
                 continue
             name_lower = obj_name.lower()
-            if name_lower in ("nota_bosque", "nota_palanca", "nota_bienvenida", "nota_boss"):
+            if name_lower in ("nota_bosque", "nota_palanca", "nota_bienvenida", "nota_boss", "nota_locura"):
                 if isinstance(obj.shape, list) and len(obj.shape) >= 3:
                     x = (obj.shape[0][0] + obj.shape[2][0]) / 2
                     y = (obj.shape[0][1] + obj.shape[2][1]) / 2
@@ -325,6 +360,8 @@ class VistaJuego(arcade.View):
                     pos_nota_bienvenida = (x, y)
                 elif name_lower == "nota_boss":
                     pos_nota_boss = (x, y)
+                elif name_lower == "nota_locura":
+                    pos_nota_locura = (x, y)
             elif name_lower == "palanca":
                 self.objeto_palanca = obj
             elif name_lower == "rejas_trial":
@@ -463,6 +500,16 @@ class VistaJuego(arcade.View):
             nota_boss.center_y = 12064
         self.item_manager.add_to_world(nota_boss)
 
+        nota_locura = Nota(503, "Nota", "NO ERES EL BUENO",
+            "VETEVETEVETEVETEVETE\nVETEVETEVETEVETEVETE\nVETEVETEVETEVETEVETE\nVETEVETEVETEVETEVETE\nVETEVETEVETEVETEVETE",
+            "assets/items/Nota.png")
+        if pos_nota_locura:
+            nota_locura.center_x, nota_locura.center_y = pos_nota_locura
+        else:
+            nota_locura.center_x = 14560
+            nota_locura.center_y = 10624
+        self.item_manager.add_to_world(nota_locura)
+
         self.sprite_jugador.inventory[0] = Pistola()
         self.sprite_jugador.inventory[1] = Cuchillo()
         self.sprite_jugador.inventory[2] = Botiquin()
@@ -480,6 +527,17 @@ class VistaJuego(arcade.View):
             try:
                 x = (enemy_obj.shape[0][0] + enemy_obj.shape[2][0]) / 2
                 y = (enemy_obj.shape[0][1] + enemy_obj.shape[2][1]) / 2
+
+                obj_name = getattr(enemy_obj, 'name', '')
+                if obj_name and obj_name.lower() == 'jefe':
+                    width = abs(enemy_obj.shape[2][0] - enemy_obj.shape[0][0])
+                    height = abs(enemy_obj.shape[2][1] - enemy_obj.shape[0][1])
+                    enemigo = Jefe(x=x, y=y, width=width, height=height)
+                    enemigo.enemy_id = "jefe"
+                    self.lista_enemigos.append(enemigo)
+                    self.lista_bloques.append(enemigo)
+                    Log.info("Game", f"Jefe creado en ({x}, {y}) con tamaño {width}x{height}")
+                    continue
 
                 # Si el enemigo está en la zona del nido, lo ignoramos para spawnearlo dinámicamente
                 if self.zona_nido:
@@ -1123,8 +1181,36 @@ class VistaJuego(arcade.View):
                     self.dm.iniciar(nodo_inicial)
                     self.estado_actual = "DIALOGO"
                     return
-        
+        # Comprobar interacción con el Jefe
+        if hasattr(self, 'lista_enemigos') and self.lista_enemigos:
+            for enemigo in self.lista_enemigos:
+                if isinstance(enemigo, Jefe):
+                    dx = abs(self.sprite_jugador.center_x - enemigo.center_x) - (enemigo.width / 2)
+                    dy = abs(self.sprite_jugador.center_y - enemigo.center_y) - (enemigo.height / 2)
+                    if dx < 80 and dy < 80:
+                        self.dm.cargar_dialogo("jefe")
+                        self.dm.iniciar("saludo")
+                        self.estado_actual = "DIALOGO"
+                        return
+
         self.item_manager.intentar_recoger(self.sprite_jugador)
+
+    def iniciar_combate_jefe(self):
+        if not getattr(self, "barrera_jefe_activas", False):
+            self.barrera_jefe_activas = True
+            if getattr(self, "barrera_jefe_sprites", None):
+                for muro in self.barrera_jefe_sprites:
+                    muro.visible = True
+                    if muro not in self.lista_bloques:
+                        self.lista_bloques.append(muro)
+            self.physics_engine = arcade.PhysicsEngineSimple(self.sprite_jugador, self.lista_bloques)
+            self.nav_manager.actualizar_desde_bloques(self.lista_bloques)
+            if hasattr(self, 'lista_enemigos') and self.lista_enemigos:
+                for enemigo in self.lista_enemigos:
+                    if isinstance(enemigo, Jefe):
+                        enemigo.activar_combate()
+            TextManager().show_message("EL COMBATE HA COMENZADO", self.sprite_jugador.center_x, self.sprite_jugador.center_y + 40)
+            Log.info("Game", "Combate contra el jefe iniciado: barrera_jefe activada.")
 
     def activar_rejas(self, iniciar_oleadas=True):
         if iniciar_oleadas:
@@ -1476,6 +1562,8 @@ class VistaJuego(arcade.View):
         self.musica_miedo_activa = False
         self.barrera_final_activas = False
         self.barrera_final_sprites = []
+        self.barrera_jefe_activas = False
+        self.barrera_jefe_sprites = []
 
         # Vaciar los managers por dentro llamando a sus nuevos métodos clear
         from dialog.dialog_system import DialogSystem
