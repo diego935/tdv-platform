@@ -130,8 +130,12 @@ def ejecutar_accion(accion: str, vista) -> None:
                     nx = (npc_shape[0][0] + npc_shape[2][0]) / 2
                     ny = (npc_shape[0][1] + npc_shape[2][1]) / 2
                     offset = 80
-                    item.center_x = px + offset if px > nx else px - offset
-                    item.center_y = py + offset if py > ny else py - offset
+                    if quest_id == "mision_silvane":
+                        item.center_x = nx + 128  # 4 bloques a la derecha de Silvane
+                        item.center_y = ny
+                    else:
+                        item.center_x = px + offset if px > nx else px - offset
+                        item.center_y = py + offset if py > ny else py - offset
                     _safe_call('item_manager_add_item', item)
                 elif recompensa_tipo == "dar-dinero":
                     cantidad = int(recompensa_valor) if recompensa_valor.isdigit() else 100
