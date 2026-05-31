@@ -288,6 +288,7 @@ class HitboxTemporal(arcade.SpriteSolidColor):
         self.offset_dist = offset_dist
         self._enemies_hit = set()
         self.alive = True
+        self.visible = False
 
         self._actualizar_posicion()
 
@@ -307,7 +308,7 @@ class HitboxTemporal(arcade.SpriteSolidColor):
             self.center_x = self.owner.center_x + math.cos(angle_rad) * self.offset_dist
             self.center_y = self.owner.center_y + math.sin(angle_rad) * self.offset_dist
 
-    def on_update(self, delta_time: float = 1/60):
+    def update(self, delta_time: float = 1/60, *args, **kwargs):
         self._actualizar_posicion()
         self._timer += delta_time
         if self._timer >= self.lifetime:
