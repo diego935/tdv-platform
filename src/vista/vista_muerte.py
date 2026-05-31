@@ -87,7 +87,6 @@ class VistaGameOver(arcade.View):
     
     def on_show_view(self):
         """Se ejecuta automáticamente justo cuando esta pantalla se vuelve activa."""
-        self.window.ctx.sound_stream_player.volume = 1.0
         arcade.schedule(self.reproducir_audio, 1.5)
 
     def reproducir_audio(self, delta_time: float):

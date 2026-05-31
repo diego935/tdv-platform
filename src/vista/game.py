@@ -635,6 +635,15 @@ class VistaJuego(arcade.View):
             self.console.draw_world(self.lista_bloques, self.lista_enemigos, self.nav_manager, self.sprite_jugador)
             self.text_manager.draw()
 
+            if self.playerDead:
+                arcade.draw_lrbt_rectangle_filled(
+                    self.sprite_jugador.position[0] - 2000,
+                    self.sprite_jugador.position[0] + 2000,
+                    self.sprite_jugador.position[1] - 2000,
+                    self.sprite_jugador.position[1] + 2000,
+                    (0, 0, 0, min(255, int(255 * self.it / 200)))
+                )
+
         # Filtro de saturación para la zona de miedo
         if self.musica_miedo_activa:
             arcade.draw_lrbt_rectangle_filled(
@@ -703,7 +712,7 @@ class VistaJuego(arcade.View):
         if self.playerDead: 
             delta_time *= (0.8)** int(self.it/20)
             self.it +=1
-            if self.it >= 400: 
+            if self.it >= 300: 
                 self.window.show_view(VistaGameOver())
 
         if self.estado_actual == "CONSOLE":

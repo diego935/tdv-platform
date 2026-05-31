@@ -272,7 +272,8 @@ class Jugador(arcade.Sprite):
         if self.vida <= 0:
             self.max_vida =0
             self.slowed = 0
-            arcade.stop_sound(self.player_pasos)
+            if self.player_pasos:
+                arcade.stop_sound(self.player_pasos)
             EB.publish("player_death", {})           
 
 
